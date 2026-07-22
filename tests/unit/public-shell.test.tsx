@@ -30,4 +30,28 @@ describe("public shell", () => {
     );
     expect(screen.queryByRole("link", { name: /zalo/i })).not.toBeInTheDocument();
   });
+
+  it("shows configured public contact channels in the footer and mobile CTA", () => {
+    render(
+      <>
+        <Footer
+          contactEmail="phuh15521@gmail.com"
+          contactPhone="0334059776"
+        />
+        <MobileStickyCta contactPhone="0334059776" />
+      </>,
+    );
+
+    expect(
+      screen.getByRole("link", { name: "phuh15521@gmail.com" }),
+    ).toHaveAttribute("href", "mailto:phuh15521@gmail.com");
+    expect(screen.getAllByRole("link", { name: "0334059776" })[0]).toHaveAttribute(
+      "href",
+      "tel:0334059776",
+    );
+    expect(screen.getByRole("link", { name: /gá»i Ä‘iá»‡n/i })).toHaveAttribute(
+      "href",
+      "tel:0334059776",
+    );
+  });
 });
