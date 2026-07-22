@@ -72,7 +72,7 @@ describe("HeroVideoBackground", () => {
 
     expect(screen.getByRole("img", { name: poster.altText })).toBeVisible();
     await waitFor(() => {
-      expect(container.querySelector("source")).toHaveAttribute(
+      expect(container.querySelector("video source")).toHaveAttribute(
         "src",
         "/videos/tra-linh-hero.mp4",
       );
@@ -81,6 +81,28 @@ describe("HeroVideoBackground", () => {
     await waitFor(() => expect(play).toHaveBeenCalledOnce());
 
     unmount();
+  });
+
+  it("art-directs a single mobile poster without a duplicate preload", () => {
+    stubMediaPreferences({ desktop: false });
+
+    const { container } = render(
+      <HeroVideoBackground
+        src="/videos/tra-linh-hero.mp4"
+        poster={poster}
+        mobilePosterSrc="/images/tra-linh/hero-mobile.webp"
+      />,
+    );
+
+    expect(container.querySelector("picture source")).toHaveAttribute(
+      "media",
+      "(max-width: 767px)",
+    );
+    expect(container.querySelector("picture source")).toHaveAttribute(
+      "srcset",
+      "/images/tra-linh/hero-mobile.webp",
+    );
+    expect(container.querySelectorAll("picture img")).toHaveLength(1);
   });
 
   it("pauses motion and cleans up its media-query listener", async () => {
@@ -121,7 +143,7 @@ describe("HeroVideoBackground", () => {
     );
 
     await waitFor(() => expect(screen.getByRole("img", { name: poster.altText })).toBeVisible());
-    expect(container.querySelector("source")).not.toBeInTheDocument();
+    expect(container.querySelector("video source")).not.toBeInTheDocument();
     expect(container.querySelector("video")).not.toBeInTheDocument();
   });
 });

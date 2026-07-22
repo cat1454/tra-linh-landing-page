@@ -1,6 +1,5 @@
 "use client";
 
-import { getImageProps } from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 import type { MediaAsset } from "@/lib/content/types";
@@ -23,28 +22,6 @@ export function HeroVideoBackground({
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
-  const commonImageProps = {
-    alt: poster.altText,
-    sizes: "100vw",
-    quality: 75,
-    loading: "eager",
-  } as const;
-  const {
-    props: { srcSet: desktopSrcSet, ...desktopImageProps },
-  } = getImageProps({
-    ...commonImageProps,
-    src: poster.src,
-    width: 1920,
-    height: 1080,
-  });
-  const mobileSrcSet = mobilePosterSrc
-    ? getImageProps({
-        ...commonImageProps,
-        src: mobilePosterSrc,
-        width: 900,
-        height: 1200,
-      }).props.srcSet
-    : undefined;
 
   useEffect(() => {
     const motionPreference = window.matchMedia(
@@ -61,9 +38,10 @@ export function HeroVideoBackground({
       }
     ).connection;
     const syncEligibility = () => {
+      const isDesktop = desktopPreference.matches;
       const canLoad =
         !motionPreference.matches &&
-        desktopPreference.matches &&
+        isDesktop &&
         !connection?.saveData;
       setShouldLoadVideo(canLoad);
       if (!canLoad) setIsPlaying(false);
@@ -93,15 +71,18 @@ export function HeroVideoBackground({
   return (
     <figure className={`overflow-hidden ${className}`.trim()}>
       <picture>
-        {mobileSrcSet ? (
-          <source media="(max-width: 767px)" srcSet={mobileSrcSet} />
+        {mobilePosterSrc ? (
+          <source media="(max-width: 767px)" srcSet={mobilePosterSrc} />
         ) : null}
+        {/* The two pre-compressed art-directed sources intentionally bypass Next Image. */}
         <img
-          {...desktopImageProps}
+          src={poster.src}
           alt={poster.altText}
-          srcSet={desktopSrcSet}
+          width={1920}
+          height={1080}
           loading="eager"
           fetchPriority="high"
+          decoding="async"
           className={`absolute inset-0 h-full w-full object-cover ${mediaClassName}`.trim()}
         />
       </picture>
