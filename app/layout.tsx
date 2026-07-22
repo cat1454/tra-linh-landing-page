@@ -1,11 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import { Be_Vietnam_Pro, Lora } from "next/font/google";
 
-import { subscribeNewsletterAction } from "@/app/actions/forms";
 import { SmoothScrollProvider } from "@/components/animation/SmoothScrollProvider";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
-import { getSiteUrl, isSupabaseAdminConfigured } from "@/lib/supabase/config";
+import { MobileStickyCta } from "@/components/layout/MobileStickyCta";
+import { getPublicSiteSettings } from "@/lib/content/public-settings-server";
+import { getSiteUrl } from "@/lib/supabase/config";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
@@ -49,10 +50,10 @@ export const metadata: Metadata = {
       "Một hành trình chậm qua đại ngàn, văn hóa Xơ Đăng và vùng sâm Ngọc Linh.",
     images: [
       {
-        url: "/images/tra-linh/og-social-card.jpg",
+        url: "/images/tra-linh/og-social-card-imagegen.jpg",
         width: 1200,
         height: 630,
-        alt: "Trà Linh – Đại ngàn Ngọc Linh",
+        alt: "Phong cảnh minh họa đại ngàn cho trang giới thiệu Trà Linh",
       },
     ],
   },
@@ -61,7 +62,7 @@ export const metadata: Metadata = {
     title: "Trà Linh – Đại ngàn Ngọc Linh",
     description:
       "Khám phá thiên nhiên, văn hóa Xơ Đăng và vùng sâm Ngọc Linh.",
-    images: ["/images/tra-linh/og-social-card.jpg"],
+    images: ["/images/tra-linh/og-social-card-imagegen.jpg"],
   },
   robots: {
     index: true,
@@ -86,16 +87,16 @@ export const viewport: Viewport = {
   colorScheme: "light",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const formsEnabled = isSupabaseAdminConfigured();
+  const siteSettings = await getPublicSiteSettings();
 
   return (
     <html lang="vi" className={`${beVietnamPro.variable} ${lora.variable}`}>
-      <body className="min-h-screen bg-mist text-jungle antialiased">
+      <body className="min-h-screen bg-mist pb-[calc(4.5rem+env(safe-area-inset-bottom))] text-jungle antialiased md:pb-0">
         <SmoothScrollProvider>
           <a className="skip-link" href="#noi-dung-chinh">
             Bỏ qua điều hướng
@@ -106,8 +107,13 @@ export default function RootLayout({
           {children}
 
           <Footer
-            isNewsletterEnabled={formsEnabled}
-            newsletterAction={subscribeNewsletterAction}
+            contactEmail={siteSettings.contactEmail}
+            contactPhone={siteSettings.contactPhone}
+          />
+          <MobileStickyCta
+            contactPhone={siteSettings.contactPhone}
+            mapsUrl={siteSettings.mapsUrl}
+            zaloUrl={siteSettings.zaloUrl}
           />
         </SmoothScrollProvider>
 

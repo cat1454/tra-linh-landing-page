@@ -35,7 +35,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const product = await getProduct(slug);
 
   if (!product || product.status !== "published") {
-    notFound();
+    return {
+      title: "Không tìm thấy nội dung",
+      robots: { index: false, follow: false },
+    };
   }
 
   return createDetailMetadata({

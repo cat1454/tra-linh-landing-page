@@ -1,13 +1,5 @@
 import Link from 'next/link'
 
-import { NewsletterForm } from '@/components/forms/NewsletterForm'
-import type { PublicFormAction } from '@/components/forms/types'
-
-interface FooterProps {
-  readonly isNewsletterEnabled?: boolean
-  readonly newsletterAction?: PublicFormAction
-}
-
 const footerGroups = [
   {
     title: 'Khám phá',
@@ -19,32 +11,34 @@ const footerGroups = [
     ],
   },
   {
-    title: 'Sản vật',
+    title: 'Tìm hiểu',
     links: [
-      { href: '/#san-pham-sam', label: 'Sâm Ngọc Linh' },
+      { href: '/#vung-sam', label: 'Vùng sâm Ngọc Linh' },
       { href: '/#san-vat', label: 'Dược liệu' },
       { href: '/#san-vat', label: 'Nông sản địa phương' },
-      { href: '/#san-pham-sam', label: 'Sản phẩm đề xuất' },
     ],
   },
   {
     title: 'Thông tin',
     links: [
       { href: '/#cam-nang', label: 'Cẩm nang' },
-      { href: '/#cam-nang', label: 'Bản đồ' },
       { href: '/#lien-he', label: 'Liên hệ' },
+      { href: '/chinh-sach-quyen-rieng', label: 'Quyền riêng tư' },
+      { href: 'https://tralinh.danang.gov.vn/', label: 'Cổng thông tin xã' },
     ],
   },
 ] as const
 
-export function Footer({
-  isNewsletterEnabled = false,
-  newsletterAction,
-}: FooterProps) {
+interface FooterProps {
+  contactEmail?: string;
+  contactPhone?: string;
+}
+
+export function Footer({ contactEmail, contactPhone }: FooterProps = {}) {
   return (
     <footer className="site-footer bg-[#10251A] text-[#EEF1E9]">
       <div className="site-footer__inner mx-auto w-full max-w-[1440px] px-5 py-14 md:px-8 md:py-20 xl:px-12">
-        <div className="site-footer__grid grid gap-10 lg:grid-cols-[1.35fr_2fr_1.25fr] xl:gap-14">
+        <div className="site-footer__grid grid gap-10 lg:grid-cols-[1.1fr_2fr] xl:gap-16">
           <div className="site-footer__identity max-w-sm">
             <Link href="/" className="inline-flex min-h-11 flex-col justify-center">
               <span className="text-2xl font-semibold tracking-[0.2em]">TRÀ LINH</span>
@@ -58,6 +52,23 @@ export function Footer({
             <p className="mt-4 text-xs leading-6 text-[#EEF1E9]/55">
               Nhận diện địa phương: Trà Linh – vùng Nam Trà My, Quảng Nam trước đây.
             </p>
+            <p className="mt-4 text-xs leading-6 text-[#EEF1E9]/55">
+              Đây là trang giới thiệu độc lập, không phải cổng thông tin chính thức hay website bán tour.
+            </p>
+            {contactEmail || contactPhone ? (
+              <address className="mt-5 flex flex-col items-start gap-1 text-sm not-italic text-[#EEF1E9]/78">
+                {contactPhone ? (
+                  <a className="min-h-8 hover:text-[#D5A84E]" href={`tel:${contactPhone}`}>
+                    {contactPhone}
+                  </a>
+                ) : null}
+                {contactEmail ? (
+                  <a className="min-h-8 hover:text-[#D5A84E]" href={`mailto:${contactEmail}`}>
+                    {contactEmail}
+                  </a>
+                ) : null}
+              </address>
+            ) : null}
           </div>
 
           <div className="site-footer__navigation grid gap-3 sm:grid-cols-3 sm:gap-6">
@@ -71,6 +82,9 @@ export function Footer({
                     <li key={`${group.title}-${link.label}`}>
                       <a
                         href={link.href}
+                        {...(link.href.startsWith('http')
+                          ? { target: '_blank', rel: 'noreferrer' }
+                          : {})}
                         className="inline-flex min-h-11 items-center text-sm text-[#EEF1E9]/72 transition-colors hover:text-[#D5A84E] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D5A84E]"
                       >
                         {link.label}
@@ -82,13 +96,6 @@ export function Footer({
             ))}
           </div>
 
-          <div className="site-footer__newsletter">
-            <NewsletterForm
-              isEnabled={isNewsletterEnabled}
-              serverAction={newsletterAction}
-              tone="dark"
-            />
-          </div>
         </div>
 
         <div className="site-footer__legal mt-12 flex flex-col gap-3 border-t border-white/10 pt-6 text-xs leading-5 text-[#EEF1E9]/55 md:flex-row md:items-center md:justify-between">

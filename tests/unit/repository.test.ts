@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { fallbackContent } from '@/lib/content/fallback-content'
 import { createContentRepository } from '@/lib/content/repository'
-import type { ContentAdapter, HomePageContent } from '@/lib/content/types'
+import type { ContentAdapter, HomePageContent, Product } from '@/lib/content/types'
 
 function createAdapter(
   overrides: Partial<ContentAdapter> = {},
@@ -89,13 +89,16 @@ describe('ContentRepository', () => {
     draft.status = 'draft'
     const forbidden = structuredClone(fallbackContent.journeys[2])
     forbidden.description = 'Nội dung nhầm về Trà Lĩnh.'
-    const missingLabel = structuredClone(fallbackContent.journeys[2])
-    missingLabel.placeholderLabel = undefined
+    const placeholder = structuredClone(fallbackContent.journeys[2])
+    placeholder.isPlaceholder = true
+    placeholder.verificationStatus = 'placeholder'
+    placeholder.verifiedAt = null
+    placeholder.placeholderLabel = 'Nội dung đề xuất'
 
     const cmsContent: HomePageContent = {
       ...structuredClone(fallbackContent),
       source: 'supabase',
-      journeys: [valid, draft, forbidden, missingLabel, earlier],
+      journeys: [valid, draft, forbidden, placeholder, earlier],
       products: [...structuredClone(fallbackContent.products)].reverse(),
       guides: [...structuredClone(fallbackContent.guides)].reverse(),
     }
@@ -112,13 +115,22 @@ describe('ContentRepository', () => {
       earlier.slug,
       valid.slug,
     ])
-    expect(home.products.map((item) => item.displayOrder)).toEqual([1, 2, 3])
+    expect(home.products).toEqual([])
     expect(home.guides.map((item) => item.displayOrder)).toEqual([1, 2, 3])
   })
 
   it('returns only publishable CMS detail records', async () => {
     const journey = structuredClone(fallbackContent.journeys[0])
-    const product = structuredClone(fallbackContent.products[0])
+    const product: Product = {
+      ...structuredClone(journey),
+      id: 'verified-product',
+      slug: 'verified-product',
+      title: 'Sản phẩm đã xác minh',
+      productType: 'fresh-ginseng',
+      originNote: 'Nguồn gốc đã xác minh.',
+      legalDisclaimer: 'Thông tin giới thiệu không thay thế tư vấn chuyên môn.',
+      contactUrl: null,
+    }
     const guide = structuredClone(fallbackContent.guides[0])
     const repository = createContentRepository(
       createAdapter({
@@ -146,6 +158,19 @@ describe('ContentRepository', () => {
     await expect(hiddenRepository.getJourneyBySlug(journey.slug)).resolves.toBeNull()
     await expect(hiddenRepository.getProductBySlug(product.slug)).resolves.toBeNull()
     await expect(hiddenRepository.getGuideBySlug(guide.slug)).resolves.toBeNull()
+
+    const placeholderRepository = createContentRepository(
+      createAdapter({
+        getJourneyBySlug: vi.fn().mockResolvedValue({
+          ...journey,
+          isPlaceholder: true,
+          verificationStatus: 'placeholder',
+          verifiedAt: null,
+          placeholderLabel: 'Nội dung đề xuất',
+        }),
+      }),
+    )
+    await expect(placeholderRepository.getJourneyBySlug(journey.slug)).resolves.toBeNull()
   })
 
   it('uses fallback detail records after adapter errors', async () => {
@@ -158,7 +183,7 @@ describe('ContentRepository', () => {
     )
 
     await expect(repository.getJourneyBySlug('trekking-duoi-tan-rung')).resolves.toBeTruthy()
-    await expect(repository.getProductBySlug('sam-tuoi-ngoc-linh')).resolves.toBeTruthy()
+    await expect(repository.getProductBySlug('sam-tuoi-ngoc-linh')).resolves.toBeNull()
     await expect(repository.getGuideBySlug('duong-den-tra-linh')).resolves.toBeTruthy()
     await expect(repository.getProductBySlug('khong-ton-tai')).resolves.toBeNull()
     await expect(repository.getGuideBySlug('khong-ton-tai')).resolves.toBeNull()
@@ -167,7 +192,16 @@ describe('ContentRepository', () => {
   it('reads list methods directly and filters unpublished records', async () => {
     const journey = structuredClone(fallbackContent.journeys[0])
     const hiddenJourney = { ...structuredClone(journey), status: 'review' as const }
-    const product = structuredClone(fallbackContent.products[0])
+    const product: Product = {
+      ...structuredClone(journey),
+      id: 'verified-product',
+      slug: 'verified-product',
+      title: 'Sản phẩm đã xác minh',
+      productType: 'fresh-ginseng',
+      originNote: 'Nguồn gốc đã xác minh.',
+      legalDisclaimer: 'Thông tin giới thiệu không thay thế tư vấn chuyên môn.',
+      contactUrl: null,
+    }
     const guide = structuredClone(fallbackContent.guides[0])
     const adapter = createAdapter({
       getPublishedJourneys: vi.fn().mockResolvedValue([hiddenJourney, journey]),
@@ -186,7 +220,7 @@ describe('ContentRepository', () => {
     const repository = createContentRepository(adapter)
 
     await expect(repository.getPublishedJourneys()).resolves.toHaveLength(3)
-    await expect(repository.getPublishedProducts()).resolves.toHaveLength(3)
+    await expect(repository.getPublishedProducts()).resolves.toHaveLength(0)
     await expect(repository.getPublishedGuides()).resolves.toHaveLength(3)
     expect(adapter.getHomePageContent).toHaveBeenCalledTimes(3)
   })
@@ -201,7 +235,7 @@ describe('ContentRepository', () => {
     )
 
     await expect(repository.getPublishedJourneys()).resolves.toHaveLength(3)
-    await expect(repository.getPublishedProducts()).resolves.toHaveLength(3)
+    await expect(repository.getPublishedProducts()).resolves.toHaveLength(0)
     await expect(repository.getPublishedGuides()).resolves.toHaveLength(3)
   })
 
@@ -210,10 +244,10 @@ describe('ContentRepository', () => {
     vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', '')
     const repository = createContentRepository()
 
-    await expect(repository.getProductBySlug('sam-tuoi-ngoc-linh')).resolves.toBeTruthy()
+    await expect(repository.getProductBySlug('sam-tuoi-ngoc-linh')).resolves.toBeNull()
     await expect(repository.getGuideBySlug('duong-den-tra-linh')).resolves.toBeTruthy()
     await expect(repository.getPublishedJourneys()).resolves.toHaveLength(3)
-    await expect(repository.getPublishedProducts()).resolves.toHaveLength(3)
+    await expect(repository.getPublishedProducts()).resolves.toHaveLength(0)
     await expect(repository.getPublishedGuides()).resolves.toHaveLength(3)
   })
 })

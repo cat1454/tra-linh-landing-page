@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { requestAdminMagicLink, signOutAdmin } from "@/app/actions/admin-auth";
+import { AdminLoginSubmitButton } from "@/components/admin/AdminLoginSubmitButton";
 import { getAdminAccess } from "@/lib/supabase/access";
 import { getSupabaseEnvironmentStatus } from "@/lib/supabase/config";
 
@@ -74,12 +75,7 @@ export default async function AdminLoginPage({
               maxLength={254}
               className="min-h-12 w-full rounded-xl border border-[#10251a]/20 bg-white px-4 outline-none focus:border-[#5e7f3b] focus:ring-2 focus:ring-[#9bbe62]/40"
             />
-            <button
-              type="submit"
-              className="min-h-12 w-full rounded-full bg-[#10251a] px-5 font-semibold text-white transition hover:bg-[#294431]"
-            >
-              Gửi liên kết đăng nhập
-            </button>
+            <AdminLoginSubmitButton />
           </form>
         ) : (
           <div className="mt-7 rounded-2xl border border-dashed border-[#5e7f3b]/40 p-5">

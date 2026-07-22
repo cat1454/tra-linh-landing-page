@@ -163,7 +163,10 @@ function journeyFromRow(
         ? category
         : 'nature',
     locationLabel: stringValue(row.location_label, 'Xã Trà Linh'),
-    durationLabel: stringValue(row.duration_label, 'Đang cập nhật'),
+    durationLabel: stringValue(
+      row.duration_label,
+      'Cần xác nhận điều kiện thực tế',
+    ),
     accessStatus:
       accessStatus === 'open' ||
       accessStatus === 'contact_required' ||
@@ -201,7 +204,7 @@ function productFromRow(
         : 'herbal-tea',
     originNote: stringValue(
       row.origin_note,
-      'Thông tin nguồn gốc đang được cập nhật.',
+      'Nguồn gốc cần được đơn vị cung cấp xác nhận.',
     ),
     legalDisclaimer: stringValue(
       row.legal_disclaimer,
@@ -508,11 +511,7 @@ class SupabaseContentAdapter implements ContentAdapter {
         fallbackContent.localSpecialties,
         localSpecialtyFromRow,
       ),
-      products: mapRowsOrFallback(
-        productRows,
-        fallbackContent.products,
-        (row, fallback) => productFromRow(row, fallback.featuredMedia),
-      ),
+      products: productRows.map((row) => productFromRow(row)),
       guides: mapRowsOrFallback(
         guideRows,
         fallbackContent.guides,

@@ -177,3 +177,7 @@ li {
   filter: grayscale(0%) brightness(1.05);
   transform: scale(1.04);
 }
+
+.mobile-sticky-cta {
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+}

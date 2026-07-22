@@ -31,7 +31,8 @@ function contactForm(overrides: Record<string, string | Blob> = {}) {
   const values: Record<string, string | Blob> = {
     name: 'Nguyễn An',
     email: 'AN@example.com',
-    phone: '',
+    phone: '0900000000',
+    interest: 'journey',
     message: 'Tôi muốn tìm hiểu hành trình có hướng dẫn tại Trà Linh.',
     consent: 'on',
     website: '',
@@ -166,7 +167,8 @@ describe('public server actions', () => {
       expect.objectContaining({
         name: 'Nguyễn An',
         email: 'an@example.com',
-        phone: null,
+        phone: '0900000000',
+        interest: 'journey',
         consent: true,
         request_fingerprint: 'fingerprint',
       }),
