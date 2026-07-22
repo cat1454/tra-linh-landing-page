@@ -142,6 +142,10 @@ li {
     scroll-behavior: auto;
   }
 
+  .hero-video {
+    display: none;
+  }
+
   *,
   *::before,
   *::after {

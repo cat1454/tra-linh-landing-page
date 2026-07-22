@@ -3,7 +3,8 @@ import ScrollReveal from "@/components/animation/ScrollReveal";
 
 import type { HomePageContent } from "@/lib/content/types";
 
-import { ArrowGlyph, MediaFrame } from "./_shared";
+import { HeroVideoBackground } from "./HeroVideoBackground";
+import { ArrowGlyph } from "./_shared";
 
 type HeroSectionProps = {
   hero: HomePageContent["hero"];
@@ -16,12 +17,11 @@ export function HeroSection({ hero }: HeroSectionProps) {
       aria-labelledby="hero-title"
       className="hero-section relative isolate flex min-h-[680px] overflow-hidden bg-[#07100C] text-[#EEF1E9] sm:min-h-[760px] lg:min-h-[100svh]"
     >
-      <MediaFrame
-        media={hero.backgroundMedia}
-        priority
-        sizes="100vw"
+      <HeroVideoBackground
+        src="/videos/tra-linh-hero.mp4"
+        poster={hero.backgroundMedia}
         className="hero-media absolute inset-0 -z-30"
-        imageClassName="scale-[1.03] motion-safe:transition-transform motion-safe:duration-[1800ms]"
+        mediaClassName="scale-[1.03] motion-safe:transition-transform motion-safe:duration-[1800ms]"
       />
       <div className="absolute inset-0 -z-20 bg-[linear-gradient(90deg,rgba(7,16,12,0.92)_0%,rgba(7,16,12,0.66)_50%,rgba(7,16,12,0.24)_76%,rgba(7,16,12,0.38)_100%)]" />
       <div className="absolute inset-0 -z-20 bg-[linear-gradient(0deg,#07100C_0%,transparent_42%,rgba(7,16,12,0.45)_100%)]" />
