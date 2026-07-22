@@ -44,3 +44,17 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+*.key
+*.p12
+*.pfx
+*.jks
+*.sqlite
+*.sqlite3
+*.db
+credentials*.json
+service-account*.json
+secrets*.json
+.envrc
+.direnv/
+supabase/.temp/

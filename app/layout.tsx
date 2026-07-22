@@ -6,7 +6,7 @@ import { SmoothScrollProvider } from "@/components/animation/SmoothScrollProvide
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { getSiteUrl, isSupabaseAdminConfigured } from "@/lib/supabase/config";
-
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 const beVietnamPro = Be_Vietnam_Pro({
@@ -86,7 +86,11 @@ export const viewport: Viewport = {
   colorScheme: "light",
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   const formsEnabled = isSupabaseAdminConfigured();
 
   return (
@@ -96,13 +100,18 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <a className="skip-link" href="#noi-dung-chinh">
             Bỏ qua điều hướng
           </a>
+
           <Header />
+
           {children}
+
           <Footer
             isNewsletterEnabled={formsEnabled}
             newsletterAction={subscribeNewsletterAction}
           />
         </SmoothScrollProvider>
+
+        <SpeedInsights />
       </body>
     </html>
   );
