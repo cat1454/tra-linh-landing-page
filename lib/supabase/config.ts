@@ -28,7 +28,9 @@ function isAllowedSupabaseUrl(value: string): boolean {
 
 export function getPublicSupabaseConfig(): PublicSupabaseConfig | null {
   const url = nonEmpty(process.env.NEXT_PUBLIC_SUPABASE_URL);
-  const anonKey = nonEmpty(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+  const anonKey =
+    nonEmpty(process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) ??
+    nonEmpty(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
   if (!url || !anonKey || !isAllowedSupabaseUrl(url)) {
     return null;
