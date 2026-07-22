@@ -60,7 +60,7 @@ on conflict (id) do update set
 
 insert into public.admin_users (email, role, is_active)
 values ('phuh15521@gmail.com', 'admin', true)
-on conflict do update set
+on conflict ((lower(email))) do update set
   role = 'admin',
   is_active = true,
   updated_at = now();
