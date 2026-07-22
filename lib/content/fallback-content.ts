@@ -26,7 +26,7 @@ const CRAWLER_CREDIT = 'Cổng thông tin du lịch Trà Linh (dữ liệu lưu 
 const media = {
   hero: {
     id: 'media-hero-ngoc-linh',
-    src: '/images/tra-linh/hero-ban-lang-ngoc-linh.jpg',
+    src: '/images/tra-linh/hero-ban-lang-ngoc-linh-desktop.webp',
     title: 'Mây núi vùng Ngọc Linh',
     altText: 'Mây phủ trên những sườn núi xanh ở vùng Ngọc Linh',
     caption: 'Không gian núi rừng vùng Ngọc Linh.',

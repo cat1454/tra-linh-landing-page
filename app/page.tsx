@@ -65,7 +65,7 @@ export default async function Home() {
       <GinsengForestStory steps={home.ginsengStorySteps} />
       <XoDangCultureSection stories={home.cultureStories} />
       <LocalProduceSection items={home.localSpecialties} />
-      <GinsengProductsSection products={home.products} />
+      {home.products.length ? <GinsengProductsSection products={home.products} /> : null}
       <TravelGuideSection guides={home.guides} />
       <FinalCTA media={finalMedia} />
       <div id="lien-he" className="bg-[#EEF1E9] px-5 py-20 sm:px-8 sm:py-24 lg:px-16">

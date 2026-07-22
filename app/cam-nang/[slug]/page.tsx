@@ -28,7 +28,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const guide = await getGuide(slug);
 
   if (!guide || guide.status !== "published") {
-    notFound();
+    return {
+      title: "Không tìm thấy cẩm nang",
+      robots: { index: false, follow: false },
+    };
   }
 
   return createDetailMetadata({

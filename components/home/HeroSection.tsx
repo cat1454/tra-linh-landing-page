@@ -20,6 +20,7 @@ export function HeroSection({ hero }: HeroSectionProps) {
       <HeroVideoBackground
         src="/videos/tra-linh-hero.mp4"
         poster={hero.backgroundMedia}
+        mobilePosterSrc="/images/tra-linh/hero-ban-lang-ngoc-linh-mobile.webp"
         className="hero-media absolute inset-0 -z-30"
         mediaClassName="scale-[1.03] motion-safe:transition-transform motion-safe:duration-[1800ms]"
       />

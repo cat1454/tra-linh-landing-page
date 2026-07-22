@@ -111,9 +111,9 @@ describe("HeroVideoBackground", () => {
   });
 
   it.each([
-    [{ desktop: false }, "small screens"],
-    [{ saveData: true }, "data saver"],
-  ])("does not download video for %s", async (preferences) => {
+    { preferences: { desktop: false }, scenario: "small screens" },
+    { preferences: { saveData: true }, scenario: "data saver" },
+  ])("does not download video for $scenario", async ({ preferences }) => {
     stubMediaPreferences(preferences);
 
     const { container } = render(

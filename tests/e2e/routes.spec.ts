@@ -16,6 +16,21 @@ test('unknown or unpublished slugs return 404', async ({ page }) => {
   })
 
   expect(response?.status()).toBe(404)
+  await expect(page.getByRole('heading', { name: /không tìm thấy trang/i })).toBeVisible()
+  await expect(page.getByRole('link', { name: /về trang chủ/i })).toHaveAttribute('href', '/')
+})
+
+test('privacy route is indexable and links back home', async ({ page }) => {
+  const response = await page.goto('/chinh-sach-quyen-rieng', {
+    waitUntil: 'domcontentloaded',
+  })
+
+  expect(response?.ok()).toBe(true)
+  await expect(page.getByRole('heading', { name: 'Chính sách quyền riêng tư' })).toBeVisible()
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    /\/chinh-sach-quyen-rieng$/,
+  )
 })
 
 test('admin explains the safe fallback state when CMS is not configured', async ({ page }) => {

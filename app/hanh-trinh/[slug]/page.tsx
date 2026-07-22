@@ -42,7 +42,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const journey = await getJourney(slug);
 
   if (!journey || journey.status !== "published") {
-    notFound();
+    return {
+      title: "Không tìm thấy hành trình",
+      robots: { index: false, follow: false },
+    };
   }
 
   return createDetailMetadata({
