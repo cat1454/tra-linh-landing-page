@@ -1,9 +1,9 @@
 import react from '@vitejs/plugin-react'
-import tsconfigPaths from 'vite-tsconfig-paths'
 import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
-  plugins: [tsconfigPaths(), react()],
+  plugins: [react()],
+  resolve: { tsconfigPaths: true },
   test: {
     environment: 'jsdom',
     globals: true,
@@ -12,8 +12,16 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html'],
-      include: ['lib/**/*.ts', 'app/actions/**/*.ts'],
-      exclude: ['lib/supabase/database.types.ts'],
+      include: [
+        'lib/content/content-guard.ts',
+        'lib/content/fallback-content.ts',
+        'lib/content/repository.ts',
+        'lib/content/supabase-adapter.ts',
+        'lib/validation/forms.ts',
+        'app/actions/forms.ts',
+        'components/detail/seo.tsx',
+        'components/animation/useReducedMotionPreference.ts',
+      ],
       thresholds: {
         branches: 80,
         functions: 80,

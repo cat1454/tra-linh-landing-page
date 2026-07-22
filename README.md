@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Trà Linh – Đại ngàn Ngọc Linh
 
-## Getting Started
+Landing page giới thiệu thiên nhiên, văn hóa Xơ Đăng và vùng sâm Ngọc Linh tại xã Trà Linh, thành phố Đà Nẵng. Dự án dùng Next.js App Router, TypeScript, Tailwind, GSAP, Lenis, Framer Motion, Embla và kiến trúc dữ liệu Supabase-ready.
 
-First, run the development server:
+Production: [tra-linh-landing-page.vercel.app](https://tra-linh-landing-page.vercel.app)
+
+## Chạy local
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Mở `http://localhost:3000`. Khi chưa cấu hình Supabase, website tự dùng dữ liệu curated trong `lib/content` và khóa gửi form với thông báo rõ ràng.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Kiểm tra chất lượng
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run typecheck
+npm run lint
+npm test
+npm run test:coverage
+npm run build
+npm run test:e2e
+```
 
-## Learn More
+Visual baselines nằm trong `tests/e2e/visual.spec.ts-snapshots` và được duy trì trên desktop Chromium. Playwright vẫn chạy functional, accessibility và responsive checks trên Chromium, Firefox, WebKit và mobile Chromium.
 
-To learn more about Next.js, take a look at the following resources:
+## Kết nối Supabase
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Sao chép `.env.example` thành `.env.local` và điền biến môi trường.
+2. Áp dụng `supabase/migrations/202607220001_initial_schema.sql`.
+3. Thêm email quản trị vào `admin_users`, sau đó cấu hình magic-link redirect.
+4. Chạy lại ứng dụng; repository sẽ tự chuyển từ local fallback sang Supabase khi cấu hình hợp lệ.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Service-role key chỉ dùng phía server và không được đặt trong biến `NEXT_PUBLIC_*`. Media CMS nằm trong bucket private; nội dung đã xuất bản được cấp signed URL ngắn hạn.
 
-## Deploy on Vercel
+## Phát hành Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npx vercel --prod
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Đặt `NEXT_PUBLIC_SITE_URL` bằng domain chính thức để canonical, Open Graph, sitemap và callback URL dùng đúng origin. Nếu chưa có Supabase, bản phát hành vẫn hoạt động đầy đủ ở chế độ nội dung fallback; `/admin` hiển thị “Chưa kết nối CMS”.
+
+Nguồn và quyền sử dụng ảnh curated được ghi tại `public/images/tra-linh/CREDITS.md`.

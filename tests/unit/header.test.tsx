@@ -12,7 +12,7 @@ describe('Header', () => {
     const trigger = screen.getByRole('button', { name: /mở menu/i })
     await user.click(trigger)
 
-    expect(screen.getByRole('dialog', { name: /điều hướng/i })).toBeVisible()
+    expect(await screen.findByRole('dialog', { name: /điều hướng/i })).toBeVisible()
     expect(screen.getByRole('link', { name: /vùng sâm/i })).toBeVisible()
 
     await user.click(screen.getByRole('button', { name: /đóng menu/i }))

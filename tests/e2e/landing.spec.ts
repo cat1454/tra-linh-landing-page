@@ -8,7 +8,7 @@ test('landing page presents Trà Linh and its primary journey', async ({ page })
     page.getByRole('heading', { level: 1, name: /giữa đại ngàn/i }),
   ).toBeVisible()
   await expect(page.getByText('Trà Linh', { exact: true }).first()).toBeVisible()
-  await expect(page.getByRole('link', { name: /bắt đầu hành trình/i })).toHaveAttribute(
+  await expect(page.getByRole('link', { name: /khám phá hành trình/i }).first()).toHaveAttribute(
     'href',
     '#hanh-trinh',
   )

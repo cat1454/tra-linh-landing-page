@@ -1,0 +1,43 @@
+import { MapPin } from "lucide-react";
+import Link from "next/link";
+
+import type { HomePageContent } from "@/lib/content/types";
+
+import { MediaFrame, PlaceholderPill } from "./_shared";
+
+export function JourneyCard({
+  journey,
+  index,
+}: {
+  journey: HomePageContent["journeys"][number];
+  index: number;
+}) {
+  return (
+    <article className="group relative isolate min-h-[500px] overflow-hidden rounded-[1.5rem] bg-[#29452C]">
+      <MediaFrame media={journey.featuredMedia} className="absolute inset-0 -z-20" sizes="(min-width: 1024px) 32vw, 88vw" imageClassName="transition duration-700 group-hover:scale-[1.035]" />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#07100C] via-[#07100C]/30 to-[#07100C]/5" />
+      <div className="flex min-h-[500px] flex-col justify-between p-6 sm:p-8">
+        <div className="flex items-start justify-between gap-4">
+          <span className="font-serif text-4xl text-[#EEF1E9]/45">{String(index + 1).padStart(2, "0")}</span>
+          {journey.isPlaceholder ? <PlaceholderPill label={journey.placeholderLabel} /> : null}
+        </div>
+        <div>
+          {journey.locationLabel ? (
+            <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.15em] text-[#D5A84E]">
+              <MapPin aria-hidden="true" className="size-4" />
+              {journey.locationLabel}
+            </p>
+          ) : null}
+          <h3 className="mt-3 font-serif text-3xl leading-tight text-[#EEF1E9] sm:text-4xl">{journey.title}</h3>
+          <p className="mt-4 line-clamp-3 text-sm leading-7 text-[#EEF1E9]/70">{journey.shortDescription}</p>
+          <Link
+            href={`/hanh-trinh/${journey.slug}`}
+            className="mt-6 inline-flex min-h-11 items-center border-b border-[#D5A84E] text-sm font-semibold text-[#EEF1E9] transition-colors hover:text-[#D5A84E] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#D5A84E]"
+          >
+            Xem hành trình <span aria-hidden="true" className="ml-2">↗</span>
+          </Link>
+        </div>
+      </div>
+    </article>
+  );
+}
