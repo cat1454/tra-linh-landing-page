@@ -33,19 +33,20 @@ test('privacy route is indexable and links back home', async ({ page }) => {
   )
 })
 
-test('admin explains the safe fallback state when CMS is not configured', async ({ page }) => {
+test('admin redirects anonymous visitors to the configured login', async ({ page }) => {
   const response = await page.goto('/admin', { waitUntil: 'domcontentloaded' })
 
   expect(response?.ok()).toBe(true)
   await expect(page.locator('main#noi-dung-chinh')).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Chưa kết nối CMS' })).toBeVisible()
+  await expect(page).toHaveURL(/\/admin\/login$/)
+  await expect(page.getByRole('heading', { name: 'Đăng nhập quản trị' })).toBeVisible()
 })
 
-test('admin login remains unavailable without a configured CMS', async ({ page }) => {
+test('configured admin login accepts an allowlisted email', async ({ page }) => {
   const response = await page.goto('/admin/login', { waitUntil: 'domcontentloaded' })
 
   expect(response?.ok()).toBe(true)
   await expect(page.getByRole('heading', { name: 'Đăng nhập quản trị' })).toBeVisible()
-  await expect(page.getByText('Chưa kết nối CMS')).toBeVisible()
-  await expect(page.getByLabel('Email quản trị')).toHaveCount(0)
+  await expect(page.getByLabel('Email quản trị')).toHaveAttribute('required', '')
+  await expect(page.getByRole('button', { name: 'Gửi liên kết đăng nhập' })).toBeEnabled()
 })

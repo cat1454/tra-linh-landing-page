@@ -5,7 +5,7 @@ test('landing page presents Trà Linh and its primary journey', async ({ page })
   await page.goto('/')
 
   await expect(
-    page.getByRole('heading', { level: 1, name: /giữa đại ngàn/i }),
+    page.getByRole('heading', { level: 1, name: /đại ngàn ngọc linh/i }),
   ).toBeVisible()
   await expect(page.getByText('Trà Linh', { exact: true }).first()).toBeVisible()
   await expect(page.getByRole('link', { name: /khám phá hành trình/i }).first()).toHaveAttribute(
