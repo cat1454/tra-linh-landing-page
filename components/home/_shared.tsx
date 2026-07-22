@@ -124,6 +124,7 @@ export function MediaFrame({
         src={media.src}
         alt={media.altText}
         fill
+        preload={priority}
         loading={priority ? "eager" : undefined}
         fetchPriority={priority ? "high" : "auto"}
         sizes={sizes}
