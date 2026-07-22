@@ -37,17 +37,17 @@ export function Header() {
           'site-header fixed inset-x-0 top-0 z-50 border-b text-[#EEF1E9] transition-[background-color,border-color,padding] duration-300',
           hasSolidBackground
             ? 'site-header--scrolled border-white/10 bg-[#10251A]/90 py-2 shadow-lg shadow-black/5 backdrop-blur-xl'
-            : 'site-header--transparent border-transparent bg-transparent py-4',
+            : 'site-header--transparent border-white/10 bg-[#10251A]/80 py-2.5 shadow-lg shadow-black/5 backdrop-blur-xl lg:border-transparent lg:bg-transparent lg:py-4 lg:shadow-none lg:backdrop-blur-none',
         )}
       >
-        <div className="site-header__inner mx-auto flex w-full max-w-[1440px] items-center justify-between gap-6 px-5 md:px-8 xl:px-12">
+        <div className="site-header__inner mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4 px-6 md:gap-6 md:px-8 xl:px-12">
           <Link
             href="/"
             aria-label="Trà Linh — trang chủ"
-            className="site-header__brand inline-flex min-h-11 shrink-0 flex-col justify-center focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#D5A84E]"
+            className="site-header__brand inline-flex min-h-10 shrink-0 flex-col justify-center focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#D5A84E]"
           >
-            <span className="text-base font-semibold tracking-[0.2em] sm:text-lg">TRÀ LINH</span>
-            <span className="mt-0.5 hidden text-[0.66rem] tracking-wide text-[#EEF1E9]/70 sm:block">
+            <span className="text-sm font-semibold tracking-[0.22em] sm:text-base lg:text-lg">TRÀ LINH</span>
+            <span className="mt-0.5 hidden text-[0.66rem] tracking-wide text-[#EEF1E9]/70 lg:block">
               Đại ngàn Ngọc Linh
             </span>
           </Link>
@@ -72,7 +72,7 @@ export function Header() {
               href="/#hanh-trinh"
               variant="light"
               size="sm"
-              className="site-header__cta hidden xl:inline-flex"
+              className="site-header__cta hidden whitespace-nowrap md:inline-flex"
             >
               Khám phá Trà Linh
               <ArrowRight aria-hidden="true" size={17} />
@@ -84,9 +84,9 @@ export function Header() {
               aria-expanded={isMenuOpen}
               aria-controls="mobile-navigation"
               onClick={() => setIsMenuOpen(true)}
-              className="site-header__menu-trigger inline-flex size-12 items-center justify-center rounded-full border border-white/25 bg-[#10251A]/20 backdrop-blur-sm transition-colors hover:border-[#D5A84E] hover:text-[#D5A84E] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#D5A84E] lg:hidden"
+              className="site-header__menu-trigger inline-flex size-10 items-center justify-center rounded-xl border border-white/15 bg-white/5 transition-colors hover:border-[#D5A84E]/70 hover:bg-white/10 hover:text-[#D5A84E] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#D5A84E] lg:hidden"
             >
-              <Menu aria-hidden="true" size={22} strokeWidth={1.5} />
+              <Menu aria-hidden="true" size={20} strokeWidth={1.5} />
             </button>
           </div>
         </div>
