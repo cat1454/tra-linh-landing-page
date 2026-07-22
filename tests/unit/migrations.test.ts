@@ -45,4 +45,10 @@ describe("verified public content migration", () => {
     expect(sql).toContain("status = 'review'::public.content_status");
     expect(sql).toContain("is_placeholder = true");
   });
+
+  it("uses the normalized-email index when upserting the production admin", () => {
+    const sql = migration("202607220005_production_contact_settings.sql");
+
+    expect(sql).toContain("on conflict ((lower(email))) do update");
+  });
 });
