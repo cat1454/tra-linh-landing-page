@@ -51,4 +51,22 @@ describe("verified public content migration", () => {
 
     expect(sql).toContain("on conflict ((lower(email))) do update");
   });
+
+  it("publishes every verified journey and guide linked from the fallback homepage", () => {
+    const sql = migration("202607220006_verified_detail_content.sql");
+
+    for (const slug of [
+      "trekking-duoi-tan-rung",
+      "ban-lang-trong-suong",
+      "cham-vao-mien-duoc-lieu",
+      "duong-den-tra-linh",
+      "thoi-diem-goi-y",
+      "luu-y-khi-vao-rung",
+    ]) {
+      expect(sql).toContain(slug);
+    }
+    expect(sql).toContain("status = excluded.status");
+    expect(sql).toContain("is_placeholder = excluded.is_placeholder");
+    expect(sql).toContain("verified_at = excluded.verified_at");
+  });
 });
