@@ -16,6 +16,7 @@ export default defineConfig({
         'lib/content/content-guard.ts',
         'lib/content/fallback-content.ts',
         'lib/content/repository.ts',
+        'lib/content/public-settings.ts',
         'lib/content/supabase-adapter.ts',
         'lib/validation/forms.ts',
         'app/actions/forms.ts',
