@@ -8,6 +8,7 @@ import { MobileStickyCta } from "@/components/layout/MobileStickyCta";
 import { getPublicSiteSettings } from "@/lib/content/public-settings-server";
 import { getSiteUrl } from "@/lib/supabase/config";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { AgentationWrapper } from "@/components/layout/AgentationWrapper";
 import "./globals.css";
 
 const beVietnamPro = Be_Vietnam_Pro({
@@ -118,6 +119,7 @@ export default async function RootLayout({
         </SmoothScrollProvider>
 
         <SpeedInsights />
+        <AgentationWrapper />
       </body>
     </html>
   );

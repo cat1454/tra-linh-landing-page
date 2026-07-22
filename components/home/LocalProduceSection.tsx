@@ -1,7 +1,12 @@
+"use client";
+
+import { useState } from "react";
+import { AnimatePresence } from "framer-motion";
 import { Leaf, UtensilsCrossed, Wheat } from "lucide-react";
 import ScrollReveal from "@/components/animation/ScrollReveal";
 
-import type { HomePageContent } from "@/lib/content/types";
+import type { HomePageContent, LocalSpecialty } from "@/lib/content/types";
+import { SpecialtyStoryModal } from "@/components/ui/SpecialtyStoryModal";
 
 import { MediaFrame, PlaceholderPill, SectionIntro } from "./_shared";
 
@@ -16,6 +21,8 @@ const categoryMeta = {
 };
 
 export function LocalProduceSection({ items }: LocalProduceSectionProps) {
+  const [selectedSpecialty, setSelectedSpecialty] = useState<LocalSpecialty | null>(null);
+
   if (!items.length) return null;
 
   return (
@@ -57,9 +64,14 @@ export function LocalProduceSection({ items }: LocalProduceSectionProps) {
                   <div>
                     <h3 className="font-serif text-3xl text-[#EEF1E9] sm:text-4xl">{item.name}</h3>
                     <p className="mt-3 max-w-lg text-sm leading-7 text-[#EEF1E9]/70">{item.description}</p>
-                    <p className="mt-5 text-xs font-semibold uppercase tracking-[0.14em] text-[#D5A84E]">
-                      Câu chuyện sản vật địa phương
-                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedSpecialty(item)}
+                      className="mt-5 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.14em] text-[#D5A84E] hover:text-[#EEF1E9] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D5A84E] rounded transition-colors text-left"
+                    >
+                      <span>Câu chuyện sản vật địa phương</span>
+                      <span aria-hidden="true">→</span>
+                    </button>
                   </div>
                 </div>
                 </ScrollReveal>
@@ -68,6 +80,16 @@ export function LocalProduceSection({ items }: LocalProduceSectionProps) {
           })}
         </div>
       </div>
+
+      <AnimatePresence>
+        {selectedSpecialty && (
+          <SpecialtyStoryModal
+            isOpen={selectedSpecialty !== null}
+            onClose={() => setSelectedSpecialty(null)}
+            specialty={selectedSpecialty}
+          />
+        )}
+      </AnimatePresence>
     </section>
   );
 }

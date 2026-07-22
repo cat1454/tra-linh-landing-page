@@ -52,6 +52,13 @@ export default async function GuideDetailPage({ params }: PageProps) {
   }
 
   const pathname = `/cam-nang/${guide.slug}`;
+  const guides = await repository.getPublishedGuides();
+  const navigationTabs = guides.map((g) => ({
+    label: g.title,
+    href: `/cam-nang/${g.slug}`,
+    isActive: g.slug === slug,
+  }));
+
   const breadcrumbSchema = createBreadcrumbSchema([
     { name: "Trang chủ", pathname: "/" },
     { name: "Cẩm nang", pathname: "/#cam-nang" },
@@ -96,6 +103,7 @@ export default async function GuideDetailPage({ params }: PageProps) {
         sourceUrl={guide.sourceUrl}
         sourceCredit={guide.sourceCredit}
         updatedAt={guide.updatedAt}
+        navigationTabs={navigationTabs}
       />
     </>
   );
