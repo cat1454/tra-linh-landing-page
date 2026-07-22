@@ -34,6 +34,27 @@ test('mobile menu exposes the navigation', async ({ page }) => {
   await expect(page.getByRole('link', { name: /cẩm nang/i })).toBeVisible()
 })
 
+test('hero plays its public video and falls back to the poster for reduced motion', async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== 'chromium', 'Video playback is verified in Chromium.')
+  await page.emulateMedia({ reducedMotion: 'no-preference' })
+  await page.goto('/')
+
+  const video = page.locator('#dau-trang video')
+  await expect(video.locator('source')).toHaveAttribute(
+    'src',
+    '/videos/tra-linh-hero.mp4',
+  )
+  await expect
+    .poll(() => video.evaluate((element) => (element as HTMLVideoElement).currentTime))
+    .toBeGreaterThan(0)
+
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await expect(video).toHaveCSS('display', 'none')
+  await expect(page.locator('#dau-trang img')).toBeVisible()
+})
+
 for (const width of [320, 768, 1024, 1440, 1920]) {
   test(`does not overflow horizontally at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 })
