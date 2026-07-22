@@ -59,6 +59,7 @@ export async function submitContactAction(
     name: textField(formData.get("name")),
     email: textField(formData.get("email")),
     phone: textField(formData.get("phone")),
+    interest: textField(formData.get("interest")),
     message: textField(formData.get("message")),
     consent: booleanField(formData.get("consent")),
     website: textField(formData.get("website")),
@@ -93,7 +94,8 @@ export async function submitContactAction(
   const { error } = await supabase.from("contact_submissions").insert({
     name: parsed.data.name,
     email: parsed.data.email,
-    phone: parsed.data.phone || null,
+    phone: parsed.data.phone,
+    interest: parsed.data.interest,
     message: parsed.data.message,
     consent: parsed.data.consent,
     request_fingerprint: fingerprint,

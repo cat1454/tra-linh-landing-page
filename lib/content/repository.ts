@@ -28,15 +28,28 @@ interface PublishableRecord {
   displayOrder: number
   isPlaceholder: boolean
   placeholderLabel?: string
+  verificationStatus: string
+  verifiedAt: string | null
+  sourceUrl: string
+  sourceCredit: string
 }
 
 function isPublishableRecord(record: PublishableRecord): boolean {
-  if (record.status !== 'published') return false
+  if (
+    record.status !== 'published' ||
+    record.isPlaceholder ||
+    record.verificationStatus !== 'verified' ||
+    !record.verifiedAt?.trim() ||
+    !record.sourceUrl.trim() ||
+    !record.sourceCredit.trim()
+  ) return false
 
   try {
     assertContentIsPublishable(record, {
       isPlaceholder: record.isPlaceholder,
       placeholderLabel: record.placeholderLabel,
+      sourceUrl: record.sourceUrl,
+      requireSourceForStatistics: true,
     })
     return true
   } catch {
@@ -55,7 +68,7 @@ function published<T extends PublishableRecord>(
 function fallbackJourney(slug: string): Journey | null {
   return (
     fallbackContent.journeys.find(
-      (journey) => journey.slug === slug && journey.status === 'published',
+      (journey) => journey.slug === slug && isPublishableRecord(journey),
     ) ?? null
   )
 }
@@ -63,7 +76,7 @@ function fallbackJourney(slug: string): Journey | null {
 function fallbackProduct(slug: string): Product | null {
   return (
     fallbackContent.products.find(
-      (product) => product.slug === slug && product.status === 'published',
+      (product) => product.slug === slug && isPublishableRecord(product),
     ) ?? null
   )
 }
@@ -71,7 +84,7 @@ function fallbackProduct(slug: string): Product | null {
 function fallbackGuide(slug: string): Guide | null {
   return (
     fallbackContent.guides.find(
-      (guide) => guide.slug === slug && guide.status === 'published',
+      (guide) => guide.slug === slug && isPublishableRecord(guide),
     ) ?? null
   )
 }

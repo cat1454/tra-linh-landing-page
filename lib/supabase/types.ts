@@ -9,6 +9,12 @@ export type Json =
 export type ContentStatus = "draft" | "review" | "published";
 export type VerificationStatus = "placeholder" | "verified";
 export type AccessStatus = "open" | "contact_required" | "organized_only";
+export type ContactInterest =
+  | "journey"
+  | "culture"
+  | "ginseng"
+  | "partnership"
+  | "other";
 
 type ContentCommonRow = {
   id: string;
@@ -51,6 +57,11 @@ export interface Database {
           primary_cta_label: string | null;
           primary_cta_href: string | null;
           legal_address: string | null;
+          contact_email: string | null;
+          contact_phone: string | null;
+          zalo_url: string | null;
+          maps_url: string | null;
+          privacy_url: string | null;
         };
         Insert: ContentCommonInsert & {
           site_name: string;
@@ -59,6 +70,11 @@ export interface Database {
           primary_cta_label?: string | null;
           primary_cta_href?: string | null;
           legal_address?: string | null;
+          contact_email?: string | null;
+          contact_phone?: string | null;
+          zalo_url?: string | null;
+          maps_url?: string | null;
+          privacy_url?: string | null;
         };
         Update: ContentCommonUpdate & {
           site_name?: string;
@@ -67,6 +83,11 @@ export interface Database {
           primary_cta_label?: string | null;
           primary_cta_href?: string | null;
           legal_address?: string | null;
+          contact_email?: string | null;
+          contact_phone?: string | null;
+          zalo_url?: string | null;
+          maps_url?: string | null;
+          privacy_url?: string | null;
         };
         Relationships: [];
       };
@@ -401,6 +422,7 @@ export interface Database {
           name: string;
           email: string;
           phone: string | null;
+          interest: ContactInterest | null;
           message: string;
           consent: boolean;
           status: "new" | "in_progress" | "resolved" | "spam";
@@ -413,6 +435,7 @@ export interface Database {
           name: string;
           email: string;
           phone?: string | null;
+          interest?: ContactInterest | null;
           message: string;
           consent: boolean;
           status?: "new" | "in_progress" | "resolved" | "spam";
@@ -422,6 +445,7 @@ export interface Database {
         };
         Update: {
           status?: "new" | "in_progress" | "resolved" | "spam";
+          interest?: ContactInterest | null;
           updated_at?: string;
         };
         Relationships: [];

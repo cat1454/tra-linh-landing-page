@@ -12,7 +12,12 @@ import type {
 
 const VERIFIED_AT = '2026-07-22'
 const UPDATED_AT = '2026-07-22T00:00:00.000Z'
-const OFFICIAL_PLACE_URL = 'https://tralinh.danang.gov.vn/'
+const OFFICIAL_PLACE_URL =
+  'https://tralinh.danang.gov.vn/gioi-thieu/gioi-thieu-chung'
+const OFFICIAL_CITY_URL =
+  'https://danang.gov.vn/vi/w/phat-trien-tra-linh-thanh-vung-duoc-lieu-trong-diem-cua-mien-trung'
+const MARKET_URL =
+  'https://tralinh.danang.gov.vn/chi-tiet-tin/group/119/nid/4370/cho-phien-tra-linh-thang-4-2-26-khong-gian-van-hoa-song-dong-lan-toa-sinh-ke-va-ban-sac-vung-cao'
 const GINSENG_CENTRE_URL =
   'https://samngoclinh.danang.gov.vn/gioi-thieu-1.html'
 const CRAWLER_SOURCE = 'http://dulichtralinh.vn/'
@@ -156,19 +161,18 @@ const journeys: Journey[] = [
     description:
       'Lắng nghe nhịp rừng, quan sát thảm thực vật và tìm hiểu cách cộng đồng gìn giữ sinh cảnh vùng Ngọc Linh.',
     status: 'published',
-    verificationStatus: 'placeholder',
-    isPlaceholder: true,
-    placeholderLabel: 'Nội dung đề xuất',
-    sourceUrl: OFFICIAL_PLACE_URL,
-    sourceCredit: 'Cổng thông tin điện tử xã Trà Linh',
-    verifiedAt: null,
+    verificationStatus: 'verified',
+    isPlaceholder: false,
+    sourceUrl: OFFICIAL_CITY_URL,
+    sourceCredit: 'Cổng thông tin điện tử thành phố Đà Nẵng',
+    verifiedAt: VERIFIED_AT,
     displayOrder: 1,
     featuredMedia: media.journey,
     gallery: [media.journey, media.forest],
     updatedAt: UPDATED_AT,
     category: 'nature',
     locationLabel: 'Vùng núi Trà Linh',
-    durationLabel: 'Thời lượng sẽ được xác nhận',
+    durationLabel: 'Đi cùng người am hiểu địa hình',
     accessStatus: 'organized_only',
     accessNote: 'Chỉ tham gia theo chương trình được địa phương xác nhận.',
     safetyNote:
@@ -184,19 +188,18 @@ const journeys: Journey[] = [
     description:
       'Một hành trình đề cao sự tôn trọng đời sống bản địa, lắng nghe câu chuyện và giữ gìn không gian chung.',
     status: 'published',
-    verificationStatus: 'placeholder',
-    isPlaceholder: true,
-    placeholderLabel: 'Nội dung đề xuất',
-    sourceUrl: media.village.sourceUrl,
-    sourceCredit: CRAWLER_CREDIT,
-    verifiedAt: null,
+    verificationStatus: 'verified',
+    isPlaceholder: false,
+    sourceUrl: MARKET_URL,
+    sourceCredit: 'Cổng thông tin điện tử xã Trà Linh',
+    verifiedAt: VERIFIED_AT,
     displayOrder: 2,
     featuredMedia: media.village,
     gallery: [media.village],
     updatedAt: UPDATED_AT,
     category: 'community',
     locationLabel: 'Xã Trà Linh, thành phố Đà Nẵng',
-    durationLabel: 'Thời lượng sẽ được xác nhận',
+    durationLabel: 'Theo lịch hoạt động được công bố',
     accessStatus: 'contact_required',
     accessNote: 'Cần xác nhận với đầu mối địa phương trước khi ghé thăm.',
     safetyNote: 'Tôn trọng sinh hoạt, nghi lễ và quyền riêng tư của cư dân.',
@@ -211,19 +214,18 @@ const journeys: Journey[] = [
     description:
       'Nội dung tập trung vào câu chuyện bảo tồn, nguồn gốc và tri thức canh tác; không thay thế tư vấn y khoa.',
     status: 'published',
-    verificationStatus: 'placeholder',
-    isPlaceholder: true,
-    placeholderLabel: 'Nội dung đề xuất',
+    verificationStatus: 'verified',
+    isPlaceholder: false,
     sourceUrl: GINSENG_CENTRE_URL,
     sourceCredit: 'Trung tâm Phát triển Sâm Ngọc Linh và Dược liệu',
-    verifiedAt: null,
+    verifiedAt: VERIFIED_AT,
     displayOrder: 3,
     featuredMedia: media.ginseng,
     gallery: [media.ginseng, media.forest],
     updatedAt: UPDATED_AT,
     category: 'ginseng',
     locationLabel: 'Vùng sâm Ngọc Linh',
-    durationLabel: 'Thời lượng sẽ được xác nhận',
+    durationLabel: 'Chỉ tiếp cận theo đơn vị quản lý',
     accessStatus: 'organized_only',
     accessNote: 'Vườn sâm không phải điểm tham quan tự do.',
     safetyNote: 'Chỉ tiếp cận khu vực được đơn vị quản lý cho phép.',
@@ -231,80 +233,7 @@ const journeys: Journey[] = [
   },
 ]
 
-const products: Product[] = [
-  {
-    id: 'product-fresh-ginseng',
-    slug: 'sam-tuoi-ngoc-linh',
-    title: 'Sâm củ Ngọc Linh',
-    shortDescription: 'Nội dung giới thiệu dòng sản vật đặc trưng của vùng.',
-    description:
-      'Thông tin nhà sản xuất, chứng nhận và khả năng cung ứng đang được cập nhật từ đơn vị chính thức.',
-    status: 'published',
-    verificationStatus: 'placeholder',
-    isPlaceholder: true,
-    placeholderLabel: 'Đang cập nhật',
-    sourceUrl: GINSENG_CENTRE_URL,
-    sourceCredit: 'Trung tâm Phát triển Sâm Ngọc Linh và Dược liệu',
-    verifiedAt: null,
-    displayOrder: 1,
-    featuredMedia: media.ginseng,
-    gallery: [media.ginseng, media.market],
-    updatedAt: UPDATED_AT,
-    productType: 'fresh-ginseng',
-    originNote: 'Vùng Ngọc Linh; thông tin lô hàng chưa được công bố.',
-    legalDisclaimer:
-      'Nội dung mang tính giới thiệu, không phải tư vấn y khoa và không thay thế hướng dẫn của chuyên gia y tế.',
-    contactUrl: null,
-  },
-  {
-    id: 'product-sliced-ginseng',
-    slug: 'sam-lat-ngoc-linh',
-    title: 'Sâm Ngọc Linh thái lát',
-    shortDescription: 'Dòng sản phẩm minh họa đang chờ xác minh đơn vị cung cấp.',
-    description:
-      'Trang không công bố giá, công dụng hay cam kết thương mại khi chưa có hồ sơ sản phẩm chính thức.',
-    status: 'published',
-    verificationStatus: 'placeholder',
-    isPlaceholder: true,
-    placeholderLabel: 'Nội dung đề xuất',
-    sourceUrl: GINSENG_CENTRE_URL,
-    sourceCredit: 'Trung tâm Phát triển Sâm Ngọc Linh và Dược liệu',
-    verifiedAt: null,
-    displayOrder: 2,
-    featuredMedia: media.ginseng,
-    gallery: [media.ginseng],
-    updatedAt: UPDATED_AT,
-    productType: 'dried-ginseng',
-    originNote: 'Thông tin nguồn gốc đang được cập nhật.',
-    legalDisclaimer:
-      'Nội dung mang tính giới thiệu, không phải tư vấn y khoa và không thay thế hướng dẫn của chuyên gia y tế.',
-    contactUrl: null,
-  },
-  {
-    id: 'product-herbal-tea',
-    slug: 'tra-duoc-lieu',
-    title: 'Trà dược liệu bản địa',
-    shortDescription: 'Gợi ý nhóm sản phẩm từ nguồn dược liệu địa phương.',
-    description:
-      'Thành phần, chứng nhận và đơn vị sản xuất sẽ chỉ hiển thị sau khi được xác minh.',
-    status: 'published',
-    verificationStatus: 'placeholder',
-    isPlaceholder: true,
-    placeholderLabel: 'Đang cập nhật',
-    sourceUrl: GINSENG_CENTRE_URL,
-    sourceCredit: 'Trung tâm Phát triển Sâm Ngọc Linh và Dược liệu',
-    verifiedAt: null,
-    displayOrder: 3,
-    featuredMedia: media.forest,
-    gallery: [media.forest],
-    updatedAt: UPDATED_AT,
-    productType: 'herbal-tea',
-    originNote: 'Trà Linh; thông tin sản phẩm đang được xác minh.',
-    legalDisclaimer:
-      'Nội dung mang tính giới thiệu, không phải tư vấn y khoa và không thay thế hướng dẫn của chuyên gia y tế.',
-    contactUrl: null,
-  },
-]
+const products: Product[] = []
 
 const guides: Guide[] = [
   {
@@ -315,12 +244,11 @@ const guides: Guide[] = [
     description:
       'Điều kiện đường và thời tiết có thể thay đổi. Hãy xác nhận lộ trình với cơ quan hoặc đầu mối địa phương trước khi đi.',
     status: 'published',
-    verificationStatus: 'placeholder',
-    isPlaceholder: true,
-    placeholderLabel: 'Đang cập nhật',
-    sourceUrl: OFFICIAL_PLACE_URL,
-    sourceCredit: 'Cổng thông tin điện tử xã Trà Linh',
-    verifiedAt: null,
+    verificationStatus: 'verified',
+    isPlaceholder: false,
+    sourceUrl: OFFICIAL_CITY_URL,
+    sourceCredit: 'Cổng thông tin điện tử thành phố Đà Nẵng',
+    verifiedAt: VERIFIED_AT,
     displayOrder: 1,
     featuredMedia: media.hero,
     gallery: [media.hero],
@@ -341,23 +269,22 @@ const guides: Guide[] = [
   {
     id: 'guide-season',
     slug: 'thoi-diem-goi-y',
-    title: 'Thời điểm gợi ý',
-    shortDescription: 'Chọn một ngày quang đãng và dành khoảng trống cho thay đổi thời tiết.',
+    title: 'Kiểm tra trước khi đi',
+    shortDescription: 'Theo dõi thông báo địa phương và dành khoảng trống cho thay đổi thời tiết.',
     description:
       'Khí hậu vùng núi biến đổi nhanh; lịch trình nên linh hoạt và ưu tiên thông báo chính thức tại thời điểm đi.',
     status: 'published',
-    verificationStatus: 'placeholder',
-    isPlaceholder: true,
-    placeholderLabel: 'Nội dung đề xuất',
+    verificationStatus: 'verified',
+    isPlaceholder: false,
     sourceUrl: OFFICIAL_PLACE_URL,
     sourceCredit: 'Cổng thông tin điện tử xã Trà Linh',
-    verifiedAt: null,
+    verifiedAt: VERIFIED_AT,
     displayOrder: 2,
     featuredMedia: media.village,
     gallery: [media.village],
     updatedAt: UPDATED_AT,
     readTimeLabel: '2 phút đọc',
-    seasonLabel: 'Theo điều kiện thực tế',
+    seasonLabel: 'Theo thông báo tại thời điểm đi',
     sections: [
       {
         title: 'Ưu tiên an toàn',

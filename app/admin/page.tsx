@@ -8,6 +8,7 @@ import {
   uploadMediaAction,
 } from "@/app/actions/admin-content";
 import { signOutAdmin } from "@/app/actions/admin-auth";
+import { updateContactSubmissionStatusAction } from "@/app/actions/admin-leads";
 import { getAdminAccess } from "@/lib/supabase/access";
 import { getSupabaseEnvironmentStatus } from "@/lib/supabase/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
@@ -33,6 +34,7 @@ const noticeMessages: Record<string, string> = {
   updated: "Đã cập nhật trạng thái nội dung.",
   deleted: "Đã xóa nội dung.",
   uploaded: "Đã tải ảnh lên ở trạng thái chờ duyệt.",
+  "lead-updated": "Đã cập nhật trạng thái liên hệ.",
 };
 
 const errorMessages: Record<string, string> = {
@@ -51,6 +53,8 @@ const errorMessages: Record<string, string> = {
   "invalid-file": "Ảnh không đúng định dạng hoặc lớn hơn 5 MB.",
   "invalid-metadata": "Ảnh cần đủ alt text, nguồn, credit và quyền sử dụng.",
   "upload-failed": "Không thể tải ảnh lên storage.",
+  "invalid-lead-update": "Yêu cầu cập nhật liên hệ không hợp lệ.",
+  "lead-update-failed": "Không thể cập nhật trạng thái liên hệ.",
 };
 
 interface AdminPreview {
@@ -64,6 +68,25 @@ interface AdminPreview {
   slug?: string;
   file_url?: string;
 }
+
+interface ContactSubmissionPreview {
+  id: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  interest: "journey" | "culture" | "ginseng" | "partnership" | "other" | null;
+  message: string;
+  status: "new" | "in_progress" | "resolved" | "spam";
+  created_at: string;
+}
+
+const interestLabels: Record<NonNullable<ContactSubmissionPreview["interest"]>, string> = {
+  journey: "Hành trình",
+  culture: "Văn hóa",
+  ginseng: "Sâm và dược liệu",
+  partnership: "Hợp tác",
+  other: "Khác",
+};
 
 function isContentTableName(value: string | undefined): value is ContentTableName {
   return contentTables.some((table) => table.name === value);
@@ -100,7 +123,7 @@ function CmsUnavailable({ partial }: { partial: boolean }) {
 export default async function AdminPage({
   searchParams,
 }: {
-  searchParams: Promise<{ table?: string; notice?: string; error?: string }>;
+  searchParams: Promise<{ table?: string; view?: string; notice?: string; error?: string }>;
 }) {
   const environment = getSupabaseEnvironmentStatus();
   if (environment !== "ready") {
@@ -115,15 +138,27 @@ export default async function AdminPage({
   const selectedTable = isContentTableName(params.table)
     ? params.table
     : "journeys";
+  const showLeads = params.view === "contacts";
   const supabase = await createServerSupabaseClient();
   if (!supabase) return <CmsUnavailable partial={false} />;
 
-  const { data, error } = await supabase
-    .from(selectedTable)
-    .select("*")
-    .order("display_order", { ascending: true })
-    .limit(100);
-  const rows = (data ?? []) as unknown as AdminPreview[];
+  const contentResult = showLeads
+    ? null
+    : await supabase
+        .from(selectedTable)
+        .select("*")
+        .order("display_order", { ascending: true })
+        .limit(100);
+  const leadsResult = showLeads
+    ? await supabase
+        .from("contact_submissions")
+        .select("id, name, email, phone, interest, message, status, created_at")
+        .order("created_at", { ascending: false })
+        .limit(100)
+    : null;
+  const rows = (contentResult?.data ?? []) as unknown as AdminPreview[];
+  const leads = (leadsResult?.data ?? []) as unknown as ContactSubmissionPreview[];
+  const loadError = contentResult?.error ?? leadsResult?.error;
   const flash = params.error
     ? errorMessages[params.error] ?? "Có lỗi xảy ra."
     : params.notice
@@ -154,14 +189,25 @@ export default async function AdminPage({
       </header>
 
       <div className="mx-auto grid max-w-[1400px] gap-6 px-5 py-8 lg:grid-cols-[250px_minmax(0,1fr)]">
-        <nav aria-label="Nhóm nội dung" className="rounded-3xl bg-[#10251a] p-3 text-white lg:self-start">
+        <nav aria-label="Nhóm quản trị" className="rounded-3xl bg-[#10251a] p-3 text-white lg:self-start">
+          <Link
+            href="/admin?view=contacts"
+            aria-current={showLeads ? "page" : undefined}
+            className={`mb-2 flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold transition ${
+              showLeads
+                ? "bg-[#9bbe62] text-[#10251a]"
+                : "hover:bg-white/10"
+            }`}
+          >
+            Liên hệ
+          </Link>
           {contentTables.map((table) => (
             <Link
               key={table.name}
               href={`/admin?table=${table.name}`}
-              aria-current={selectedTable === table.name ? "page" : undefined}
+              aria-current={!showLeads && selectedTable === table.name ? "page" : undefined}
               className={`flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold transition ${
-                selectedTable === table.name
+                !showLeads && selectedTable === table.name
                   ? "bg-[#9bbe62] text-[#10251a]"
                   : "hover:bg-white/10"
               }`}
@@ -176,14 +222,16 @@ export default async function AdminPage({
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#5e7f3b]">
-                  Supabase CMS
+                  {showLeads ? "Hộp thư liên hệ" : "Supabase CMS"}
                 </p>
                 <h1 className="mt-2 font-serif text-3xl">
-                  {contentTables.find((item) => item.name === selectedTable)?.label}
+                  {showLeads
+                    ? "Yêu cầu đã nhận"
+                    : contentTables.find((item) => item.name === selectedTable)?.label}
                 </h1>
               </div>
               <p className="rounded-full bg-[#eef1e9] px-4 py-2 text-sm font-semibold">
-                {rows.length} bản ghi
+                {showLeads ? leads.length : rows.length} bản ghi
               </p>
             </div>
 
@@ -192,20 +240,24 @@ export default async function AdminPage({
                 {flash}
               </p>
             ) : null}
-            {error ? (
+            {loadError ? (
               <p role="alert" className="mt-5 rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-800">
                 Không thể tải dữ liệu. Kiểm tra migration và RLS của dự án Supabase.
               </p>
             ) : null}
           </section>
 
-          {selectedTable === "media_assets" ? (
-            <MediaUploadForm />
+          {showLeads ? (
+            <ContactSubmissionList leads={leads} />
           ) : (
-            <CreateContentForm table={selectedTable} />
-          )}
+            <>
+              {selectedTable === "media_assets" ? (
+                <MediaUploadForm />
+              ) : (
+                <CreateContentForm table={selectedTable} />
+              )}
 
-          <section className="overflow-hidden rounded-3xl bg-white">
+              <section className="overflow-hidden rounded-3xl bg-white">
             <h2 className="px-6 pt-6 font-serif text-2xl sm:px-8">Nội dung hiện có</h2>
             {rows.length ? (
               <div className="mt-5 divide-y divide-[#10251a]/10">
@@ -264,10 +316,64 @@ export default async function AdminPage({
             ) : (
               <p className="px-6 py-10 text-[#10251a]/60 sm:px-8">Chưa có bản ghi nào trong nhóm này.</p>
             )}
-          </section>
+              </section>
+            </>
+          )}
         </div>
       </div>
     </main>
+  );
+}
+
+function ContactSubmissionList({ leads }: { leads: ContactSubmissionPreview[] }) {
+  return (
+    <section className="overflow-hidden rounded-3xl bg-white">
+      <h2 className="px-6 pt-6 font-serif text-2xl sm:px-8">Danh sách liên hệ</h2>
+      {leads.length ? (
+        <div className="mt-5 divide-y divide-[#10251a]/10">
+          {leads.map((lead) => (
+            <article key={lead.id} className="grid gap-5 px-6 py-6 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-start sm:px-8">
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                  <h3 className="font-semibold">{lead.name}</h3>
+                  <span className="rounded-full bg-[#eef1e9] px-3 py-1 text-xs font-semibold">
+                    {lead.interest ? interestLabels[lead.interest] : "Lead cũ · chưa phân nhóm"}
+                  </span>
+                </div>
+                <p className="mt-2 text-sm text-[#10251a]/65">
+                  <a className="underline-offset-4 hover:underline" href={`mailto:${lead.email}`}>{lead.email}</a>
+                  {lead.phone ? <> · <a className="underline-offset-4 hover:underline" href={`tel:${lead.phone}`}>{lead.phone}</a></> : null}
+                </p>
+                <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-[#10251a]/80">{lead.message}</p>
+                <time className="mt-3 block text-xs text-[#10251a]/50" dateTime={lead.created_at}>
+                  {new Intl.DateTimeFormat("vi-VN", { dateStyle: "medium", timeStyle: "short" }).format(new Date(lead.created_at))}
+                </time>
+              </div>
+              <form action={updateContactSubmissionStatusAction} className="flex flex-wrap items-center gap-2">
+                <input type="hidden" name="id" value={lead.id} />
+                <label className="sr-only" htmlFor={`lead-status-${lead.id}`}>Trạng thái xử lý</label>
+                <select
+                  id={`lead-status-${lead.id}`}
+                  name="status"
+                  defaultValue={lead.status}
+                  className="min-h-11 rounded-xl border border-[#10251a]/15 px-3 text-sm"
+                >
+                  <option value="new">Mới</option>
+                  <option value="in_progress">Đang xử lý</option>
+                  <option value="resolved">Đã xử lý</option>
+                  <option value="spam">Spam</option>
+                </select>
+                <button className="min-h-11 rounded-full bg-[#5e7f3b] px-4 text-sm font-semibold text-white" type="submit">
+                  Lưu
+                </button>
+              </form>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <p className="px-6 py-10 text-[#10251a]/60 sm:px-8">Chưa có yêu cầu liên hệ nào.</p>
+      )}
+    </section>
   );
 }
 
