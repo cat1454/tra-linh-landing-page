@@ -49,7 +49,7 @@ describe("public shell", () => {
       "href",
       "tel:0334059776",
     );
-    expect(screen.getByRole("link", { name: /gá»i Ä‘iá»‡n/i })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: /gọi điện/i })).toHaveAttribute(
       "href",
       "tel:0334059776",
     );

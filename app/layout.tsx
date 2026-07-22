@@ -5,6 +5,7 @@ import { SmoothScrollProvider } from "@/components/animation/SmoothScrollProvide
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { MobileStickyCta } from "@/components/layout/MobileStickyCta";
+import { getPublicSiteSettings } from "@/lib/content/public-settings-server";
 import { getSiteUrl } from "@/lib/supabase/config";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
@@ -86,11 +87,13 @@ export const viewport: Viewport = {
   colorScheme: "light",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const siteSettings = await getPublicSiteSettings();
+
   return (
     <html lang="vi" className={`${beVietnamPro.variable} ${lora.variable}`}>
       <body className="min-h-screen bg-mist pb-[calc(4.5rem+env(safe-area-inset-bottom))] text-jungle antialiased md:pb-0">
@@ -103,8 +106,15 @@ export default function RootLayout({
 
           {children}
 
-          <Footer />
-          <MobileStickyCta />
+          <Footer
+            contactEmail={siteSettings.contactEmail}
+            contactPhone={siteSettings.contactPhone}
+          />
+          <MobileStickyCta
+            contactPhone={siteSettings.contactPhone}
+            mapsUrl={siteSettings.mapsUrl}
+            zaloUrl={siteSettings.zaloUrl}
+          />
         </SmoothScrollProvider>
 
         <SpeedInsights />

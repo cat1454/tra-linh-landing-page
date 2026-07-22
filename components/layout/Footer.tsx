@@ -29,7 +29,12 @@ const footerGroups = [
   },
 ] as const
 
-export function Footer() {
+interface FooterProps {
+  contactEmail?: string;
+  contactPhone?: string;
+}
+
+export function Footer({ contactEmail, contactPhone }: FooterProps = {}) {
   return (
     <footer className="site-footer bg-[#10251A] text-[#EEF1E9]">
       <div className="site-footer__inner mx-auto w-full max-w-[1440px] px-5 py-14 md:px-8 md:py-20 xl:px-12">
@@ -50,6 +55,20 @@ export function Footer() {
             <p className="mt-4 text-xs leading-6 text-[#EEF1E9]/55">
               Đây là trang giới thiệu độc lập, không phải cổng thông tin chính thức hay website bán tour.
             </p>
+            {contactEmail || contactPhone ? (
+              <address className="mt-5 flex flex-col items-start gap-1 text-sm not-italic text-[#EEF1E9]/78">
+                {contactPhone ? (
+                  <a className="min-h-8 hover:text-[#D5A84E]" href={`tel:${contactPhone}`}>
+                    {contactPhone}
+                  </a>
+                ) : null}
+                {contactEmail ? (
+                  <a className="min-h-8 hover:text-[#D5A84E]" href={`mailto:${contactEmail}`}>
+                    {contactEmail}
+                  </a>
+                ) : null}
+              </address>
+            ) : null}
           </div>
 
           <div className="site-footer__navigation grid gap-3 sm:grid-cols-3 sm:gap-6">
