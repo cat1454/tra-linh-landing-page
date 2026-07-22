@@ -15,15 +15,25 @@ const poster: MediaAsset = {
   verifiedAt: "2026-07-22",
 };
 
-function stubMotionPreference(matches: boolean) {
+function stubMediaPreferences({
+  reducedMotion = false,
+  desktop = true,
+  saveData = false,
+}: {
+  reducedMotion?: boolean;
+  desktop?: boolean;
+  saveData?: boolean;
+} = {}) {
   const addEventListener = vi.fn();
   const removeEventListener = vi.fn();
 
   vi.stubGlobal(
     "matchMedia",
-    vi.fn(() => ({
-      matches,
-      media: "(prefers-reduced-motion: reduce)",
+    vi.fn((query: string) => ({
+      matches: query.includes("prefers-reduced-motion")
+        ? reducedMotion
+        : desktop,
+      media: query,
       onchange: null,
       addEventListener,
       removeEventListener,
@@ -32,6 +42,11 @@ function stubMotionPreference(matches: boolean) {
       dispatchEvent: vi.fn(),
     })) as unknown as typeof window.matchMedia,
   );
+
+  Object.defineProperty(window.navigator, "connection", {
+    configurable: true,
+    value: { saveData },
+  });
 
   return { addEventListener, removeEventListener };
 }
@@ -43,7 +58,7 @@ afterEach(() => {
 
 describe("HeroVideoBackground", () => {
   it("plays the optimized public video over a meaningful poster", async () => {
-    stubMotionPreference(false);
+    stubMediaPreferences();
     const play = vi
       .spyOn(window.HTMLMediaElement.prototype, "play")
       .mockResolvedValue();
@@ -56,14 +71,13 @@ describe("HeroVideoBackground", () => {
     );
 
     expect(screen.getByRole("img", { name: poster.altText })).toBeVisible();
-    expect(container.querySelector("source")).toHaveAttribute(
-      "src",
-      "/videos/tra-linh-hero.mp4",
-    );
-    expect(container.querySelector("video")).toHaveAttribute(
-      "poster",
-      poster.src,
-    );
+    await waitFor(() => {
+      expect(container.querySelector("source")).toHaveAttribute(
+        "src",
+        "/videos/tra-linh-hero.mp4",
+      );
+    });
+    expect(container.querySelector("video")).toHaveAttribute("poster", poster.src);
     await waitFor(() => expect(play).toHaveBeenCalledOnce());
 
     unmount();
@@ -71,10 +85,8 @@ describe("HeroVideoBackground", () => {
 
   it("pauses motion and cleans up its media-query listener", async () => {
     const { addEventListener, removeEventListener } =
-      stubMotionPreference(true);
-    const pause = vi
-      .spyOn(window.HTMLMediaElement.prototype, "pause")
-      .mockImplementation(() => undefined);
+      stubMediaPreferences({ reducedMotion: true });
+    const play = vi.spyOn(window.HTMLMediaElement.prototype, "play");
 
     const { unmount } = render(
       <HeroVideoBackground
@@ -83,7 +95,9 @@ describe("HeroVideoBackground", () => {
       />,
     );
 
-    await waitFor(() => expect(pause).toHaveBeenCalledOnce());
+    await waitFor(() => expect(screen.getByRole("img", { name: poster.altText })).toBeVisible());
+    expect(play).not.toHaveBeenCalled();
+    expect(document.querySelector("video")).not.toBeInTheDocument();
     expect(addEventListener).toHaveBeenCalledWith(
       "change",
       expect.any(Function),
@@ -94,5 +108,20 @@ describe("HeroVideoBackground", () => {
       "change",
       expect.any(Function),
     );
+  });
+
+  it.each([
+    [{ desktop: false }, "small screens"],
+    [{ saveData: true }, "data saver"],
+  ])("does not download video for %s", async (preferences) => {
+    stubMediaPreferences(preferences);
+
+    const { container } = render(
+      <HeroVideoBackground src="/videos/tra-linh-hero.mp4" poster={poster} />,
+    );
+
+    await waitFor(() => expect(screen.getByRole("img", { name: poster.altText })).toBeVisible());
+    expect(container.querySelector("source")).not.toBeInTheDocument();
+    expect(container.querySelector("video")).not.toBeInTheDocument();
   });
 });
