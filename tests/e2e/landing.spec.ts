@@ -39,15 +39,17 @@ test('mobile menu exposes the navigation', async ({ page }) => {
   await expect(page).toHaveURL(/#cam-nang$/)
 })
 
-test('unconfigured contact section uses a real public channel instead of a dead form', async ({ page }) => {
+test('configured contact section exposes the complete production form', async ({ page }) => {
   await page.goto('/#lien-he')
 
-  await expect(page.getByRole('heading', { name: /xác nhận trước/i })).toBeVisible()
-  await expect(page.getByRole('button', { name: /sắp mở|gửi yêu cầu/i })).toHaveCount(0)
-  await expect(page.getByRole('link', { name: 'Cổng thông tin xã Trà Linh' })).toHaveAttribute(
-    'href',
-    'https://tralinh.danang.gov.vn/',
-  )
+  await expect(page.getByRole('heading', { name: /cùng chuẩn bị/i })).toBeVisible()
+  await expect(page.getByLabel('Họ và tên')).toHaveAttribute('required', '')
+  await expect(page.getByLabel('Số điện thoại')).toHaveAttribute('required', '')
+  await expect(page.getByLabel('Email')).toHaveAttribute('required', '')
+  await expect(page.getByLabel(/bạn quan tâm/i)).toHaveAttribute('required', '')
+  await expect(page.getByLabel('Lời nhắn')).toHaveAttribute('required', '')
+  await expect(page.getByLabel(/tôi đồng ý/i)).toHaveAttribute('required', '')
+  await expect(page.getByRole('button', { name: 'Gửi yêu cầu' })).toBeEnabled()
 })
 
 for (const width of [375, 390]) {
