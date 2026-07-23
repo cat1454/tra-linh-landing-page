@@ -211,6 +211,21 @@ describe('Supabase homepage content adapter', () => {
         })],
         error: null,
       },
+      page_sections: {
+        data: [publishedRow({
+          id: "section-hero",
+          section_key: "hero",
+          eyebrow: "Editable eyebrow",
+          title: "Editable section title",
+          description: "Editable section description",
+          secondary_text: "Editable supporting text",
+          cta_label: "Editable CTA",
+          cta_href: "#editable",
+          badges: ["One", "Two"],
+          stats: [{ value: "4", label: "giá trị" }],
+        })],
+        error: null,
+      },
     }
     const { client, createSignedUrl, from, storageFrom } = clientFor(results)
     mocks.createClient.mockReturnValue(client)
@@ -246,6 +261,14 @@ describe('Supabase homepage content adapter', () => {
         id: 'media-1',
         src: 'https://signed.example.com/cms-library.webp',
       }],
+      sectionSettings: {
+        hero: {
+          eyebrow: "Editable eyebrow",
+          title: "Editable section title",
+          cta: { label: "Editable CTA", href: "#editable" },
+          badges: ["One", "Two"],
+        },
+      },
     })
     expect(storageFrom).toHaveBeenCalledWith('media')
     expect(createSignedUrl).toHaveBeenCalledWith('2026/cms-library.webp', 3600)

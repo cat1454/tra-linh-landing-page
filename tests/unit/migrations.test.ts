@@ -69,4 +69,28 @@ describe("verified public content migration", () => {
     expect(sql).toContain("is_placeholder = excluded.is_placeholder");
     expect(sql).toContain("verified_at = excluded.verified_at");
   });
+
+  it("adds the full CMS schema without rewriting deployed migrations", () => {
+    const sql = migration("202607230001_full_cms_schema.sql");
+
+    expect(sql).toContain("create table public.page_sections");
+    expect(sql).toContain("section_key text not null unique");
+    expect(sql).toContain("add column if not exists hero_video_asset_id uuid");
+    expect(sql).toContain("add column if not exists media_type text");
+    expect(sql).toContain("add column if not exists file_size_bytes bigint");
+    expect(sql).toContain("add column if not exists media_asset_id uuid");
+    expect(sql).toContain('create policy "Public reads published page sections"');
+    expect(sql).toContain("status = 'published'::public.content_status");
+  });
+
+  it("seeds editable homepage sections and expands the media bucket separately", () => {
+    const sql = migration("202607230002_full_cms_seed.sql");
+
+    expect(sql).toContain("insert into public.page_sections");
+    expect(sql).toContain("'hero'");
+    expect(sql).toContain("'final_cta'");
+    expect(sql).toContain("file_size_limit = 262144000");
+    expect(sql).toContain("'video/mp4'");
+    expect(sql).toContain("'video/webm'");
+  });
 });
