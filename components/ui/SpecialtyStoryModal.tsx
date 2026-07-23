@@ -136,14 +136,14 @@ export function SpecialtyStoryModal({ isOpen, onClose, specialty }: SpecialtySto
     >
       <motion.div
         ref={panelRef}
-        className="relative w-full max-w-2xl overflow-hidden rounded-[2rem] bg-[#EEF1E9] text-[#10251A] shadow-[0_24px_80px_rgba(0,0,0,0.4)]"
+        className="relative w-full max-w-2xl overflow-hidden rounded-[1.75rem] md:rounded-[2rem] bg-[#EEF1E9] text-[#10251A] shadow-[0_24px_80px_rgba(0,0,0,0.4)] max-h-[85vh] sm:max-h-[88vh] flex flex-col"
         initial={prefersReducedMotion ? false : { scale: 0.95, y: 15 }}
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.95, y: 15 }}
         transition={{ type: "spring", duration: 0.4 }}
       >
         {/* Top media banner */}
-        <div className="relative aspect-[16/10] w-full bg-[#D8DDCF]">
+        <div className="relative aspect-[16/10] w-full bg-[#D8DDCF] shrink-0">
           <Image
             src={specialty.media.src}
             alt={specialty.media.altText}
@@ -165,7 +165,7 @@ export function SpecialtyStoryModal({ isOpen, onClose, specialty }: SpecialtySto
         </div>
 
         {/* Modal content details */}
-        <div className="px-6 pb-8 pt-4 sm:px-8 sm:pb-10">
+        <div className="px-6 pb-8 pt-4 sm:px-8 sm:pb-10 overflow-y-auto flex-1">
           <div className="flex items-center gap-2">
             {Icon && (
               <span className="inline-flex items-center gap-1.5 rounded-full border border-[#10251A]/10 bg-white/60 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.1em] text-[#435348] backdrop-blur-sm">
