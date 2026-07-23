@@ -239,11 +239,11 @@ describe('Supabase homepage content adapter', () => {
     expect(content).toMatchObject({
       source: 'supabase',
       hero: {
-        eyebrow: 'CMS eyebrow',
-        title: 'CMS hero',
-        placeName: 'CMS Trà Linh',
-        description: 'CMS hero description',
-        primaryCta: { label: 'CMS slide CTA', href: '#cms' },
+        eyebrow: 'Editable eyebrow',
+        title: 'Editable section title',
+        placeName: 'Editable supporting text',
+        description: 'Editable section description',
+        primaryCta: { label: 'Editable CTA', href: '#editable' },
         backgroundMedia: { src: '/images/cms-hero.webp' },
       },
       storyChapters: [{ id: 'story-1', title: 'CMS story' }],

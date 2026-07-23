@@ -60,16 +60,27 @@ export default async function Home() {
       <JsonLd />
       <HeroSection hero={home.hero} />
       <IdentityStrip items={home.identityValues} />
-      <TraLinhStory chapters={home.storyChapters} />
-      <JourneySection journeys={home.journeys} />
-      <GinsengForestStory steps={home.ginsengStorySteps} />
-      <XoDangCultureSection stories={home.cultureStories} />
-      <LocalProduceSection items={home.localSpecialties} />
-      {home.products.length ? <GinsengProductsSection products={home.products} /> : null}
-      <TravelGuideSection guides={home.guides} />
-      <FinalCTA media={finalMedia} />
-      <div id="lien-he" className="bg-[#EEF1E9] px-5 py-20 sm:px-8 sm:py-24 lg:px-16">
+      <TraLinhStory chapters={home.storyChapters} section={home.sectionSettings.story} />
+      <JourneySection journeys={home.journeys} section={home.sectionSettings.journeys} />
+      <GinsengForestStory steps={home.ginsengStorySteps} section={home.sectionSettings.ginseng} />
+      <XoDangCultureSection stories={home.cultureStories} section={home.sectionSettings.culture} />
+      <LocalProduceSection items={home.localSpecialties} section={home.sectionSettings.local_products} />
+      {home.products.length ? <GinsengProductsSection products={home.products} section={home.sectionSettings.products} /> : null}
+      <TravelGuideSection guides={home.guides} section={home.sectionSettings.guides} />
+      <FinalCTA media={home.sectionSettings.final_cta?.media ?? finalMedia} section={home.sectionSettings.final_cta} />
+      <div id="lien-he" className="bg-[#EEF1E9] px-5 py-12 sm:px-8 sm:py-16 lg:px-16 lg:py-20">
         <div className="mx-auto max-w-3xl rounded-[1.75rem] border border-[#10251A]/10 bg-[#EEE3CB]/70 p-6 shadow-[0_24px_80px_rgba(16,37,26,0.08)] sm:p-10">
+          <div className="mb-8">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#3D5133]">
+              {home.sectionSettings.contact?.eyebrow ?? "Liên hệ"}
+            </p>
+            <h2 className="mt-3 font-serif text-3xl">
+              {home.sectionSettings.contact?.title ?? "Kết nối với Trà Linh"}
+            </h2>
+            {home.sectionSettings.contact?.description ? (
+              <p className="mt-3 leading-7 text-[#10251A]/70">{home.sectionSettings.contact.description}</p>
+            ) : null}
+          </div>
           <ContactForm
             isEnabled={formsEnabled}
             serverAction={submitContactAction}

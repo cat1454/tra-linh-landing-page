@@ -38,4 +38,25 @@ describe("public site settings", () => {
       privacyUrl: undefined,
     });
   });
+
+  it("normalizes editable branding, SEO, and navigation", () => {
+    expect(normalizePublicSiteSettings({
+      header_title: " Trà Linh ",
+      header_subtitle: " Đại ngàn Ngọc Linh ",
+      footer_title: "Du lịch Trà Linh",
+      footer_description: "Đi chậm và tôn trọng cộng đồng.",
+      seo_title: "Khám phá Trà Linh",
+      seo_description: "Cẩm nang hành trình vùng Ngọc Linh.",
+      navigation: [
+        { label: "Hành trình", href: "/#hanh-trinh" },
+        { label: "Unsafe", href: "javascript:alert(1)" },
+      ],
+    })).toMatchObject({
+      headerTitle: "Trà Linh",
+      headerSubtitle: "Đại ngàn Ngọc Linh",
+      footerTitle: "Du lịch Trà Linh",
+      seoTitle: "Khám phá Trà Linh",
+      navigation: [{ label: "Hành trình", href: "/#hanh-trinh" }],
+    });
+  });
 });

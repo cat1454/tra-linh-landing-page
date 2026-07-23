@@ -18,9 +18,9 @@ export function HeroSection({ hero }: HeroSectionProps) {
       className="hero-section relative isolate flex min-h-[680px] overflow-hidden bg-[#07100C] text-[#EEF1E9] sm:min-h-[760px] lg:min-h-[100svh]"
     >
       <HeroVideoBackground
-        src="/videos/tra-linh-hero.mp4"
+        src={hero.videoMedia?.src ?? "/videos/tra-linh-hero.mp4"}
         poster={hero.backgroundMedia}
-        mobilePosterSrc="/images/tra-linh/hero-ban-lang-ngoc-linh-mobile.webp"
+        mobilePosterSrc={hero.mobilePoster?.src ?? "/images/tra-linh/hero-ban-lang-ngoc-linh-mobile.webp"}
         className="hero-media absolute inset-0 -z-30"
         mediaClassName="scale-[1.03] motion-safe:transition-transform motion-safe:duration-[1800ms]"
       />

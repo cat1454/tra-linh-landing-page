@@ -5,28 +5,33 @@ import { MediaFrame, SectionIntro } from "./_shared";
 
 type XoDangCultureSectionProps = {
   stories: HomePageContent["cultureStories"];
+  section?: HomePageContent["sectionSettings"][string];
 };
 
-export function XoDangCultureSection({ stories }: XoDangCultureSectionProps) {
+export function XoDangCultureSection({ stories, section }: XoDangCultureSectionProps) {
   if (!stories.length) return null;
 
   return (
-    <section id="van-hoa" aria-labelledby="culture-heading" className="bg-[#EEE3CB] px-5 py-24 text-[#10251A] sm:px-8 sm:py-28 lg:px-16 lg:py-36 xl:px-20">
+    <section id="van-hoa" aria-labelledby="culture-heading" className="bg-[#EEE3CB] px-5 py-12 text-[#10251A] sm:px-8 sm:py-16 lg:px-16 lg:py-20 xl:px-20">
       <div className="mx-auto max-w-[1380px]">
         <div className="grid gap-10 lg:grid-cols-[0.75fr_1.25fr] lg:items-end">
           <ScrollReveal direction="up" delay={0.1}>
             <div id="culture-heading">
-              <SectionIntro eyebrow="Văn hóa & con người" title="Nhịp sống Xơ Đăng giữa đại ngàn" />
+              <SectionIntro
+                eyebrow={section?.eyebrow ?? "Văn hóa & con người"}
+                title={section?.title ?? "Nhịp sống Xơ Đăng giữa đại ngàn"}
+                description={section?.description}
+              />
             </div>
           </ScrollReveal>
           <ScrollReveal direction="left" delay={0.3}>
             <blockquote className="border-l border-[#D5A84E] pl-6 font-serif text-xl leading-8 text-[#29452C] sm:text-2xl sm:leading-10 lg:max-w-2xl">
-              Rừng không chỉ là cảnh quan. Đó là không gian sống, lao động và văn hóa của cộng đồng Xơ Đăng tại Trà Linh.
+              {section?.secondaryText ?? "Rừng không chỉ là cảnh quan. Đó là không gian sống, lao động và văn hóa của cộng đồng Xơ Đăng tại Trà Linh."}
             </blockquote>
           </ScrollReveal>
         </div>
 
-        <div className="mt-14 grid auto-rows-[190px] grid-cols-1 gap-5 sm:auto-rows-[230px] sm:grid-cols-2 lg:grid-cols-12">
+        <div className="mt-8 grid auto-rows-[190px] grid-cols-1 gap-5 sm:auto-rows-[230px] sm:grid-cols-2 lg:mt-10 lg:grid-cols-12">
           {stories.map((story, index) => (
             <article
               key={story.id}

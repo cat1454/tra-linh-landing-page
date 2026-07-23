@@ -91,8 +91,9 @@ export function MediaFrame({
   }
 
   const isVideo =
-    media.src.endsWith(".mp4") ||
-    media.src.endsWith(".webm") ||
+    media.mediaType === "video" ||
+    media.src.includes(".mp4") ||
+    media.src.includes(".webm") ||
     media.src.includes("/videos/");
 
   if (isVideo) {
@@ -103,9 +104,10 @@ export function MediaFrame({
           loop
           muted
           playsInline
+          poster={media.poster?.src}
           className={`h-full w-full object-cover ${imageClassName} ${imgRevealClass}`.trim()}
         >
-          <source src={media.src} type="video/mp4" />
+          <source src={media.src} type={media.mimeType ?? (media.src.includes(".webm") ? "video/webm" : "video/mp4")} />
         </video>
         {showCaption && (media.caption || media.sourceCredit) ? (
           <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#07100C]/90 to-transparent px-4 pb-3 pt-10 text-xs leading-5 text-[#EEF1E9]/75">

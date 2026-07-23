@@ -15,6 +15,8 @@ interface MobileMenuProps {
   readonly isOpen: boolean
   readonly onClose: () => void
   readonly items?: readonly NavigationItem[]
+  readonly title?: string
+  readonly subtitle?: string
 }
 
 const FOCUSABLE_SELECTOR = [
@@ -30,6 +32,8 @@ export function MobileMenu({
   isOpen,
   onClose,
   items = PRIMARY_NAVIGATION,
+  title = 'TRÀ LINH',
+  subtitle = 'Đại ngàn Ngọc Linh',
 }: MobileMenuProps) {
   const dialogRef = useRef<HTMLDivElement>(null)
   const prefersReducedMotion = useReducedMotion()
@@ -127,8 +131,8 @@ export function MobileMenu({
           className="mobile-menu__brand inline-flex min-h-11 flex-col justify-center"
           onClick={onClose}
         >
-          <span className="text-lg font-semibold tracking-[0.18em]">TRÀ LINH</span>
-          <span className="mt-1 text-xs text-[#EEF1E9]/65">Đại ngàn Ngọc Linh</span>
+          <span className="text-lg font-semibold tracking-[0.18em]">{title}</span>
+          <span className="mt-1 text-xs text-[#EEF1E9]/65">{subtitle}</span>
         </Link>
         <button
           type="button"

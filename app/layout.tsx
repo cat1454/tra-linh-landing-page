@@ -27,7 +27,7 @@ const lora = Lora({
 
 const siteUrl = getSiteUrl();
 
-export const metadata: Metadata = {
+const baseMetadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
     default: "Trà Linh – Đại ngàn Ngọc Linh",
@@ -78,6 +78,29 @@ export const metadata: Metadata = {
   },
 };
 
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getPublicSiteSettings();
+  const title = settings.seoTitle;
+  const description = settings.seoDescription;
+  if (!title && !description) return baseMetadata;
+
+  return {
+    ...baseMetadata,
+    title: title ?? baseMetadata.title,
+    description: description ?? baseMetadata.description,
+    openGraph: {
+      ...baseMetadata.openGraph,
+      title: title ?? baseMetadata.openGraph?.title,
+      description: description ?? baseMetadata.openGraph?.description,
+    },
+    twitter: {
+      ...baseMetadata.twitter,
+      title: title ?? baseMetadata.twitter?.title,
+      description: description ?? baseMetadata.twitter?.description,
+    },
+  };
+}
+
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
@@ -103,13 +126,19 @@ export default async function RootLayout({
             Bỏ qua điều hướng
           </a>
 
-          <Header />
+          <Header
+            title={siteSettings.headerTitle}
+            subtitle={siteSettings.headerSubtitle}
+            navigation={siteSettings.navigation}
+          />
 
           {children}
 
           <Footer
             contactEmail={siteSettings.contactEmail}
             contactPhone={siteSettings.contactPhone}
+            title={siteSettings.footerTitle ?? siteSettings.headerTitle}
+            description={siteSettings.footerDescription}
           />
           <MobileStickyCta
             contactPhone={siteSettings.contactPhone}

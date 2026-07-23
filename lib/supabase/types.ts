@@ -8,6 +8,7 @@ export type Json =
 
 export type ContentStatus = "draft" | "review" | "published";
 export type VerificationStatus = "placeholder" | "verified";
+export type MediaType = "image" | "video";
 export type AccessStatus = "open" | "contact_required" | "organized_only";
 export type ContactInterest =
   | "journey"
@@ -62,6 +63,17 @@ export interface Database {
           zalo_url: string | null;
           maps_url: string | null;
           privacy_url: string | null;
+          header_title: string | null;
+          header_subtitle: string | null;
+          footer_title: string | null;
+          footer_description: string | null;
+          seo_title: string | null;
+          seo_description: string | null;
+          navigation: Json;
+          hero_video_url: string | null;
+          hero_video_asset_id: string | null;
+          hero_mobile_poster_url: string | null;
+          hero_mobile_poster_asset_id: string | null;
         };
         Insert: ContentCommonInsert & {
           site_name: string;
@@ -75,6 +87,17 @@ export interface Database {
           zalo_url?: string | null;
           maps_url?: string | null;
           privacy_url?: string | null;
+          header_title?: string | null;
+          header_subtitle?: string | null;
+          footer_title?: string | null;
+          footer_description?: string | null;
+          seo_title?: string | null;
+          seo_description?: string | null;
+          navigation?: Json;
+          hero_video_url?: string | null;
+          hero_video_asset_id?: string | null;
+          hero_mobile_poster_url?: string | null;
+          hero_mobile_poster_asset_id?: string | null;
         };
         Update: ContentCommonUpdate & {
           site_name?: string;
@@ -88,6 +111,17 @@ export interface Database {
           zalo_url?: string | null;
           maps_url?: string | null;
           privacy_url?: string | null;
+          header_title?: string | null;
+          header_subtitle?: string | null;
+          footer_title?: string | null;
+          footer_description?: string | null;
+          seo_title?: string | null;
+          seo_description?: string | null;
+          navigation?: Json;
+          hero_video_url?: string | null;
+          hero_video_asset_id?: string | null;
+          hero_mobile_poster_url?: string | null;
+          hero_mobile_poster_asset_id?: string | null;
         };
         Relationships: [];
       };
@@ -100,6 +134,7 @@ export interface Database {
           alt_text: string;
           cta_label: string | null;
           cta_href: string | null;
+          media_asset_id: string | null;
         };
         Insert: ContentCommonInsert & {
           eyebrow?: string | null;
@@ -109,6 +144,7 @@ export interface Database {
           alt_text: string;
           cta_label?: string | null;
           cta_href?: string | null;
+          media_asset_id?: string | null;
         };
         Update: ContentCommonUpdate & {
           eyebrow?: string | null;
@@ -118,6 +154,7 @@ export interface Database {
           alt_text?: string;
           cta_label?: string | null;
           cta_href?: string | null;
+          media_asset_id?: string | null;
         };
         Relationships: [];
       };
@@ -130,6 +167,7 @@ export interface Database {
           quote: string | null;
           image_url: string | null;
           alt_text: string | null;
+          media_asset_id: string | null;
         };
         Insert: ContentCommonInsert & {
           eyebrow?: string | null;
@@ -139,6 +177,7 @@ export interface Database {
           quote?: string | null;
           image_url?: string | null;
           alt_text?: string | null;
+          media_asset_id?: string | null;
         };
         Update: ContentCommonUpdate & {
           eyebrow?: string | null;
@@ -148,6 +187,7 @@ export interface Database {
           quote?: string | null;
           image_url?: string | null;
           alt_text?: string | null;
+          media_asset_id?: string | null;
         };
         Relationships: [];
       };
@@ -167,6 +207,7 @@ export interface Database {
           highlights: Json;
           access_status: AccessStatus;
           contact_required: boolean;
+          media_asset_id: string | null;
         };
         Insert: ContentCommonInsert & {
           title: string;
@@ -183,6 +224,7 @@ export interface Database {
           highlights?: Json;
           access_status?: AccessStatus;
           contact_required?: boolean;
+          media_asset_id?: string | null;
         };
         Update: ContentCommonUpdate & {
           title?: string;
@@ -199,6 +241,7 @@ export interface Database {
           highlights?: Json;
           access_status?: AccessStatus;
           contact_required?: boolean;
+          media_asset_id?: string | null;
         };
         Relationships: [];
       };
@@ -210,6 +253,7 @@ export interface Database {
           quote: string | null;
           image_url: string | null;
           alt_text: string | null;
+          media_asset_id: string | null;
         };
         Insert: ContentCommonInsert & {
           step_number: number;
@@ -218,6 +262,7 @@ export interface Database {
           quote?: string | null;
           image_url?: string | null;
           alt_text?: string | null;
+          media_asset_id?: string | null;
         };
         Update: ContentCommonUpdate & {
           step_number?: number;
@@ -226,6 +271,7 @@ export interface Database {
           quote?: string | null;
           image_url?: string | null;
           alt_text?: string | null;
+          media_asset_id?: string | null;
         };
         Relationships: [];
       };
@@ -236,6 +282,7 @@ export interface Database {
           image_url: string;
           alt_text: string;
           caption: string | null;
+          media_asset_id: string | null;
         };
         Insert: ContentCommonInsert & {
           title: string;
@@ -243,6 +290,7 @@ export interface Database {
           image_url: string;
           alt_text: string;
           caption?: string | null;
+          media_asset_id?: string | null;
         };
         Update: ContentCommonUpdate & {
           title?: string;
@@ -250,6 +298,7 @@ export interface Database {
           image_url?: string;
           alt_text?: string;
           caption?: string | null;
+          media_asset_id?: string | null;
         };
         Relationships: [];
       };
@@ -262,6 +311,7 @@ export interface Database {
           image_url: string;
           alt_text: string;
           origin_note: string | null;
+          media_asset_id: string | null;
         };
         Insert: ContentCommonInsert & {
           name: string;
@@ -271,6 +321,7 @@ export interface Database {
           image_url: string;
           alt_text: string;
           origin_note?: string | null;
+          media_asset_id?: string | null;
         };
         Update: ContentCommonUpdate & {
           name?: string;
@@ -280,6 +331,7 @@ export interface Database {
           image_url?: string;
           alt_text?: string;
           origin_note?: string | null;
+          media_asset_id?: string | null;
         };
         Relationships: [];
       };
@@ -294,6 +346,7 @@ export interface Database {
           contact_url: string | null;
           origin_note: string | null;
           legal_disclaimer: string;
+          media_asset_id: string | null;
         };
         Insert: ContentCommonInsert & {
           name: string;
@@ -305,6 +358,7 @@ export interface Database {
           contact_url?: string | null;
           origin_note?: string | null;
           legal_disclaimer: string;
+          media_asset_id?: string | null;
         };
         Update: ContentCommonUpdate & {
           name?: string;
@@ -316,6 +370,7 @@ export interface Database {
           contact_url?: string | null;
           origin_note?: string | null;
           legal_disclaimer?: string;
+          media_asset_id?: string | null;
         };
         Relationships: [];
       };
@@ -331,6 +386,7 @@ export interface Database {
           read_time_label: string | null;
           season_label: string | null;
           sections: Json;
+          media_asset_id: string | null;
         };
         Insert: ContentCommonInsert & {
           title: string;
@@ -343,6 +399,7 @@ export interface Database {
           read_time_label?: string | null;
           season_label?: string | null;
           sections?: Json;
+          media_asset_id?: string | null;
         };
         Update: ContentCommonUpdate & {
           title?: string;
@@ -355,6 +412,7 @@ export interface Database {
           read_time_label?: string | null;
           season_label?: string | null;
           sections?: Json;
+          media_asset_id?: string | null;
         };
         Relationships: [];
       };
@@ -366,6 +424,13 @@ export interface Database {
           alt_text: string;
           section: string | null;
           verification_status: VerificationStatus;
+          media_type: MediaType;
+          mime_type: string | null;
+          file_size_bytes: number | null;
+          external_url: string | null;
+          width: number | null;
+          height: number | null;
+          poster_asset_id: string | null;
         };
         Insert: ContentCommonInsert & {
           title: string;
@@ -374,6 +439,13 @@ export interface Database {
           alt_text: string;
           section?: string | null;
           verification_status?: VerificationStatus;
+          media_type?: MediaType;
+          mime_type?: string | null;
+          file_size_bytes?: number | null;
+          external_url?: string | null;
+          width?: number | null;
+          height?: number | null;
+          poster_asset_id?: string | null;
         };
         Update: ContentCommonUpdate & {
           title?: string;
@@ -382,6 +454,65 @@ export interface Database {
           alt_text?: string;
           section?: string | null;
           verification_status?: VerificationStatus;
+          media_type?: MediaType;
+          mime_type?: string | null;
+          file_size_bytes?: number | null;
+          external_url?: string | null;
+          width?: number | null;
+          height?: number | null;
+          poster_asset_id?: string | null;
+        };
+        Relationships: [];
+      };
+      page_sections: {
+        Row: {
+          id: string;
+          section_key: string;
+          eyebrow: string | null;
+          title: string;
+          description: string | null;
+          secondary_text: string | null;
+          cta_label: string | null;
+          cta_href: string | null;
+          badges: Json;
+          stats: Json;
+          media_asset_id: string | null;
+          status: ContentStatus;
+          display_order: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          section_key: string;
+          eyebrow?: string | null;
+          title: string;
+          description?: string | null;
+          secondary_text?: string | null;
+          cta_label?: string | null;
+          cta_href?: string | null;
+          badges?: Json;
+          stats?: Json;
+          media_asset_id?: string | null;
+          status?: ContentStatus;
+          display_order?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          section_key?: string;
+          eyebrow?: string | null;
+          title?: string;
+          description?: string | null;
+          secondary_text?: string | null;
+          cta_label?: string | null;
+          cta_href?: string | null;
+          badges?: Json;
+          stats?: Json;
+          media_asset_id?: string | null;
+          status?: ContentStatus;
+          display_order?: number;
+          updated_at?: string;
         };
         Relationships: [];
       };
@@ -536,4 +667,5 @@ export type ContentTableName =
   | "local_products"
   | "ginseng_products"
   | "travel_guides"
-  | "media_assets";
+  | "media_assets"
+  | "page_sections";

@@ -7,23 +7,24 @@ import { SectionIntro } from "./_shared";
 
 type JourneySectionProps = {
   journeys: HomePageContent["journeys"];
+  section?: HomePageContent["sectionSettings"][string];
 };
 
-export function JourneySection({ journeys }: JourneySectionProps) {
+export function JourneySection({ journeys, section }: JourneySectionProps) {
   if (!journeys.length) return null;
 
   return (
-    <section id="hanh-trinh" aria-labelledby="journey-heading" className="overflow-hidden bg-[#EEF1E9] px-5 py-24 sm:px-8 sm:py-28 lg:px-16 lg:py-36 xl:px-20">
+    <section id="hanh-trinh" aria-labelledby="journey-heading" className="overflow-hidden bg-[#EEF1E9] px-5 py-12 sm:px-8 sm:py-16 lg:px-16 lg:py-20 xl:px-20">
       <div className="mx-auto max-w-[1440px]">
         <div id="journey-heading">
           <SectionIntro
-            eyebrow="Hành trình"
-            title="Chạm vào nhịp sống đại ngàn"
-            description="Không phải hành trình của những điểm check-in vội vã. Trà Linh mở ra qua từng cung đường, tán rừng, bản làng và câu chuyện của người dân vùng cao."
+            eyebrow={section?.eyebrow ?? "Hành trình"}
+            title={section?.title ?? "Chạm vào nhịp sống đại ngàn"}
+            description={section?.description ?? "Không phải hành trình của những điểm check-in vội vã. Trà Linh mở ra qua từng cung đường, tán rừng, bản làng và câu chuyện của người dân vùng cao."}
           />
         </div>
 
-        <div className="mt-14 sm:mt-16">
+        <div className="mt-8 lg:mt-10">
           <DeferredJourneyCarousel journeys={journeys} />
           <HorizontalJourney className="journey-horizontal-track hidden lg:block" data-horizontal-track>
             {journeys.map((journey, index) => (

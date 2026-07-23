@@ -23,6 +23,12 @@ export interface MediaAsset {
   verifiedAt: string | null
   width?: number
   height?: number
+  mediaType?: 'image' | 'video'
+  mimeType?: string
+  fileSize?: number
+  storagePath?: string
+  externalUrl?: string
+  poster?: MediaAsset
 }
 
 export interface ContentLink {
@@ -137,11 +143,32 @@ export interface HeroContent {
   secondaryCta: ContentLink
   tags: string[]
   backgroundMedia: MediaAsset
+  videoMedia?: MediaAsset
+  mobilePoster?: MediaAsset
+}
+
+export interface SectionStat {
+  value: string
+  label: string
+  icon?: IdentityIcon
+}
+
+export interface PageSectionSettings {
+  key: string
+  eyebrow?: string
+  title: string
+  description?: string
+  secondaryText?: string
+  cta?: ContentLink
+  badges: string[]
+  stats: SectionStat[]
+  media?: MediaAsset
 }
 
 export interface HomePageContent {
   source: ContentSource
   hero: HeroContent
+  sectionSettings: Record<string, PageSectionSettings>
   identityValues: IdentityValue[]
   storyChapters: StoryChapter[]
   journeys: Journey[]

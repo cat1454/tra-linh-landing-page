@@ -15,7 +15,17 @@ const MobileMenu = dynamic(
   { ssr: false },
 )
 
-export function Header() {
+interface HeaderProps {
+  title?: string
+  subtitle?: string
+  navigation?: ReadonlyArray<{ label: string; href: string }>
+}
+
+export function Header({
+  title = 'TRÀ LINH',
+  subtitle = 'Đại ngàn Ngọc Linh',
+  navigation = PRIMARY_NAVIGATION,
+}: HeaderProps = {}) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const pathname = usePathname()
@@ -46,15 +56,15 @@ export function Header() {
             aria-label="Trà Linh — trang chủ"
             className="site-header__brand inline-flex min-h-10 shrink-0 flex-col justify-center focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#D5A84E]"
           >
-            <span className="text-sm font-semibold tracking-[0.22em] sm:text-base lg:text-lg">TRÀ LINH</span>
+            <span className="text-sm font-semibold tracking-[0.22em] sm:text-base lg:text-lg">{title}</span>
             <span className="mt-0.5 hidden text-[0.66rem] tracking-wide text-[#EEF1E9]/70 lg:block">
-              Đại ngàn Ngọc Linh
+              {subtitle}
             </span>
           </Link>
 
           <nav className="site-header__desktop-nav hidden lg:block" aria-label="Điều hướng chính">
             <ul className="flex items-center gap-5 xl:gap-7">
-              {PRIMARY_NAVIGATION.map((item) => (
+              {navigation.map((item) => (
                 <li key={item.href}>
                   <a
                     href={item.href}
@@ -92,7 +102,7 @@ export function Header() {
         </div>
       </header>
 
-      {isMenuOpen ? <MobileMenu isOpen onClose={closeMenu} /> : null}
+      {isMenuOpen ? <MobileMenu isOpen onClose={closeMenu} items={navigation} title={title} subtitle={subtitle} /> : null}
     </>
   )
 }

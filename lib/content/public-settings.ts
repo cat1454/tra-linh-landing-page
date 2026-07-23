@@ -4,6 +4,13 @@ export interface PublicSiteSettings {
   zaloUrl?: string;
   mapsUrl?: string;
   privacyUrl?: string;
+  headerTitle?: string;
+  headerSubtitle?: string;
+  footerTitle?: string;
+  footerDescription?: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  navigation?: Array<{ label: string; href: string }>;
 }
 
 interface PublicSiteSettingsRow {
@@ -12,6 +19,13 @@ interface PublicSiteSettingsRow {
   zalo_url?: string | null;
   maps_url?: string | null;
   privacy_url?: string | null;
+  header_title?: string | null;
+  header_subtitle?: string | null;
+  footer_title?: string | null;
+  footer_description?: string | null;
+  seo_title?: string | null;
+  seo_description?: string | null;
+  navigation?: unknown;
 }
 
 function trimmed(value: string | null | undefined): string | undefined {
@@ -58,11 +72,30 @@ function safeUrl(
 export function normalizePublicSiteSettings(
   row: PublicSiteSettingsRow | null | undefined,
 ): PublicSiteSettings {
+  const navigation = Array.isArray(row?.navigation)
+    ? row.navigation.flatMap((item) => {
+        if (!item || typeof item !== "object") return [];
+        const record = item as Record<string, unknown>;
+        const label = typeof record.label === "string" ? record.label.trim() : "";
+        const href = typeof record.href === "string"
+          ? safeUrl(record.href, true)
+          : undefined;
+        return label && href ? [{ label, href }] : [];
+      }).slice(0, 12)
+    : undefined;
+
   return {
     contactEmail: safeEmail(row?.contact_email),
     contactPhone: safePhone(row?.contact_phone),
     zaloUrl: safeUrl(row?.zalo_url),
     mapsUrl: safeUrl(row?.maps_url),
     privacyUrl: safeUrl(row?.privacy_url, true),
+    ...(trimmed(row?.header_title) ? { headerTitle: trimmed(row?.header_title) } : {}),
+    ...(trimmed(row?.header_subtitle) ? { headerSubtitle: trimmed(row?.header_subtitle) } : {}),
+    ...(trimmed(row?.footer_title) ? { footerTitle: trimmed(row?.footer_title) } : {}),
+    ...(trimmed(row?.footer_description) ? { footerDescription: trimmed(row?.footer_description) } : {}),
+    ...(trimmed(row?.seo_title) ? { seoTitle: trimmed(row?.seo_title) } : {}),
+    ...(trimmed(row?.seo_description) ? { seoDescription: trimmed(row?.seo_description) } : {}),
+    ...(navigation?.length ? { navigation } : {}),
   };
 }

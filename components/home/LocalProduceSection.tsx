@@ -12,6 +12,7 @@ import { MediaFrame, PlaceholderPill, SectionIntro } from "./_shared";
 
 type LocalProduceSectionProps = {
   items: HomePageContent["localSpecialties"];
+  section?: HomePageContent["sectionSettings"][string];
 };
 
 const categoryMeta = {
@@ -20,25 +21,25 @@ const categoryMeta = {
   "nong-san": { label: "Nông sản", icon: Wheat },
 };
 
-export function LocalProduceSection({ items }: LocalProduceSectionProps) {
+export function LocalProduceSection({ items, section }: LocalProduceSectionProps) {
   const [selectedSpecialty, setSelectedSpecialty] = useState<LocalSpecialty | null>(null);
 
   if (!items.length) return null;
 
   return (
-    <section id="san-vat" aria-labelledby="produce-heading" className="bg-[#EEF1E9] px-5 py-24 text-[#10251A] sm:px-8 sm:py-28 lg:px-16 lg:py-36 xl:px-20">
+    <section id="san-vat" aria-labelledby="produce-heading" className="bg-[#EEF1E9] px-5 py-12 text-[#10251A] sm:px-8 sm:py-16 lg:px-16 lg:py-20 xl:px-20">
       <div className="mx-auto max-w-[1380px]">
         <ScrollReveal direction="up">
           <div id="produce-heading">
             <SectionIntro
-              eyebrow="Sản vật địa phương"
-              title="Hương vị được nuôi bởi rừng"
-              description="Từ bữa cơm vùng cao đến những sản vật theo mùa, mỗi câu chuyện đều bắt đầu bằng khí hậu, thổ nhưỡng và bàn tay người bản địa."
+              eyebrow={section?.eyebrow ?? "Sản vật địa phương"}
+              title={section?.title ?? "Hương vị được nuôi bởi rừng"}
+              description={section?.description ?? "Từ bữa cơm vùng cao đến những sản vật theo mùa, mỗi câu chuyện đều bắt đầu bằng khí hậu, thổ nhưỡng và bàn tay người bản địa."}
             />
           </div>
         </ScrollReveal>
 
-        <div className="mt-14 grid auto-rows-[360px] gap-5 md:grid-cols-2 lg:grid-cols-12">
+        <div className="mt-8 grid auto-rows-[360px] gap-5 md:grid-cols-2 lg:mt-10 lg:grid-cols-12">
           {items.map((item, index) => {
             const meta = categoryMeta[item.category];
             const Icon = meta.icon;

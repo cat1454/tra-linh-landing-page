@@ -101,7 +101,7 @@ export function HeroVideoBackground({
             isPlaying ? "opacity-100" : "opacity-0"
           } ${mediaClassName}`.trim()}
         >
-          <source src={src} type="video/mp4" />
+          <source src={src} type={src.includes(".webm") ? "video/webm" : "video/mp4"} />
         </video>
       ) : null}
     </figure>

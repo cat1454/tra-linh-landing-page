@@ -32,22 +32,29 @@ const footerGroups = [
 interface FooterProps {
   contactEmail?: string;
   contactPhone?: string;
+  title?: string;
+  description?: string;
 }
 
-export function Footer({ contactEmail, contactPhone }: FooterProps = {}) {
+export function Footer({
+  contactEmail,
+  contactPhone,
+  title = "TRÀ LINH",
+  description,
+}: FooterProps = {}) {
   return (
     <footer className="site-footer bg-[#10251A] text-[#EEF1E9]">
       <div className="site-footer__inner mx-auto w-full max-w-[1440px] px-5 py-14 md:px-8 md:py-20 xl:px-12">
         <div className="site-footer__grid grid gap-10 lg:grid-cols-[1.1fr_2fr] xl:gap-16">
           <div className="site-footer__identity max-w-sm">
             <Link href="/" className="inline-flex min-h-11 flex-col justify-center">
-              <span className="text-2xl font-semibold tracking-[0.2em]">TRÀ LINH</span>
+              <span className="text-2xl font-semibold tracking-[0.2em]">{title}</span>
               <span className="mt-1 text-xs tracking-wide text-[#EEF1E9]/65">
                 Đại ngàn Ngọc Linh
               </span>
             </Link>
             <p className="mt-6 text-sm leading-7 text-[#EEF1E9]/72">
-              Một lát cắt về thiên nhiên, văn hóa Xơ Đăng và vùng sâm dưới tán rừng Ngọc Linh.
+              {description ?? "Một lát cắt về thiên nhiên, văn hóa Xơ Đăng và vùng sâm dưới tán rừng Ngọc Linh."}
             </p>
             <p className="mt-4 text-xs leading-6 text-[#EEF1E9]/55">
               Nhận diện địa phương: Trà Linh – vùng Nam Trà My, Quảng Nam trước đây.

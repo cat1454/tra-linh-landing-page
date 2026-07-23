@@ -7,26 +7,27 @@ import { MediaFrame, SectionIntro } from "./_shared";
 
 type GinsengForestStoryProps = {
   steps: HomePageContent["ginsengStorySteps"];
+  section?: HomePageContent["sectionSettings"][string];
 };
 
-export function GinsengForestStory({ steps }: GinsengForestStoryProps) {
+export function GinsengForestStory({ steps, section }: GinsengForestStoryProps) {
   if (!steps.length) return null;
 
   return (
-    <section id="vung-sam" aria-labelledby="ginseng-heading" className="bg-[#10251A] px-5 py-24 text-[#EEF1E9] sm:px-8 sm:py-28 lg:px-16 lg:py-36 xl:px-20">
+    <section id="vung-sam" aria-labelledby="ginseng-heading" className="bg-[#10251A] px-5 py-12 text-[#EEF1E9] sm:px-8 sm:py-16 lg:px-16 lg:py-20 xl:px-20">
       <div className="mx-auto max-w-[1380px]">
         <ScrollReveal direction="fade">
           <div id="ginseng-heading">
             <SectionIntro
-              eyebrow="Vùng sâm dưới tán rừng"
-              title="Một hành trình lớn lên chậm rãi"
-              description="Sâm Ngọc Linh gắn với độ ẩm, lớp mùn và bóng râm của rừng. Câu chuyện của cây cũng là câu chuyện gìn giữ môi trường sống và sinh kế cộng đồng."
+              eyebrow={section?.eyebrow ?? "Vùng sâm dưới tán rừng"}
+              title={section?.title ?? "Một hành trình lớn lên chậm rãi"}
+              description={section?.description ?? "Sâm Ngọc Linh gắn với độ ẩm, lớp mùn và bóng râm của rừng. Câu chuyện của cây cũng là câu chuyện gìn giữ môi trường sống và sinh kế cộng đồng."}
               tone="dark"
             />
           </div>
         </ScrollReveal>
 
-        <div className="mt-16 grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-20">
+        <div className="mt-8 grid gap-8 lg:mt-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-10">
           <div className="lg:sticky lg:top-24 lg:h-fit">
             <ScrollReveal direction="left">
               <MediaFrame
@@ -39,7 +40,7 @@ export function GinsengForestStory({ steps }: GinsengForestStoryProps) {
               <div className="relative mt-6 mx-4 rounded-2xl border border-[#EEF1E9]/12 bg-[#07100C]/88 p-5 backdrop-blur-md sm:mx-8 sm:p-7">
                 <Trees aria-hidden="true" className="size-6 text-[#D5A84E]" />
                 <p className="mt-4 font-serif text-xl leading-8 text-[#EEF1E9] sm:text-2xl">
-                  “Sống cùng rừng” là nền tảng để kể câu chuyện vùng sâm một cách có trách nhiệm.
+                  {section?.secondaryText ?? "“Sống cùng rừng” là nền tảng để kể câu chuyện vùng sâm một cách có trách nhiệm."}
                 </p>
               </div>
             </ScrollReveal>
@@ -47,7 +48,7 @@ export function GinsengForestStory({ steps }: GinsengForestStoryProps) {
 
           <ol className="relative border-l border-[#9BBE62]/25 pl-7 sm:pl-10">
             {steps.map((step) => (
-              <li key={step.id} className="relative pb-14 last:pb-0 lg:min-h-[310px] lg:pb-20">
+              <li key={step.id} className="relative pb-10 last:pb-0 lg:min-h-[250px] lg:pb-12">
                 <ScrollReveal direction="up">
                   <span
                     aria-hidden="true"
@@ -69,7 +70,7 @@ export function GinsengForestStory({ steps }: GinsengForestStoryProps) {
         </div>
 
         <ScrollReveal direction="up" delay={0.2}>
-          <aside className="mt-16 flex flex-col gap-5 rounded-2xl border border-[#EEF1E9]/12 bg-[#07100C]/38 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
+          <aside className="mt-10 flex flex-col gap-5 rounded-2xl border border-[#EEF1E9]/12 bg-[#07100C]/38 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
             <div className="flex items-start gap-4">
               <ContactRound aria-hidden="true" className="mt-1 size-6 shrink-0 text-[#D5A84E]" />
               <div>
