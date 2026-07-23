@@ -1,10 +1,11 @@
 "use client";
 
 import type { FormEvent, ReactNode } from "react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ExternalLink, ImageIcon, Play, Sparkles } from "lucide-react";
 
 import type {
+  AdminFallbackPreviewMedia,
   AdminMediaPreviewOption,
 } from "@/lib/cms/admin-preview";
 import { getAdminPublicAnchor } from "@/lib/cms/admin-preview";
@@ -180,7 +181,7 @@ function SectionPreview({
           <PreviewMedia
             url={mediaUrl}
             isVideo={media?.mediaType === "video"}
-            alt={values.alt_text || title}
+            alt={media?.altText || values.alt_text || title}
             poster={media?.posterUrl}
           />
           <div className="absolute inset-0 bg-gradient-to-r from-[#07100c]/90 via-[#10251a]/65 to-transparent" />
@@ -192,7 +193,7 @@ function SectionPreview({
             <PreviewMedia
               url={mediaUrl}
               isVideo={media?.mediaType === "video"}
-              alt={values.alt_text || title}
+              alt={media?.altText || values.alt_text || title}
               poster={media?.posterUrl}
             />
           </div>
@@ -237,7 +238,7 @@ function ContentPreview({
         <PreviewMedia
           url={mediaUrl}
           isVideo={media?.mediaType === "video" || values.media_type === "video"}
-          alt={values.alt_text || title}
+          alt={media?.altText || values.alt_text || title}
           poster={media?.posterUrl}
         />
       </div>
@@ -252,17 +253,30 @@ function ContentPreview({
   );
 }
 
-export function AdminVisualEditor({
-  table,
-  row,
-  mediaOptions,
-  children,
-}: {
+interface AdminVisualEditorProps {
   table: ContentTableName;
   row: AdminVisualRow;
   mediaOptions: AdminMediaPreviewOption[];
+  fallbackMedia?: AdminFallbackPreviewMedia;
   children: ReactNode;
-}) {
+}
+
+export function AdminVisualEditor(props: AdminVisualEditorProps) {
+  return (
+    <AdminVisualEditorState
+      key={`${props.table}:${props.row.id}`}
+      {...props}
+    />
+  );
+}
+
+function AdminVisualEditorState({
+  table,
+  row,
+  mediaOptions,
+  fallbackMedia,
+  children,
+}: AdminVisualEditorProps) {
   const [values, setValues] = useState<Record<string, string>>(() => initialValues(row));
   const [dirty, setDirty] = useState(false);
   const selectedMedia = useMemo(() => {
@@ -274,7 +288,63 @@ export function AdminVisualEditor({
           values.poster_asset_id;
     return mediaOptions.find((item) => item.id === selectedId);
   }, [mediaOptions, row.id, table, values]);
+  const legacyUrl = safePreviewUrl(
+    values.external_url || values.file_url || values.image_url,
+  );
+  const activeMedia: AdminMediaPreviewOption | undefined =
+    selectedMedia ??
+    (legacyUrl
+      ? {
+          id: "legacy-preview",
+          title: values.title || "Ảnh hiện tại",
+          mediaType: values.media_type === "video" ? "video" : "image",
+          previewUrl: legacyUrl,
+        }
+      : fallbackMedia
+        ? {
+            id: "website-preview",
+            title: fallbackMedia.altText,
+            mediaType: fallbackMedia.mediaType,
+            previewUrl: fallbackMedia.url,
+            posterUrl: fallbackMedia.posterUrl,
+            altText: fallbackMedia.altText,
+          }
+        : undefined);
+  const mediaSource = selectedMedia || legacyUrl
+    ? "selected"
+    : fallbackMedia
+      ? "website"
+      : "empty";
   const anchor = getAdminPublicAnchor(table, values.section_key || row.section_key);
+
+  useEffect(() => {
+    if (!dirty) return;
+
+    const beforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+    };
+    const guardAdminNavigation = (event: MouseEvent) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      const link = target.closest("a");
+      if (!link || link.target === "_blank") return;
+      const destination = new URL(link.href, window.location.href);
+      if (
+        destination.origin === window.location.origin &&
+        destination.pathname.startsWith("/admin") &&
+        !window.confirm("Bạn có thay đổi chưa lưu. Vẫn chuyển sang nội dung khác?")
+      ) {
+        event.preventDefault();
+      }
+    };
+
+    window.addEventListener("beforeunload", beforeUnload);
+    document.addEventListener("click", guardAdminNavigation, true);
+    return () => {
+      window.removeEventListener("beforeunload", beforeUnload);
+      document.removeEventListener("click", guardAdminNavigation, true);
+    };
+  }, [dirty]);
 
   function updatePreview(event: FormEvent<HTMLDivElement>) {
     const target = event.target;
@@ -321,10 +391,25 @@ export function AdminVisualEditor({
         {table === "site_settings" ? (
           <SiteSettingsPreview values={values} />
         ) : table === "page_sections" ? (
-          <SectionPreview values={values} media={selectedMedia} />
+          <SectionPreview values={values} media={activeMedia} />
         ) : (
-          <ContentPreview values={values} media={selectedMedia} />
+          <ContentPreview values={values} media={activeMedia} />
         )}
+        {table !== "site_settings" ? (
+          <p className={`mt-3 inline-flex rounded-full px-3 py-1.5 text-xs font-bold ${
+            mediaSource === "website"
+              ? "bg-[#eee3cb] text-[#10251a]"
+              : mediaSource === "selected"
+                ? "bg-[#dfe7d8] text-[#27451f]"
+                : "bg-[#10251a]/5 text-[#10251a]/55"
+          }`}>
+            {mediaSource === "website"
+              ? "Ảnh hiện tại của website"
+              : mediaSource === "selected"
+                ? "Ảnh đã chọn"
+                : "Chưa có ảnh xem trước"}
+          </p>
+        ) : null}
         <p className="mt-3 rounded-xl bg-[#eee3cb]/75 px-4 py-3 text-xs leading-5 text-[#10251a]/65">
           Đây là bản xem trước. Website thật chỉ thay đổi sau khi bạn bấm <strong>Xuất bản</strong>.
         </p>

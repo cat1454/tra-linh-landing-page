@@ -186,7 +186,10 @@ describe("admin visual editor", () => {
     expect(map.ginseng.url).toBe(fallbackContent.ginsengStorySteps[0].media.src);
     expect(map.culture.url).toBe(fallbackContent.cultureStories[0].media.src);
     expect(map.local_products.url).toBe(fallbackContent.localSpecialties[0].media.src);
-    expect(map.products.url).toBe(fallbackContent.products[0].featuredMedia.src);
+    expect(map.products.url).toBe(
+      fallbackContent.products[0]?.featuredMedia.src ??
+        fallbackContent.hero.backgroundMedia.src,
+    );
     expect(map.guides.url).toBe(fallbackContent.guides[0].featuredMedia.src);
   });
 });

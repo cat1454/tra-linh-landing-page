@@ -15,10 +15,14 @@ import { DeleteRecordButton } from "@/components/admin/DeleteRecordButton";
 import { MediaUploadManager } from "@/components/admin/MediaUploadManager";
 import {
   ADMIN_NAV_GROUPS,
+  buildAdminPreviewMediaMap,
+  getAdminFallbackPreviewMedia,
   getAdminPublicAnchor,
   getAdminTableLabel,
+  type AdminFallbackPreviewMedia,
   type AdminMediaPreviewOption,
 } from "@/lib/cms/admin-preview";
+import { createContentRepository } from "@/lib/content/repository";
 import { getAdminAccess } from "@/lib/supabase/access";
 import { getMediaBucketName, getSupabaseEnvironmentStatus } from "@/lib/supabase/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
@@ -85,6 +89,7 @@ interface RawMediaOption {
   external_url: string | null;
   file_url: string | null;
   poster_asset_id: string | null;
+  alt_text: string | null;
 }
 
 interface ContactSubmissionPreview {
@@ -150,7 +155,11 @@ function safeAdminPreviewUrl(value: unknown): string | undefined {
   }
 }
 
-function rowPreviewUrl(row: AdminPreview, mediaOptions: MediaOption[]): string | undefined {
+function rowPreviewUrl(
+  row: AdminPreview,
+  mediaOptions: MediaOption[],
+  fallbackMedia?: AdminFallbackPreviewMedia,
+): string | undefined {
   const mediaId =
     rowText(row, "media_asset_id") ||
     rowText(row, "hero_video_asset_id") ||
@@ -159,7 +168,8 @@ function rowPreviewUrl(row: AdminPreview, mediaOptions: MediaOption[]): string |
     mediaOptions.find((item) => item.id === mediaId)?.previewUrl ??
     safeAdminPreviewUrl(row.image_url) ??
     safeAdminPreviewUrl(row.external_url) ??
-    safeAdminPreviewUrl(row.file_url)
+    safeAdminPreviewUrl(row.file_url) ??
+    fallbackMedia?.url
   );
 }
 
@@ -227,7 +237,7 @@ export default async function AdminPage({
     ? null
     : await supabase
         .from("media_assets")
-        .select("id, title, media_type, storage_path, external_url, file_url, poster_asset_id")
+        .select("id, title, media_type, storage_path, external_url, file_url, poster_asset_id, alt_text")
         .order("title", { ascending: true })
         .limit(500);
   const rows = (contentResult?.data ?? []) as unknown as AdminPreview[];
@@ -249,6 +259,7 @@ export default async function AdminPage({
         mediaType: item.media_type,
         previewUrl,
         posterUrl: undefined,
+        altText: item.alt_text ?? item.title,
       };
     }),
   );
@@ -264,6 +275,19 @@ export default async function AdminPage({
     rows.find((row) => row.id === params.id) ??
     rows[0] ??
     null;
+  const publicHomeContent = showLeads
+    ? null
+    : await createContentRepository().getHomePageContent();
+  const previewMediaMap = publicHomeContent
+    ? buildAdminPreviewMediaMap(publicHomeContent)
+    : {};
+  const selectedFallbackMedia = selectedRow
+    ? getAdminFallbackPreviewMedia(
+        selectedTable,
+        selectedRow.section_key,
+        previewMediaMap,
+      )
+    : undefined;
   const loadError = contentResult?.error ?? leadsResult?.error;
   const flash = params.error
     ? errorMessages[params.error] ?? "Có lỗi xảy ra."
@@ -400,7 +424,16 @@ export default async function AdminPage({
                   <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                     {rows.map((row) => {
                       const selected = selectedRow?.id === row.id;
-                      const previewUrl = rowPreviewUrl(row, mediaOptions);
+                      const fallbackMedia = getAdminFallbackPreviewMedia(
+                        selectedTable,
+                        row.section_key,
+                        previewMediaMap,
+                      );
+                      const previewUrl = rowPreviewUrl(
+                        row,
+                        mediaOptions,
+                        fallbackMedia,
+                      );
                       return (
                         <Link
                           key={row.id}
@@ -463,7 +496,18 @@ export default async function AdminPage({
                       </form>
                     </div>
                   </div>
-                  <AdminVisualEditor table={selectedTable} row={selectedRow} mediaOptions={mediaOptions}>
+                  {mediaOptions.length === 0 && selectedTable !== "site_settings" ? (
+                    <p className="mt-5 rounded-2xl border border-[#d5a84e]/35 bg-[#fff8e8] px-4 py-3 text-sm leading-6 text-[#6b531d]">
+                      Website đang dùng ảnh mặc định. Hãy vào <Link className="font-bold underline" href="/admin?table=media_assets">Kho ảnh & video</Link> để tải ảnh mới.
+                    </p>
+                  ) : null}
+                  <AdminVisualEditor
+                    key={`${selectedTable}:${selectedRow.id}`}
+                    table={selectedTable}
+                    row={selectedRow}
+                    mediaOptions={mediaOptions}
+                    fallbackMedia={selectedFallbackMedia}
+                  >
                     <EditContentForm table={selectedTable} row={selectedRow} mediaOptions={mediaOptions} />
                   </AdminVisualEditor>
                 </section>

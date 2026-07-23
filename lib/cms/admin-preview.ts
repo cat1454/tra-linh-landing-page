@@ -1,4 +1,5 @@
 import type { ContentStatus, ContentTableName } from "@/lib/supabase/types";
+import type { HomePageContent, MediaAsset } from "@/lib/content/types";
 
 export interface AdminNavItem {
   label: string;
@@ -18,6 +19,77 @@ export interface AdminMediaPreviewOption {
   mediaType: "image" | "video";
   previewUrl?: string;
   posterUrl?: string;
+  altText?: string;
+}
+
+export interface AdminFallbackPreviewMedia {
+  url: string;
+  mediaType: "image" | "video";
+  altText: string;
+  posterUrl?: string;
+  source: "website";
+}
+
+function previewMedia(
+  media: MediaAsset | undefined,
+  fallback: MediaAsset,
+): AdminFallbackPreviewMedia {
+  const resolved = media ?? fallback;
+  return {
+    url: resolved.src,
+    mediaType: resolved.mediaType ?? "image",
+    altText: resolved.altText,
+    posterUrl: resolved.poster?.src,
+    source: "website",
+  };
+}
+
+export function buildAdminPreviewMediaMap(
+  home: HomePageContent,
+): Record<string, AdminFallbackPreviewMedia> {
+  const hero = home.hero.backgroundMedia;
+  const finalMedia =
+    home.sectionSettings.final_cta?.media ??
+    home.media.find((item) => item.id === "media-village") ??
+    hero;
+
+  return {
+    hero: previewMedia(home.hero.backgroundMedia, hero),
+    identity: previewMedia(home.hero.backgroundMedia, hero),
+    story: previewMedia(home.storyChapters[0]?.media, hero),
+    journeys: previewMedia(home.journeys[0]?.featuredMedia, hero),
+    ginseng: previewMedia(home.ginsengStorySteps[0]?.media, hero),
+    culture: previewMedia(home.cultureStories[0]?.media, hero),
+    local_products: previewMedia(home.localSpecialties[0]?.media, hero),
+    products: previewMedia(home.products[0]?.featuredMedia, hero),
+    guides: previewMedia(home.guides[0]?.featuredMedia, hero),
+    final_cta: previewMedia(finalMedia, hero),
+    contact: previewMedia(finalMedia, hero),
+  };
+}
+
+const TABLE_PREVIEW_KEYS: Partial<Record<ContentTableName, string>> = {
+  site_settings: "hero",
+  hero_slides: "hero",
+  stories: "story",
+  journeys: "journeys",
+  ginseng_story_steps: "ginseng",
+  culture_stories: "culture",
+  local_products: "local_products",
+  ginseng_products: "products",
+  travel_guides: "guides",
+};
+
+export function getAdminFallbackPreviewMedia(
+  table: ContentTableName,
+  sectionKey: unknown,
+  mediaMap: Record<string, AdminFallbackPreviewMedia>,
+): AdminFallbackPreviewMedia | undefined {
+  const key =
+    table === "page_sections" && typeof sectionKey === "string"
+      ? sectionKey
+      : TABLE_PREVIEW_KEYS[table];
+  return key ? mediaMap[key] : undefined;
 }
 
 export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
@@ -123,4 +195,3 @@ export function resolveEditorialIntent(intent: unknown): ContentStatus {
   if (intent === "publish") return "published";
   throw new Error("invalid-editorial-intent");
 }
-
