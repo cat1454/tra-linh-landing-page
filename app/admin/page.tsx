@@ -34,7 +34,7 @@ const contentTables: { name: ContentTableName; label: string }[] = [
 
 const noticeMessages: Record<string, string> = {
   created: "Đã tạo nội dung mới.",
-  updated: "Đã cập nhật trạng thái nội dung.",
+  updated: "Đã lưu toàn bộ thay đổi.",
   deleted: "Đã xóa nội dung.",
   uploaded: "Đã tải ảnh lên ở trạng thái chờ duyệt.",
   "lead-updated": "Đã cập nhật trạng thái liên hệ.",
@@ -292,47 +292,22 @@ export default async function AdminPage({
                       </p>
                     </div>
                     <div className="flex flex-wrap items-center gap-3">
-                      <form action={updateContentItemAction} className="flex flex-wrap items-center gap-2">
-                        <input type="hidden" name="table" value={selectedTable} />
-                        <input type="hidden" name="id" value={row.id} />
-                        <label className="sr-only" htmlFor={`status-${row.id}`}>Trạng thái</label>
-                        <select
-                          id={`status-${row.id}`}
-                          name="status"
-                          defaultValue={row.status}
-                          className="min-h-11 rounded-xl border border-[#10251a]/15 px-3 text-sm"
-                        >
-                          <option value="draft">Bản nháp</option>
-                          <option value="published">Đã xuất bản</option>
-                        </select>
-                        <label className="flex min-h-11 items-center gap-2 text-xs">
-                          <input type="checkbox" name="is_placeholder" defaultChecked={row.is_placeholder} />
-                          Nội dung đề xuất
-                        </label>
-                        <label className="sr-only" htmlFor={`order-${row.id}`}>Thứ tự</label>
-                        <input
-                          id={`order-${row.id}`}
-                          name="display_order"
-                          type="number"
-                          min="0"
-                          max="10000"
-                          defaultValue={row.display_order}
-                          className="min-h-11 w-20 rounded-xl border border-[#10251a]/15 px-3 text-sm"
-                        />
-                        <button className="min-h-11 rounded-full bg-[#5e7f3b] px-4 text-sm font-semibold text-white" type="submit">
-                          Lưu
-                        </button>
-                      </form>
+                      <span className="rounded-full bg-[#eef1e9] px-4 py-2 text-xs font-semibold">
+                        {row.status === "published" ? "Đã xuất bản" : "Bản nháp"}
+                      </span>
+                      <span className="rounded-full bg-[#eef1e9] px-4 py-2 text-xs">
+                        Thứ tự {row.display_order}
+                      </span>
                       <form action={deleteContentItemAction}>
                         <input type="hidden" name="table" value={selectedTable} />
                         <input type="hidden" name="id" value={row.id} />
                         <button className="min-h-11 rounded-full border border-red-200 px-4 text-sm font-semibold text-red-700" type="submit">
-                          Xóa
+                          Xóa bản ghi
                         </button>
                       </form>
                     </div>
                     <details className="xl:col-span-2 rounded-2xl border border-[#10251a]/10 bg-[#eef1e9]/50 p-4">
-                      <summary className="cursor-pointer font-semibold">Chỉnh sửa đầy đủ</summary>
+                      <summary className="cursor-pointer font-semibold">Mở trình chỉnh sửa</summary>
                       <EditContentForm table={selectedTable} row={row} mediaOptions={mediaOptions} />
                     </details>
                   </article>
@@ -615,7 +590,12 @@ function EditContentForm({
       <form action={updateContentItemAction} className="mt-5 grid gap-4 sm:grid-cols-2">
         <input type="hidden" name="table" value={table} />
         <input type="hidden" name="id" value={row.id} />
-        <Field label="Khóa khu vực" name="section_key" defaultValue={rowText(row, "section_key")} />
+        <Field
+          label="Khóa khu vực (cố định theo bố cục)"
+          name="section_key"
+          defaultValue={rowText(row, "section_key")}
+          readOnly
+        />
         <Field label="Nhãn nhỏ" name="eyebrow" defaultValue={rowText(row, "eyebrow")} />
         <Field label="Tiêu đề" name="title" defaultValue={rowText(row, "title")} required />
         <TextArea label="Mô tả" name="description" defaultValue={rowText(row, "description")} />
@@ -767,9 +747,12 @@ function TextArea({
 
 function SaveButton() {
   return (
-    <div className="sm:col-span-2">
+    <div className="sticky bottom-3 z-10 -mx-1 flex items-center justify-between gap-4 rounded-2xl border border-[#10251a]/10 bg-white/95 p-3 shadow-lg backdrop-blur sm:col-span-2">
+      <p className="hidden text-sm text-[#10251a]/65 sm:block">
+        Nút này lưu tất cả các ô trong trình chỉnh sửa.
+      </p>
       <button type="submit" className="min-h-12 rounded-full bg-[#5e7f3b] px-7 font-semibold text-white">
-        Lưu thay đổi
+        Lưu toàn bộ thay đổi
       </button>
     </div>
   );
@@ -842,6 +825,7 @@ function Field({
   required = false,
   placeholder,
   defaultValue,
+  readOnly = false,
 }: {
   label: string;
   name: string;
@@ -849,11 +833,22 @@ function Field({
   required?: boolean;
   placeholder?: string;
   defaultValue?: string;
+  readOnly?: boolean;
 }) {
   return (
     <label>
       <span className="mb-2 block text-sm font-semibold">{label}</span>
-      <input name={name} type={type} required={required} placeholder={placeholder} defaultValue={defaultValue} className="min-h-12 w-full rounded-xl border border-[#10251a]/15 px-4 outline-none focus:ring-2 focus:ring-[#9bbe62]/40" />
+      <input
+        name={name}
+        type={type}
+        required={required}
+        placeholder={placeholder}
+        defaultValue={defaultValue}
+        readOnly={readOnly}
+        className={`min-h-12 w-full rounded-xl border border-[#10251a]/15 px-4 outline-none focus:ring-2 focus:ring-[#9bbe62]/40 ${
+          readOnly ? "cursor-not-allowed bg-[#10251a]/5 text-[#10251a]/60" : ""
+        }`}
+      />
     </label>
   );
 }
