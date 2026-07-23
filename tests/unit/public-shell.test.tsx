@@ -54,4 +54,19 @@ describe("public shell", () => {
       "tel:0334059776",
     );
   });
+
+  it("uses the editable address and privacy link in the public footer", () => {
+    render(
+      <Footer
+        legalAddress="Thôn 2, xã Trà Linh"
+        privacyUrl="/quyen-rieng"
+      />,
+    );
+
+    expect(screen.getByText("Thôn 2, xã Trà Linh")).toBeVisible();
+    expect(screen.getByRole("link", { name: /quyền riêng tư/i })).toHaveAttribute(
+      "href",
+      "/quyen-rieng",
+    );
+  });
 });

@@ -192,4 +192,32 @@ describe("admin visual editor", () => {
     );
     expect(map.guides.url).toBe(fallbackContent.guides[0].featuredMedia.src);
   });
+
+  it("shows a clear recovery message when an image preview cannot load", () => {
+    render(
+      <AdminVisualEditor
+        table="media_assets"
+        row={{
+          id: "broken-media",
+          title: "Ảnh bị lỗi",
+          external_url: "https://example.com/missing.webp",
+          media_type: "image",
+          status: "draft",
+          display_order: 0,
+          is_placeholder: false,
+        }}
+        mediaOptions={[]}
+      >
+        <form><input name="title" defaultValue="Ảnh bị lỗi" /></form>
+      </AdminVisualEditor>,
+    );
+
+    fireEvent.error(screen.getByRole("img", { name: "Ảnh bị lỗi" }));
+
+    expect(screen.getByText(/không tải được ảnh xem trước/i)).toBeVisible();
+    expect(screen.getByRole("link", { name: /mở ảnh trong tab mới/i })).toHaveAttribute(
+      "href",
+      "https://example.com/missing.webp",
+    );
+  });
 });

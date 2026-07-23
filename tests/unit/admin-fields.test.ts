@@ -49,6 +49,37 @@ describe("full CMS edit payloads", () => {
     });
   });
 
+  it("does not clear hidden page-section fields that were not submitted", () => {
+    const payload = buildAdminUpdatePayload(form({
+      section_key: "journeys",
+      title: "Các hành trình",
+      description: "Những trải nghiệm giữa đại ngàn Trà Linh.",
+    }), "page_sections");
+
+    expect(payload).toEqual({
+      title: "Các hành trình",
+      description: "Những trải nghiệm giữa đại ngàn Trà Linh.",
+    });
+    expect(payload).not.toHaveProperty("badges");
+    expect(payload).not.toHaveProperty("media_asset_id");
+  });
+
+  it("does not clear hidden global settings that were not submitted", () => {
+    const payload = buildAdminUpdatePayload(form({
+      site_name: "Trà Linh",
+      contact_email: "admin@example.com",
+      legal_address: "Xã Trà Linh, thành phố Đà Nẵng",
+    }), "site_settings");
+
+    expect(payload).toEqual({
+      site_name: "Trà Linh",
+      contact_email: "admin@example.com",
+      legal_address: "Xã Trà Linh, thành phố Đà Nẵng",
+    });
+    expect(payload).not.toHaveProperty("primary_cta_label");
+    expect(payload).not.toHaveProperty("hero_video_asset_id");
+  });
+
   it("persists every editable journey field and linked media", () => {
     const payload = buildAdminUpdatePayload(form({
       title: "Đi dưới tán rừng",
@@ -74,4 +105,3 @@ describe("full CMS edit payloads", () => {
     });
   });
 });
-

@@ -11,6 +11,7 @@ describe("public site settings", () => {
         zalo_url: "https://zalo.me/0334059776",
         maps_url: "https://maps.google.com/?q=Tra+Linh",
         privacy_url: "/chinh-sach-quyen-rieng",
+        legal_address: " Xã Trà Linh, thành phố Đà Nẵng ",
       }),
     ).toEqual({
       contactEmail: "phuh15521@gmail.com",
@@ -18,6 +19,7 @@ describe("public site settings", () => {
       zaloUrl: "https://zalo.me/0334059776",
       mapsUrl: "https://maps.google.com/?q=Tra+Linh",
       privacyUrl: "/chinh-sach-quyen-rieng",
+      legalAddress: "Xã Trà Linh, thành phố Đà Nẵng",
     });
   });
 
@@ -29,6 +31,7 @@ describe("public site settings", () => {
         zalo_url: "javascript:alert(1)",
         maps_url: "data:text/html,unsafe",
         privacy_url: "//example.com/redirect",
+        legal_address: " ",
       }),
     ).toEqual({
       contactEmail: undefined,
@@ -36,6 +39,7 @@ describe("public site settings", () => {
       zaloUrl: undefined,
       mapsUrl: undefined,
       privacyUrl: undefined,
+      legalAddress: undefined,
     });
   });
 
