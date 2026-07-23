@@ -66,6 +66,13 @@ export default async function JourneyDetailPage({ params }: PageProps) {
   }
 
   const pathname = `/hanh-trinh/${journey.slug}`;
+  const journeys = await repository.getPublishedJourneys();
+  const navigationTabs = journeys.map((j) => ({
+    label: j.title,
+    href: `/hanh-trinh/${j.slug}`,
+    isActive: j.slug === slug,
+  }));
+
   const breadcrumbSchema = createBreadcrumbSchema([
     { name: "Trang chủ", pathname: "/" },
     { name: "Hành trình", pathname: "/#hanh-trinh" },
@@ -123,6 +130,7 @@ export default async function JourneyDetailPage({ params }: PageProps) {
         sourceUrl={journey.sourceUrl}
         sourceCredit={journey.sourceCredit}
         updatedAt={journey.updatedAt}
+        navigationTabs={navigationTabs}
       />
     </>
   );

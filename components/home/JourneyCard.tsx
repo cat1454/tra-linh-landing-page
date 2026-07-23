@@ -1,4 +1,4 @@
-import { MapPin } from "lucide-react";
+import { MapPin, ExternalLink } from "lucide-react";
 import Link from "next/link";
 
 import type { HomePageContent } from "@/lib/content/types";
@@ -12,9 +12,13 @@ export function JourneyCard({
   journey: HomePageContent["journeys"][number];
   index: number;
 }) {
+  const mapUrl = journey.locationLabel === "Vùng sâm Ngọc Linh"
+    ? "https://maps.app.goo.gl/RU7q8XwC8HGnHxrC6"
+    : "https://maps.app.goo.gl/X4rMVecthoadSjcb6";
+
   return (
-    <article className="group relative isolate min-h-[500px] overflow-hidden rounded-[1.5rem] bg-[#29452C]">
-      <MediaFrame media={journey.featuredMedia} className="absolute inset-0 -z-20" sizes="(min-width: 1024px) 32vw, 88vw" imageClassName="transition duration-700 group-hover:scale-[1.035]" />
+    <article className="group relative isolate min-h-[500px] overflow-hidden rounded-[1.5rem] bg-[#29452C] transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
+      <MediaFrame media={journey.featuredMedia} className="absolute inset-0 -z-20" sizes="(min-width: 1024px) 32vw, 88vw" imageClassName="transition duration-700 group-hover:scale-105" />
       <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#07100C] via-[#07100C]/30 to-[#07100C]/5" />
       <div className="flex min-h-[500px] flex-col justify-between p-6 sm:p-8">
         <div className="flex items-start justify-between gap-4">
@@ -23,9 +27,18 @@ export function JourneyCard({
         </div>
         <div>
           {journey.locationLabel ? (
-            <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.15em] text-[#D5A84E]">
-              <MapPin aria-hidden="true" className="size-4" />
-              {journey.locationLabel}
+            <p className="flex items-center">
+              <a
+                href={mapUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.15em] text-[#D5A84E] hover:text-[#EEF1E9] hover:underline transition-colors focus-visible:outline-2 focus-visible:outline-[#D5A84E] group/location"
+              >
+                <MapPin aria-hidden="true" className="size-4 shrink-0 transition-transform group-hover/location:scale-110" />
+                <span>{journey.locationLabel}</span>
+                <ExternalLink aria-hidden="true" className="size-3 opacity-60 transition-opacity group-hover/location:opacity-100" />
+                <span className="sr-only">(mở Google Maps)</span>
+              </a>
             </p>
           ) : null}
           <h3 className="mt-3 font-serif text-3xl leading-tight text-[#EEF1E9] sm:text-4xl">{journey.title}</h3>

@@ -12,7 +12,7 @@ type FinalCTAProps = {
 export function FinalCTA({ media }: FinalCTAProps) {
   return (
     <section aria-labelledby="final-cta-heading" className="relative isolate overflow-hidden bg-[#10251A] px-5 py-28 text-center text-[#EEF1E9] sm:px-8 sm:py-36 lg:px-16 lg:py-44">
-      <MediaFrame media={media} className="absolute inset-0 -z-30" sizes="100vw" imageClassName="brightness-[0.65]" />
+      <MediaFrame media={media} className="final-cta-bg absolute inset-0 -z-30" sizes="100vw" imageClassName="brightness-[0.65]" />
       <div className="absolute inset-0 -z-20 bg-[linear-gradient(90deg,rgba(7,16,12,0.78),rgba(16,37,26,0.52),rgba(7,16,12,0.78))]" />
       <div aria-hidden="true" className="absolute inset-x-0 top-1/3 -z-10 h-48 bg-[radial-gradient(ellipse_at_center,rgba(238,241,233,0.17),transparent_67%)] blur-xl" />
 
@@ -34,13 +34,13 @@ export function FinalCTA({ media }: FinalCTAProps) {
         <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
           <Link
             href="#hanh-trinh"
-            className="group animate-pulse-ring inline-flex min-h-12 items-center justify-center gap-3 rounded-full bg-[#D5A84E] px-6 py-3 text-sm font-semibold text-[#10251A] transition-colors hover:bg-[#EEE3CB] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#EEF1E9]"
+            className="group animate-pulse-ring inline-flex min-h-12 items-center justify-center gap-3 rounded-full bg-[#D5A84E] px-6 py-3 text-sm font-semibold text-[#10251A] transition-all duration-300 hover:scale-[1.03] hover:bg-[#EEE3CB] active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#EEF1E9]"
           >
             Khám phá hành trình <ArrowGlyph />
           </Link>
           <Link
             href="#lien-he"
-            className="group inline-flex min-h-12 items-center justify-center gap-3 rounded-full border border-[#EEF1E9]/35 bg-[#07100C]/15 px-6 py-3 text-sm font-semibold text-[#EEF1E9] backdrop-blur-sm transition-colors hover:border-[#D5A84E] hover:text-[#D5A84E] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#EEF1E9]"
+            className="group inline-flex min-h-12 items-center justify-center gap-3 rounded-full border border-[#EEF1E9]/35 bg-[#07100C]/15 px-6 py-3 text-sm font-semibold text-[#EEF1E9] backdrop-blur-sm transition-all duration-300 hover:scale-[1.03] hover:border-[#D5A84E] hover:text-[#D5A84E] active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#EEF1E9]"
           >
             Liên hệ địa phương <ArrowGlyph />
           </Link>

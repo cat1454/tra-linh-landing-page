@@ -16,11 +16,11 @@ export function TraLinhStory({ chapters }: TraLinhStoryProps) {
     <section id="cau-chuyen" aria-labelledby="story-heading" className="bg-[#EEF1E9] px-5 py-24 text-[#10251A] sm:px-8 sm:py-28 lg:px-16 lg:py-36 xl:px-20">
       <div className="mx-auto grid max-w-[1380px] items-center gap-14 lg:grid-cols-[1.1fr_0.9fr] lg:gap-20">
         <ScrollReveal direction="left" duration={0.8}>
-          <div className="relative pb-12 sm:pr-16 lg:pb-20">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 sm:items-start">
             <MediaFrame
               media={primary.media}
               className="aspect-[4/5] rounded-[1.75rem] shadow-[0_30px_80px_rgba(16,37,26,0.16)] sm:aspect-[5/6]"
-              sizes="(min-width: 1024px) 54vw, 100vw"
+              sizes="(min-width: 1024px) 27vw, 50vw"
               imageClassName="transition-transform duration-700 hover:scale-[1.02]"
               showCaption
               hoverReveal={true}
@@ -28,8 +28,8 @@ export function TraLinhStory({ chapters }: TraLinhStoryProps) {
             {secondary ? (
               <MediaFrame
                 media={secondary.media}
-                className="absolute -bottom-2 right-0 hidden aspect-[4/3] w-[48%] rounded-2xl border-[8px] border-[#EEF1E9] shadow-2xl sm:block"
-                sizes="(min-width: 1024px) 24vw, 44vw"
+                className="aspect-[4/5] rounded-[1.75rem] shadow-[0_30px_80px_rgba(16,37,26,0.16)] sm:aspect-[5/6] sm:mt-12"
+                sizes="(min-width: 1024px) 27vw, 50vw"
                 imageClassName="transition-transform duration-700 hover:scale-[1.03]"
                 showCaption
                 hoverReveal={true}

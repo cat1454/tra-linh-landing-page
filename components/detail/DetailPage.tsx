@@ -34,6 +34,7 @@ type DetailPageProps = {
   sourceUrl?: string;
   sourceCredit?: string;
   updatedAt?: string;
+  navigationTabs?: { label: string; href: string; isActive: boolean }[];
 };
 
 const dateFormatter = new Intl.DateTimeFormat("vi-VN", {
@@ -74,6 +75,7 @@ export function DetailPage({
   sourceUrl,
   sourceCredit,
   updatedAt,
+  navigationTabs,
 }: DetailPageProps) {
   const formattedDate = updatedAt ? formatDate(updatedAt) : null;
   const galleryItems = gallery.filter(
@@ -109,6 +111,26 @@ export function DetailPage({
               ))}
             </ol>
           </nav>
+
+          {navigationTabs && navigationTabs.length > 0 ? (
+            <nav aria-label="Phân mục" className="mb-10 w-full border-b border-[#10251A]/10 overflow-x-auto scrollbar-none">
+              <div className="flex pb-px -mb-px gap-6 sm:gap-8 min-w-max">
+                {navigationTabs.map((tab) => (
+                  <Link
+                    key={tab.href}
+                    href={tab.href}
+                    className={`inline-flex min-h-11 items-center border-b-2 px-1 pb-3 text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#5E7F3B] ${
+                      tab.isActive
+                        ? "border-[#5E7F3B] text-[#5E7F3B]"
+                        : "border-transparent text-[#536258] hover:border-[#10251A]/20 hover:text-[#10251A]"
+                    }`}
+                  >
+                    {tab.label}
+                  </Link>
+                ))}
+              </div>
+            </nav>
+          ) : null}
 
           <div className="grid items-end gap-10 lg:grid-cols-[minmax(0,0.88fr)_minmax(460px,1.12fr)] lg:gap-16">
             <div>

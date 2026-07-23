@@ -36,7 +36,7 @@ export function GinsengForestStory({ steps }: GinsengForestStoryProps) {
                 imageClassName="brightness-[0.82]"
                 showCaption
               />
-              <div className="relative -mt-16 mx-4 rounded-2xl border border-[#EEF1E9]/12 bg-[#07100C]/88 p-5 backdrop-blur-md sm:mx-8 sm:p-7">
+              <div className="relative mt-6 mx-4 rounded-2xl border border-[#EEF1E9]/12 bg-[#07100C]/88 p-5 backdrop-blur-md sm:mx-8 sm:p-7">
                 <Trees aria-hidden="true" className="size-6 text-[#D5A84E]" />
                 <p className="mt-4 font-serif text-xl leading-8 text-[#EEF1E9] sm:text-2xl">
                   “Sống cùng rừng” là nền tảng để kể câu chuyện vùng sâm một cách có trách nhiệm.
@@ -51,7 +51,7 @@ export function GinsengForestStory({ steps }: GinsengForestStoryProps) {
                 <ScrollReveal direction="up">
                   <span
                     aria-hidden="true"
-                    className="absolute -left-[2.17rem] top-0 grid size-10 place-items-center rounded-full border border-[#D5A84E]/60 bg-[#10251A] font-serif text-sm text-[#D5A84E] sm:-left-[3.05rem]"
+                    className="absolute -left-[3rem] top-0 grid size-10 place-items-center rounded-full border border-[#D5A84E]/60 bg-[#10251A] font-serif text-sm text-[#D5A84E] sm:-left-[3.75rem]"
                   >
                     {String(step.stepNumber).padStart(2, "0")}
                   </span>
