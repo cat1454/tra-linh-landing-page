@@ -51,7 +51,7 @@ export function GinsengForestStory({ steps }: GinsengForestStoryProps) {
                 <ScrollReveal direction="up">
                   <span
                     aria-hidden="true"
-                    className="absolute -left-[2.17rem] top-0 grid size-10 place-items-center rounded-full border border-[#D5A84E]/60 bg-[#10251A] font-serif text-sm text-[#D5A84E] sm:-left-[3.05rem]"
+                    className="absolute -left-[3rem] top-0 grid size-10 place-items-center rounded-full border border-[#D5A84E]/60 bg-[#10251A] font-serif text-sm text-[#D5A84E] sm:-left-[3.75rem]"
                   >
                     {String(step.stepNumber).padStart(2, "0")}
                   </span>
