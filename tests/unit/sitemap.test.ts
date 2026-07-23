@@ -23,13 +23,41 @@ describe("public sitemap", () => {
     mocks.getPublishedGuides.mockResolvedValue([]);
   });
 
-  it("includes the privacy page and omits absent product placeholders", async () => {
+  it("includes verified fallback routes and omits absent product placeholders", async () => {
     const entries = await sitemap();
 
     expect(entries.map((entry) => entry.url)).toEqual([
       "https://tralinh.example/",
       "https://tralinh.example/chinh-sach-quyen-rieng",
+      "https://tralinh.example/hanh-trinh/trekking-duoi-tan-rung",
+      "https://tralinh.example/hanh-trinh/ban-lang-trong-suong",
+      "https://tralinh.example/hanh-trinh/cham-vao-mien-duoc-lieu",
+      "https://tralinh.example/cam-nang/duong-den-tra-linh",
+      "https://tralinh.example/cam-nang/thoi-diem-goi-y",
+      "https://tralinh.example/cam-nang/luu-y-khi-vao-rung",
     ]);
     expect(entries.some((entry) => entry.url.includes("/san-vat/"))).toBe(false);
+  });
+
+  it("includes every published public content route returned by the repository", async () => {
+    mocks.getPublishedJourneys.mockResolvedValue([
+      { slug: "trekking-duoi-tan-rung", updatedAt: "2026-07-22" },
+    ]);
+    mocks.getPublishedProducts.mockResolvedValue([
+      { slug: "sam-ngoc-linh", updatedAt: "2026-07-22" },
+    ]);
+    mocks.getPublishedGuides.mockResolvedValue([
+      { slug: "duong-den-tra-linh", updatedAt: "2026-07-22" },
+    ]);
+
+    const entries = await sitemap();
+
+    expect(entries.map((entry) => entry.url)).toEqual([
+      "https://tralinh.example/",
+      "https://tralinh.example/chinh-sach-quyen-rieng",
+      "https://tralinh.example/hanh-trinh/trekking-duoi-tan-rung",
+      "https://tralinh.example/san-vat/sam-ngoc-linh",
+      "https://tralinh.example/cam-nang/duong-den-tra-linh",
+    ]);
   });
 });

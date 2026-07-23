@@ -7,9 +7,10 @@ import { MediaFrame, SectionIntro } from "./_shared";
 
 type GinsengForestStoryProps = {
   steps: HomePageContent["ginsengStorySteps"];
+  section?: HomePageContent["sectionSettings"][string];
 };
 
-export function GinsengForestStory({ steps }: GinsengForestStoryProps) {
+export function GinsengForestStory({ steps, section }: GinsengForestStoryProps) {
   if (!steps.length) return null;
 
   return (
@@ -18,9 +19,9 @@ export function GinsengForestStory({ steps }: GinsengForestStoryProps) {
         <ScrollReveal direction="fade">
           <div id="ginseng-heading">
             <SectionIntro
-              eyebrow="Vùng sâm dưới tán rừng"
-              title="Một hành trình lớn lên chậm rãi"
-              description="Sâm Ngọc Linh gắn với độ ẩm, lớp mùn và bóng râm của rừng. Câu chuyện của cây cũng là câu chuyện gìn giữ môi trường sống và sinh kế cộng đồng."
+              eyebrow={section?.eyebrow ?? "Vùng sâm dưới tán rừng"}
+              title={section?.title ?? "Một hành trình lớn lên chậm rãi"}
+              description={section?.description ?? "Sâm Ngọc Linh gắn với độ ẩm, lớp mùn và bóng râm của rừng. Câu chuyện của cây cũng là câu chuyện gìn giữ môi trường sống và sinh kế cộng đồng."}
               tone="dark"
             />
           </div>
@@ -39,7 +40,7 @@ export function GinsengForestStory({ steps }: GinsengForestStoryProps) {
               <div className="relative mt-6 mx-4 rounded-2xl border border-[#EEF1E9]/12 bg-[#07100C]/88 p-5 backdrop-blur-md sm:mx-8 sm:p-7">
                 <Trees aria-hidden="true" className="size-6 text-[#D5A84E]" />
                 <p className="mt-4 font-serif text-xl leading-8 text-[#EEF1E9] sm:text-2xl">
-                  “Sống cùng rừng” là nền tảng để kể câu chuyện vùng sâm một cách có trách nhiệm.
+                  {section?.secondaryText ?? "“Sống cùng rừng” là nền tảng để kể câu chuyện vùng sâm một cách có trách nhiệm."}
                 </p>
               </div>
             </ScrollReveal>

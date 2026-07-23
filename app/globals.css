@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+body:has([data-admin-root]) {
+  padding-bottom: 0;
+}
+
+body:has([data-admin-root]) .public-site-chrome {
+  display: none;
+}
+
 :root {
   --forest-black: #07100c;
   --deep-jungle: #10251a;

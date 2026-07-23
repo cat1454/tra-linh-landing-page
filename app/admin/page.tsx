@@ -3,35 +3,44 @@ import { redirect } from "next/navigation";
 
 import {
   createContentItemAction,
+  createExternalMediaAction,
   deleteContentItemAction,
   updateContentItemAction,
   uploadMediaAction,
 } from "@/app/actions/admin-content";
 import { signOutAdmin } from "@/app/actions/admin-auth";
 import { updateContactSubmissionStatusAction } from "@/app/actions/admin-leads";
+import { AdminVisualEditor } from "@/components/admin/AdminVisualEditor";
+import { DeleteRecordButton } from "@/components/admin/DeleteRecordButton";
+import { MediaUploadManager } from "@/components/admin/MediaUploadManager";
+import {
+  ADMIN_NAV_GROUPS,
+  buildAdminPreviewMediaMap,
+  getAdminFallbackPreviewMedia,
+  getAdminPublicAnchor,
+  getAdminTableLabel,
+  type AdminFallbackPreviewMedia,
+  type AdminMediaPreviewOption,
+} from "@/lib/cms/admin-preview";
+import { createContentRepository } from "@/lib/content/repository";
 import { getAdminAccess } from "@/lib/supabase/access";
-import { getSupabaseEnvironmentStatus } from "@/lib/supabase/config";
+import { getMediaBucketName, getSupabaseEnvironmentStatus } from "@/lib/supabase/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { ContentStatus, ContentTableName } from "@/lib/supabase/types";
 
 export const dynamic = "force-dynamic";
 
-const contentTables: { name: ContentTableName; label: string }[] = [
-  { name: "site_settings", label: "Thiết lập" },
-  { name: "hero_slides", label: "Hero" },
-  { name: "stories", label: "Câu chuyện" },
-  { name: "journeys", label: "Hành trình" },
-  { name: "ginseng_story_steps", label: "Vùng sâm" },
-  { name: "culture_stories", label: "Văn hóa" },
-  { name: "local_products", label: "Sản vật" },
-  { name: "ginseng_products", label: "Sản phẩm sâm" },
-  { name: "travel_guides", label: "Cẩm nang" },
-  { name: "media_assets", label: "Thư viện ảnh" },
-];
+const contentTables = ADMIN_NAV_GROUPS.flatMap((group) =>
+  group.items.flatMap((item) =>
+    item.table ? [{ name: item.table, label: item.label }] : [],
+  ),
+);
 
 const noticeMessages: Record<string, string> = {
   created: "Đã tạo nội dung mới.",
-  updated: "Đã cập nhật trạng thái nội dung.",
+  updated: "Đã lưu toàn bộ thay đổi.",
+  "draft-saved": "Đã lưu bản nháp. Website công khai chưa thay đổi.",
+  published: "Đã xuất bản. Nội dung mới đang hiển thị trên website.",
   deleted: "Đã xóa nội dung.",
   uploaded: "Đã tải ảnh lên ở trạng thái chờ duyệt.",
   "lead-updated": "Đã cập nhật trạng thái liên hệ.",
@@ -67,6 +76,20 @@ interface AdminPreview {
   site_name?: string;
   slug?: string;
   file_url?: string;
+  [key: string]: unknown;
+}
+
+type MediaOption = AdminMediaPreviewOption;
+
+interface RawMediaOption {
+  id: string;
+  title: string;
+  media_type: "image" | "video";
+  storage_path: string | null;
+  external_url: string | null;
+  file_url: string | null;
+  poster_asset_id: string | null;
+  alt_text: string | null;
 }
 
 interface ContactSubmissionPreview {
@@ -96,6 +119,60 @@ function rowTitle(row: AdminPreview): string {
   return row.title ?? row.name ?? row.site_name ?? row.slug ?? row.file_url ?? row.id;
 }
 
+const sectionNames: Record<string, string> = {
+  hero: "Đầu trang nổi bật",
+  identity: "Dải số liệu giới thiệu",
+  story: "Câu chuyện Trà Linh",
+  journeys: "Các hành trình",
+  ginseng: "Vùng sâm Ngọc Linh",
+  culture: "Văn hóa Xơ Đăng",
+  local_products: "Sản vật địa phương",
+  products: "Sản phẩm sâm",
+  guides: "Cẩm nang chuyến đi",
+  final_cta: "Lời mời cuối trang",
+  contact: "Biểu mẫu liên hệ",
+};
+
+function friendlyRowTitle(table: ContentTableName, row: AdminPreview): string {
+  if (table === "page_sections") {
+    const key = rowText(row, "section_key");
+    return sectionNames[key] ?? rowTitle(row);
+  }
+  return rowTitle(row);
+}
+
+function safeAdminPreviewUrl(value: unknown): string | undefined {
+  if (typeof value !== "string" || !value.trim()) return undefined;
+  const candidate = value.trim();
+  if (candidate.startsWith("/")) return candidate;
+  try {
+    const parsed = new URL(candidate);
+    return parsed.protocol === "http:" || parsed.protocol === "https:"
+      ? parsed.toString()
+      : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+function rowPreviewUrl(
+  row: AdminPreview,
+  mediaOptions: MediaOption[],
+  fallbackMedia?: AdminFallbackPreviewMedia,
+): string | undefined {
+  const mediaId =
+    rowText(row, "media_asset_id") ||
+    rowText(row, "hero_video_asset_id") ||
+    (rowText(row, "media_type") ? row.id : "");
+  return (
+    mediaOptions.find((item) => item.id === mediaId)?.previewUrl ??
+    safeAdminPreviewUrl(row.image_url) ??
+    safeAdminPreviewUrl(row.external_url) ??
+    safeAdminPreviewUrl(row.file_url) ??
+    fallbackMedia?.url
+  );
+}
+
 function CmsUnavailable({ partial }: { partial: boolean }) {
   return (
     <main id="noi-dung-chinh" className="min-h-screen bg-[#eef1e9] px-5 py-16 text-[#10251a]">
@@ -123,7 +200,7 @@ function CmsUnavailable({ partial }: { partial: boolean }) {
 export default async function AdminPage({
   searchParams,
 }: {
-  searchParams: Promise<{ table?: string; view?: string; notice?: string; error?: string }>;
+  searchParams: Promise<{ table?: string; id?: string; view?: string; notice?: string; error?: string }>;
 }) {
   const environment = getSupabaseEnvironmentStatus();
   if (environment !== "ready") {
@@ -156,8 +233,61 @@ export default async function AdminPage({
         .order("created_at", { ascending: false })
         .limit(100)
     : null;
+  const mediaResult = showLeads
+    ? null
+    : await supabase
+        .from("media_assets")
+        .select("id, title, media_type, storage_path, external_url, file_url, poster_asset_id, alt_text")
+        .order("title", { ascending: true })
+        .limit(500);
   const rows = (contentResult?.data ?? []) as unknown as AdminPreview[];
   const leads = (leadsResult?.data ?? []) as unknown as ContactSubmissionPreview[];
+  const rawMediaOptions = (mediaResult?.data ?? []) as unknown as RawMediaOption[];
+  const bucket = supabase.storage.from(getMediaBucketName());
+  const signedMediaOptions = await Promise.all(
+    rawMediaOptions.map(async (item): Promise<MediaOption> => {
+      let previewUrl =
+        safeAdminPreviewUrl(item.external_url) ??
+        safeAdminPreviewUrl(item.file_url);
+      if (item.storage_path && !item.storage_path.includes("..")) {
+        const { data } = await bucket.createSignedUrl(item.storage_path, 3600);
+        previewUrl = data?.signedUrl ?? previewUrl;
+      }
+      return {
+        id: item.id,
+        title: item.title,
+        mediaType: item.media_type,
+        previewUrl,
+        posterUrl: undefined,
+        altText: item.alt_text ?? item.title,
+      };
+    }),
+  );
+  const mediaById = new Map(signedMediaOptions.map((item) => [item.id, item]));
+  const mediaOptions = signedMediaOptions.map((item) => {
+    const raw = rawMediaOptions.find((candidate) => candidate.id === item.id);
+    const poster = raw?.poster_asset_id
+      ? mediaById.get(raw.poster_asset_id)?.previewUrl
+      : undefined;
+    return poster ? { ...item, posterUrl: poster } : item;
+  });
+  const selectedRow =
+    rows.find((row) => row.id === params.id) ??
+    rows[0] ??
+    null;
+  const publicHomeContent = showLeads
+    ? null
+    : await createContentRepository().getHomePageContent();
+  const previewMediaMap = publicHomeContent
+    ? buildAdminPreviewMediaMap(publicHomeContent)
+    : {};
+  const selectedFallbackMedia = selectedRow
+    ? getAdminFallbackPreviewMedia(
+        selectedTable,
+        selectedRow.section_key,
+        previewMediaMap,
+      )
+    : undefined;
   const loadError = contentResult?.error ?? leadsResult?.error;
   const flash = params.error
     ? errorMessages[params.error] ?? "Có lỗi xảy ra."
@@ -166,74 +296,96 @@ export default async function AdminPage({
       : null;
 
   return (
-    <main id="noi-dung-chinh" className="min-h-screen bg-[#eef1e9] text-[#10251a]">
+    <main id="noi-dung-chinh" className="min-h-screen bg-[#eef1e9] text-[#10251a]" data-testid="visual-admin">
       <header className="border-b border-[#10251a]/10 bg-white px-5 py-4">
-        <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-4">
+        <div className="mx-auto flex max-w-[1580px] flex-wrap items-center justify-between gap-4">
           <div>
-            <Link href="/" className="font-serif text-2xl font-bold tracking-wide">
-              TRÀ LINH
-            </Link>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#5e7f3b]">Trà Linh CMS</p>
+            <h1 className="mt-1 font-serif text-2xl font-bold">Quản trị website</h1>
             <p className="mt-1 text-xs text-[#10251a]/60">
               {access.email} · {access.role}
             </p>
           </div>
-          <form action={signOutAdmin}>
-            <button
-              type="submit"
-              className="min-h-11 rounded-full border border-[#10251a]/20 px-5 text-sm font-semibold"
-            >
-              Đăng xuất
-            </button>
-          </form>
+          <div className="flex flex-wrap items-center gap-2">
+            <a href="/" target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center rounded-full bg-[#10251a] px-5 text-sm font-semibold text-white">
+              Mở website
+            </a>
+            <form action={signOutAdmin}>
+              <button type="submit" className="min-h-11 rounded-full border border-[#10251a]/20 px-5 text-sm font-semibold">
+                Đăng xuất
+              </button>
+            </form>
+          </div>
         </div>
       </header>
 
-      <div className="mx-auto grid max-w-[1400px] gap-6 px-5 py-8 lg:grid-cols-[250px_minmax(0,1fr)]">
-        <nav aria-label="Nhóm quản trị" className="rounded-3xl bg-[#10251a] p-3 text-white lg:self-start">
-          <Link
-            href="/admin?view=contacts"
-            aria-current={showLeads ? "page" : undefined}
-            className={`mb-2 flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold transition ${
-              showLeads
-                ? "bg-[#9bbe62] text-[#10251a]"
-                : "hover:bg-white/10"
-            }`}
-          >
-            Liên hệ
-          </Link>
-          {contentTables.map((table) => (
-            <Link
-              key={table.name}
-              href={`/admin?table=${table.name}`}
-              aria-current={!showLeads && selectedTable === table.name ? "page" : undefined}
-              className={`flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold transition ${
-                !showLeads && selectedTable === table.name
-                  ? "bg-[#9bbe62] text-[#10251a]"
-                  : "hover:bg-white/10"
-              }`}
-            >
-              {table.label}
-            </Link>
+      <div className="mx-auto grid max-w-[1580px] gap-6 px-4 py-6 sm:px-5 lg:grid-cols-[280px_minmax(0,1fr)]">
+        <nav aria-label="Nhóm quản trị" className="rounded-3xl bg-[#10251a] p-3 text-white lg:sticky lg:top-5 lg:self-start">
+          {ADMIN_NAV_GROUPS.map((group) => (
+            <div key={group.label} className="mb-4 last:mb-0">
+              <p className="px-4 pb-2 pt-3 text-[0.65rem] font-bold uppercase tracking-[0.18em] text-white/45">
+                {group.label}
+              </p>
+              {group.items.map((item) => {
+                const active = item.table
+                  ? !showLeads && selectedTable === item.table
+                  : showLeads && item.view === "contacts";
+                const href = item.table ? `/admin?table=${item.table}` : "/admin?view=contacts";
+                return (
+                  <Link
+                    key={item.label}
+                    href={href}
+                    aria-current={active ? "page" : undefined}
+                    className={`mb-1 block rounded-2xl px-4 py-3 transition ${
+                      active ? "bg-[#9bbe62] text-[#10251a]" : "hover:bg-white/10"
+                    }`}
+                  >
+                    <span className="block text-sm font-semibold">{item.label}</span>
+                    <span className={`mt-1 block text-[0.68rem] leading-4 ${active ? "text-[#10251a]/65" : "text-white/50"}`}>
+                      {item.description}
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
           ))}
         </nav>
 
         <div className="min-w-0 space-y-6">
-          <section className="rounded-3xl bg-white p-6 sm:p-8">
+          <section className="rounded-3xl bg-white p-5 sm:p-7">
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#5e7f3b]">
-                  {showLeads ? "Hộp thư liên hệ" : "Supabase CMS"}
+                  {showLeads ? "Hộp thư liên hệ" : "Chọn → Sửa → Xuất bản"}
                 </p>
                 <h1 className="mt-2 font-serif text-3xl">
                   {showLeads
                     ? "Yêu cầu đã nhận"
-                    : contentTables.find((item) => item.name === selectedTable)?.label}
+                    : getAdminTableLabel(selectedTable)}
                 </h1>
               </div>
               <p className="rounded-full bg-[#eef1e9] px-4 py-2 text-sm font-semibold">
                 {showLeads ? leads.length : rows.length} bản ghi
               </p>
             </div>
+
+            {!showLeads ? (
+              <ol className="mt-6 grid gap-3 sm:grid-cols-3">
+                {[
+                  ["1", "Chọn khu vực", "Chọn một thẻ nội dung bên dưới."],
+                  ["2", "Sửa và xem trước", "Gõ tới đâu, preview đổi tới đó."],
+                  ["3", "Lưu hoặc xuất bản", "Bản nháp không hiện ra website."],
+                ].map(([step, title, description]) => (
+                  <li key={step} className="flex gap-3 rounded-2xl bg-[#eef1e9] p-3">
+                    <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#10251a] text-xs font-bold text-white">{step}</span>
+                    <span>
+                      <strong className="block text-sm">{title}</strong>
+                      <span className="mt-0.5 block text-xs leading-5 text-[#10251a]/60">{description}</span>
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            ) : null}
 
             {flash ? (
               <p role="status" className="mt-5 rounded-2xl bg-[#eee3cb] px-4 py-3 text-sm">
@@ -253,70 +405,113 @@ export default async function AdminPage({
             <>
               {selectedTable === "media_assets" ? (
                 <MediaUploadForm />
-              ) : (
-                <CreateContentForm table={selectedTable} />
-              )}
+              ) : !["site_settings", "page_sections"].includes(selectedTable) ? (
+                <details className="rounded-3xl bg-white p-5 sm:p-7">
+                  <summary className="cursor-pointer font-semibold">＋ Tạo nội dung mới</summary>
+                  <CreateContentForm table={selectedTable} embedded />
+                </details>
+              ) : null}
 
-              <section className="overflow-hidden rounded-3xl bg-white">
-            <h2 className="px-6 pt-6 font-serif text-2xl sm:px-8">Nội dung hiện có</h2>
-            {rows.length ? (
-              <div className="mt-5 divide-y divide-[#10251a]/10">
-                {rows.map((row) => (
-                  <article key={row.id} className="grid gap-4 px-6 py-5 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-center sm:px-8">
-                    <div className="min-w-0">
-                      <h3 className="truncate font-semibold">{rowTitle(row)}</h3>
-                      <p className="mt-1 truncate text-xs text-[#10251a]/55">
-                        {row.slug ?? row.id}
+              <section className="rounded-3xl bg-white p-5 sm:p-7">
+                <div className="flex flex-wrap items-end justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#5e7f3b]">Bước 1</p>
+                    <h2 className="mt-2 font-serif text-2xl">Chọn nội dung cần sửa</h2>
+                  </div>
+                  <p className="text-xs text-[#10251a]/55">Thẻ có viền xanh đang được chọn</p>
+                </div>
+                {rows.length ? (
+                  <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                    {rows.map((row) => {
+                      const selected = selectedRow?.id === row.id;
+                      const fallbackMedia = getAdminFallbackPreviewMedia(
+                        selectedTable,
+                        row.section_key,
+                        previewMediaMap,
+                      );
+                      const previewUrl = rowPreviewUrl(
+                        row,
+                        mediaOptions,
+                        fallbackMedia,
+                      );
+                      return (
+                        <Link
+                          key={row.id}
+                          href={`/admin?table=${selectedTable}&id=${row.id}#trinh-chinh-sua`}
+                          aria-current={selected ? "true" : undefined}
+                          className={`group overflow-hidden rounded-2xl border-2 bg-white transition hover:-translate-y-0.5 hover:shadow-lg ${
+                            selected ? "border-[#5e7f3b] shadow-md" : "border-[#10251a]/10"
+                          }`}
+                        >
+                          <div
+                            className="flex h-28 items-end bg-gradient-to-br from-[#dfe7d8] to-[#eee3cb] bg-cover bg-center p-3"
+                            style={previewUrl ? { backgroundImage: `linear-gradient(0deg, rgba(7,16,12,.72), rgba(7,16,12,.05)), url(${JSON.stringify(previewUrl)})` } : undefined}
+                          >
+                            <span className={`rounded-full px-2.5 py-1 text-[0.65rem] font-bold ${
+                              previewUrl ? "bg-white/90 text-[#10251a]" : "bg-[#10251a] text-white"
+                            }`}>
+                              {row.status === "published" ? "Đang hiển thị" : "Bản nháp"}
+                            </span>
+                          </div>
+                          <div className="p-4">
+                            <h3 className="line-clamp-2 font-semibold">{friendlyRowTitle(selectedTable, row)}</h3>
+                            <p className="mt-2 text-xs font-bold text-[#5e7f3b]">
+                              {selected ? "Đang chỉnh sửa" : "Sửa khu vực này →"}
+                            </p>
+                          </div>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="mt-5 rounded-2xl bg-[#eef1e9] px-5 py-8 text-center text-sm text-[#10251a]/60">
+                    Chưa có nội dung trong nhóm này.
+                  </p>
+                )}
+              </section>
+
+              {selectedRow ? (
+                <section id="trinh-chinh-sua" className="scroll-mt-5 rounded-3xl bg-white p-5 sm:p-7">
+                  <div className="flex flex-wrap items-start justify-between gap-4">
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#5e7f3b]">Bước 2 & 3</p>
+                      <h2 className="mt-2 font-serif text-2xl">{friendlyRowTitle(selectedTable, selectedRow)}</h2>
+                      <p className="mt-2 text-sm text-[#10251a]/60">
+                        {selectedRow.status === "published" ? "Nội dung này đang hiển thị trên website." : "Nội dung này đang là bản nháp."}
                       </p>
                     </div>
-                    <div className="flex flex-wrap items-center gap-3">
-                      <form action={updateContentItemAction} className="flex flex-wrap items-center gap-2">
-                        <input type="hidden" name="table" value={selectedTable} />
-                        <input type="hidden" name="id" value={row.id} />
-                        <label className="sr-only" htmlFor={`status-${row.id}`}>Trạng thái</label>
-                        <select
-                          id={`status-${row.id}`}
-                          name="status"
-                          defaultValue={row.status}
-                          className="min-h-11 rounded-xl border border-[#10251a]/15 px-3 text-sm"
-                        >
-                          <option value="draft">Bản nháp</option>
-                          <option value="review">Chờ duyệt</option>
-                          <option value="published">Đã xuất bản</option>
-                        </select>
-                        <label className="flex min-h-11 items-center gap-2 text-xs">
-                          <input type="checkbox" name="is_placeholder" defaultChecked={row.is_placeholder} />
-                          Nội dung đề xuất
-                        </label>
-                        <label className="sr-only" htmlFor={`order-${row.id}`}>Thứ tự</label>
-                        <input
-                          id={`order-${row.id}`}
-                          name="display_order"
-                          type="number"
-                          min="0"
-                          max="10000"
-                          defaultValue={row.display_order}
-                          className="min-h-11 w-20 rounded-xl border border-[#10251a]/15 px-3 text-sm"
-                        />
-                        <button className="min-h-11 rounded-full bg-[#5e7f3b] px-4 text-sm font-semibold text-white" type="submit">
-                          Lưu
-                        </button>
-                      </form>
+                    <div className="flex flex-wrap gap-2">
+                      <a
+                        href={`/${getAdminPublicAnchor(selectedTable, selectedRow.section_key)}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex min-h-11 items-center rounded-full border border-[#10251a]/15 px-4 text-sm font-semibold"
+                      >
+                        Xem trên website
+                      </a>
                       <form action={deleteContentItemAction}>
                         <input type="hidden" name="table" value={selectedTable} />
-                        <input type="hidden" name="id" value={row.id} />
-                        <button className="min-h-11 rounded-full border border-red-200 px-4 text-sm font-semibold text-red-700" type="submit">
-                          Xóa
-                        </button>
+                        <input type="hidden" name="id" value={selectedRow.id} />
+                        <DeleteRecordButton title={friendlyRowTitle(selectedTable, selectedRow)} />
                       </form>
                     </div>
-                  </article>
-                ))}
-              </div>
-            ) : (
-              <p className="px-6 py-10 text-[#10251a]/60 sm:px-8">Chưa có bản ghi nào trong nhóm này.</p>
-            )}
-              </section>
+                  </div>
+                  {mediaOptions.length === 0 && selectedTable !== "site_settings" ? (
+                    <p className="mt-5 rounded-2xl border border-[#d5a84e]/35 bg-[#fff8e8] px-4 py-3 text-sm leading-6 text-[#6b531d]">
+                      Website đang dùng ảnh mặc định. Hãy vào <Link className="font-bold underline" href="/admin?table=media_assets">Kho ảnh & video</Link> để tải ảnh mới.
+                    </p>
+                  ) : null}
+                  <AdminVisualEditor
+                    key={`${selectedTable}:${selectedRow.id}`}
+                    table={selectedTable}
+                    row={selectedRow}
+                    mediaOptions={mediaOptions}
+                    fallbackMedia={selectedFallbackMedia}
+                  >
+                    <EditContentForm table={selectedTable} row={selectedRow} mediaOptions={mediaOptions} />
+                  </AdminVisualEditor>
+                </section>
+              ) : null}
             </>
           )}
         </div>
@@ -377,10 +572,16 @@ function ContactSubmissionList({ leads }: { leads: ContactSubmissionPreview[] })
   );
 }
 
-function CreateContentForm({ table }: { table: Exclude<ContentTableName, "media_assets"> }) {
+function CreateContentForm({
+  table,
+  embedded = false,
+}: {
+  table: Exclude<ContentTableName, "media_assets">;
+  embedded?: boolean;
+}) {
   const needsSlug = ["journeys", "local_products", "ginseng_products", "travel_guides"].includes(table);
   return (
-    <section className="rounded-3xl bg-white p-6 sm:p-8">
+    <section className={embedded ? "pt-6" : "rounded-3xl bg-white p-6 sm:p-8"}>
       <h2 className="font-serif text-2xl">Tạo nội dung</h2>
       <p className="mt-2 text-sm leading-6 text-[#10251a]/60">
         Nội dung mới mặc định có thể giữ ở bản nháp hoặc chờ duyệt trước khi xuất bản.
@@ -458,7 +659,6 @@ function CreateContentForm({ table }: { table: Exclude<ContentTableName, "media_
           <span className="mb-2 block text-sm font-semibold">Trạng thái</span>
           <select name="status" defaultValue="draft" className="min-h-12 w-full rounded-xl border border-[#10251a]/15 px-3">
             <option value="draft">Bản nháp</option>
-            <option value="review">Chờ duyệt</option>
             <option value="published">Đã xuất bản</option>
           </select>
         </label>
@@ -475,9 +675,299 @@ function CreateContentForm({ table }: { table: Exclude<ContentTableName, "media_
   );
 }
 
+function rowText(row: AdminPreview, key: string): string {
+  const value = row[key];
+  return typeof value === "string" || typeof value === "number"
+    ? String(value)
+    : "";
+}
+
+function rowLines(row: AdminPreview, key: string): string {
+  const value = row[key];
+  if (!Array.isArray(value)) return "";
+  return value.map((item) => {
+    if (typeof item === "string") return item;
+    if (item && typeof item === "object") {
+      const record = item as Record<string, unknown>;
+      if (record.value && record.label) {
+        return [record.value, record.label, record.icon].filter(Boolean).join("|");
+      }
+      if (record.body) return String(record.body);
+    }
+    return "";
+  }).filter(Boolean).join("\n");
+}
+
+function MediaSelect({
+  name = "media_asset_id",
+  value,
+  options,
+  label = "Media từ thư viện",
+  only,
+}: {
+  name?: string;
+  value?: string;
+  options: MediaOption[];
+  label?: string;
+  only?: "image" | "video";
+}) {
+  return (
+    <label>
+      <span className="mb-2 block text-sm font-semibold">{label}</span>
+      <select name={name} defaultValue={value ?? ""} className="min-h-12 w-full rounded-xl border border-[#10251a]/15 px-3">
+        <option value="">Không chọn</option>
+        {options.filter((item) => !only || item.mediaType === only).map((item) => (
+          <option key={item.id} value={item.id}>{item.title} · {item.mediaType === "video" ? "Video" : "Ảnh"}</option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
+function EditContentForm({
+  table,
+  row,
+  mediaOptions,
+}: {
+  table: ContentTableName;
+  row: AdminPreview;
+  mediaOptions: MediaOption[];
+}) {
+  const statusFields = (
+    <>
+      <Field label="Thứ tự" name="display_order" type="number" defaultValue={String(row.display_order ?? 0)} />
+      {table !== "page_sections" ? (
+        <label className="flex min-h-12 items-center gap-3 text-sm font-semibold">
+          <input type="checkbox" name="is_placeholder" defaultChecked={Boolean(row.is_placeholder)} />
+          Nội dung đề xuất
+        </label>
+      ) : null}
+    </>
+  );
+
+  if (table === "site_settings") {
+    return (
+      <form action={updateContentItemAction} className="mt-5 grid gap-4 sm:grid-cols-2">
+        <input type="hidden" name="table" value={table} />
+        <input type="hidden" name="id" value={row.id} />
+        <Field label="Tên website" name="site_name" defaultValue={rowText(row, "site_name")} required />
+        <Field label="Khẩu hiệu" name="tagline" defaultValue={rowText(row, "tagline")} />
+        <TextArea label="Mô tả chung" name="description" defaultValue={rowText(row, "description")} />
+        <Field label="Địa chỉ" name="legal_address" defaultValue={rowText(row, "legal_address")} />
+        <Field label="Email liên hệ" name="contact_email" type="email" defaultValue={rowText(row, "contact_email")} />
+        <Field label="Số điện thoại" name="contact_phone" type="tel" defaultValue={rowText(row, "contact_phone")} />
+        <Field label="URL Zalo" name="zalo_url" type="url" defaultValue={rowText(row, "zalo_url")} />
+        <Field label="URL Google Maps" name="maps_url" type="url" defaultValue={rowText(row, "maps_url")} />
+        <Field label="URL chính sách riêng tư" name="privacy_url" defaultValue={rowText(row, "privacy_url")} />
+        <Field label="Tên trên header" name="header_title" defaultValue={rowText(row, "header_title")} />
+        <Field label="Dòng phụ header" name="header_subtitle" defaultValue={rowText(row, "header_subtitle")} />
+        <Field label="Tiêu đề footer" name="footer_title" defaultValue={rowText(row, "footer_title")} />
+        <TextArea label="Mô tả footer" name="footer_description" defaultValue={rowText(row, "footer_description")} />
+        <Field label="SEO title" name="seo_title" defaultValue={rowText(row, "seo_title")} />
+        <TextArea label="SEO description" name="seo_description" defaultValue={rowText(row, "seo_description")} />
+        <Field label="Nhãn CTA chính" name="primary_cta_label" defaultValue={rowText(row, "primary_cta_label")} />
+        <Field label="URL CTA chính" name="primary_cta_href" defaultValue={rowText(row, "primary_cta_href")} />
+        <MediaSelect name="hero_video_asset_id" label="Video Hero" value={rowText(row, "hero_video_asset_id")} options={mediaOptions} only="video" />
+        <Field label="Hoặc URL video Hero" name="hero_video_url" type="url" defaultValue={rowText(row, "hero_video_url")} />
+        <MediaSelect name="hero_mobile_poster_asset_id" label="Poster Hero mobile" value={rowText(row, "hero_mobile_poster_asset_id")} options={mediaOptions} only="image" />
+        <Field label="Hoặc URL poster mobile" name="hero_mobile_poster_url" type="url" defaultValue={rowText(row, "hero_mobile_poster_url")} />
+        {statusFields}
+        <SaveButton />
+      </form>
+    );
+  }
+
+  if (table === "page_sections") {
+    return (
+      <form action={updateContentItemAction} className="mt-5 grid gap-4 sm:grid-cols-2">
+        <input type="hidden" name="table" value={table} />
+        <input type="hidden" name="id" value={row.id} />
+        <Field label="Nhãn nhỏ" name="eyebrow" defaultValue={rowText(row, "eyebrow")} />
+        <Field label="Tiêu đề" name="title" defaultValue={rowText(row, "title")} required />
+        <TextArea label="Mô tả" name="description" defaultValue={rowText(row, "description")} />
+        <TextArea label="Nội dung phụ" name="secondary_text" defaultValue={rowText(row, "secondary_text")} />
+        <Field label="Nhãn CTA" name="cta_label" defaultValue={rowText(row, "cta_label")} />
+        <Field label="URL CTA" name="cta_href" defaultValue={rowText(row, "cta_href")} />
+        <TextArea label="Nhãn/badge — mỗi dòng một mục" name="badges" defaultValue={rowLines(row, "badges")} />
+        <TextArea label="Số liệu — giá trị|nhãn|icon, mỗi dòng" name="stats" defaultValue={rowLines(row, "stats")} />
+        <MediaSelect value={rowText(row, "media_asset_id")} options={mediaOptions} />
+        {statusFields}
+        <SaveButton />
+      </form>
+    );
+  }
+
+  if (table === "media_assets") {
+    return (
+      <form action={updateContentItemAction} className="mt-5 grid gap-4 sm:grid-cols-2">
+        <input type="hidden" name="table" value={table} />
+        <input type="hidden" name="id" value={row.id} />
+        <Field label="Tiêu đề" name="title" defaultValue={rowText(row, "title")} required />
+        <Field label="Mô tả media" name="alt_text" defaultValue={rowText(row, "alt_text")} required />
+        <Field label="Khu vực sử dụng" name="section" defaultValue={rowText(row, "section")} />
+        <Field label="URL nguồn" name="source_url" type="url" defaultValue={rowText(row, "source_url")} />
+        <Field label="Credit nguồn" name="source_credit" defaultValue={rowText(row, "source_credit")} />
+        <SelectField label="Quyền sử dụng" name="usage_permission" defaultValue={rowText(row, "usage_permission") || "client_confirmed"} options={[
+          { value: "client_confirmed", label: "Chủ website xác nhận" },
+          { value: "official_publication", label: "Nguồn công bố chính thức" },
+          { value: "pending", label: "Đang xác minh" },
+        ]} />
+        <MediaSelect name="poster_asset_id" label="Poster cho video" value={rowText(row, "poster_asset_id")} options={mediaOptions} only="image" />
+        {statusFields}
+        <SaveButton />
+      </form>
+    );
+  }
+
+  const recordTitle = rowText(row, "title") || rowText(row, "name");
+  const recordDescription =
+    rowText(row, "description") ||
+    rowText(row, "short_description") ||
+    rowText(row, "excerpt");
+  return (
+    <form action={updateContentItemAction} className="mt-5 grid gap-4 sm:grid-cols-2">
+      <input type="hidden" name="table" value={table} />
+      <input type="hidden" name="id" value={row.id} />
+      <Field label="Tiêu đề / tên" name="title" defaultValue={recordTitle} required />
+      {["journeys", "local_products", "ginseng_products", "travel_guides"].includes(table) ? (
+        <Field label="Slug" name="slug" defaultValue={rowText(row, "slug")} required />
+      ) : null}
+      <Field label="Nhãn nhỏ" name="eyebrow" defaultValue={rowText(row, "eyebrow")} />
+      <TextArea label="Mô tả" name="description" defaultValue={recordDescription} required />
+      <TextArea label="Nội dung chi tiết — mỗi đoạn một dòng" name="body" defaultValue={rowLines(row, "body")} />
+      <Field label="URL ảnh/video ngoài" name="image_url" defaultValue={rowText(row, "image_url")} />
+      <MediaSelect value={rowText(row, "media_asset_id")} options={mediaOptions} />
+      <Field label="Mô tả media" name="alt_text" defaultValue={rowText(row, "alt_text")} />
+      <Field label="URL nguồn" name="source_url" type="url" defaultValue={rowText(row, "source_url")} />
+      <Field label="Credit nguồn" name="source_credit" defaultValue={rowText(row, "source_credit")} />
+      <SelectField label="Quyền sử dụng" name="usage_permission" defaultValue={rowText(row, "usage_permission") || "client_confirmed"} options={[
+        { value: "client_confirmed", label: "Chủ website xác nhận" },
+        { value: "official_publication", label: "Nguồn công bố chính thức" },
+        { value: "pending", label: "Đang xác minh" },
+      ]} />
+      <SpecificFields table={table} row={row} />
+      {statusFields}
+      <SaveButton />
+    </form>
+  );
+}
+
+function SpecificFields({ table, row }: { table: ContentTableName; row: AdminPreview }) {
+  if (table === "journeys") return (
+    <>
+      <SelectField label="Loại hành trình" name="category" defaultValue={rowText(row, "category") || "nature"} options={[
+        { value: "nature", label: "Thiên nhiên" }, { value: "community", label: "Cộng đồng" },
+        { value: "heritage", label: "Di sản" }, { value: "ginseng", label: "Sâm Ngọc Linh" },
+      ]} />
+      <SelectField label="Quyền tiếp cận" name="access_status" defaultValue={rowText(row, "access_status") || "contact_required"} options={[
+        { value: "open", label: "Mở" }, { value: "contact_required", label: "Cần liên hệ" },
+        { value: "organized_only", label: "Chỉ đi có tổ chức" },
+      ]} />
+      <Field label="Địa điểm" name="location_label" defaultValue={rowText(row, "location_label")} />
+      <Field label="Thời lượng" name="duration_label" defaultValue={rowText(row, "duration_label")} />
+      <TextArea label="Lưu ý tiếp cận" name="access_note" defaultValue={rowText(row, "access_note")} />
+      <TextArea label="Lưu ý an toàn" name="safety_note" defaultValue={rowText(row, "safety_note")} />
+      <TextArea label="Điểm nổi bật — mỗi dòng một mục" name="highlights" defaultValue={rowLines(row, "highlights")} />
+    </>
+  );
+  if (table === "local_products") return (
+    <>
+      <SelectField label="Danh mục" name="category" defaultValue={rowText(row, "category") || "am-thuc"} options={[
+        { value: "am-thuc", label: "Ẩm thực" }, { value: "duoc-lieu", label: "Dược liệu" }, { value: "nong-san", label: "Nông sản" },
+      ]} />
+      <Field label="Ghi chú nguồn gốc" name="origin_note" defaultValue={rowText(row, "origin_note")} />
+    </>
+  );
+  if (table === "ginseng_products") return (
+    <>
+      <SelectField label="Loại sản phẩm" name="product_type" defaultValue={rowText(row, "product_type") || "fresh-ginseng"} options={[
+        { value: "fresh-ginseng", label: "Sâm tươi" }, { value: "dried-ginseng", label: "Sâm khô" }, { value: "herbal-tea", label: "Trà thảo dược" },
+      ]} />
+      <Field label="URL liên hệ" name="contact_url" defaultValue={rowText(row, "contact_url")} />
+      <Field label="Ghi chú nguồn gốc" name="origin_note" defaultValue={rowText(row, "origin_note")} />
+      <TextArea label="Tuyên bố pháp lý" name="legal_disclaimer" defaultValue={rowText(row, "legal_disclaimer")} />
+    </>
+  );
+  if (table === "ginseng_story_steps") return (
+    <>
+      <Field label="Số bước" name="step_number" type="number" defaultValue={rowText(row, "step_number") || "1"} />
+      <TextArea label="Trích dẫn" name="quote" defaultValue={rowText(row, "quote")} />
+    </>
+  );
+  if (table === "hero_slides") return (
+    <>
+      <Field label="Nhãn CTA" name="cta_label" defaultValue={rowText(row, "cta_label")} />
+      <Field label="URL CTA" name="cta_href" defaultValue={rowText(row, "cta_href")} />
+    </>
+  );
+  if (table === "culture_stories") return <Field label="Chú thích" name="caption" defaultValue={rowText(row, "caption")} />;
+  if (table === "travel_guides") return (
+    <>
+      <Field label="Danh mục" name="category" defaultValue={rowText(row, "category")} />
+      <Field label="Thời gian đọc" name="read_time_label" defaultValue={rowText(row, "read_time_label")} />
+      <Field label="Mùa phù hợp" name="season_label" defaultValue={rowText(row, "season_label")} />
+      <TextArea label="Các phần — mỗi dòng một phần" name="sections" defaultValue={rowLines(row, "sections")} />
+    </>
+  );
+  return null;
+}
+
+function TextArea({
+  label,
+  name,
+  defaultValue,
+  required = false,
+}: {
+  label: string;
+  name: string;
+  defaultValue?: string;
+  required?: boolean;
+}) {
+  return (
+    <label className="sm:col-span-2">
+      <span className="mb-2 block text-sm font-semibold">{label}</span>
+      <textarea name={name} defaultValue={defaultValue} required={required} rows={4} className="w-full rounded-xl border border-[#10251a]/15 px-4 py-3" />
+    </label>
+  );
+}
+
+function SaveButton() {
+  return (
+    <div className="sticky bottom-3 z-10 -mx-1 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#10251a]/10 bg-white/95 p-3 shadow-lg backdrop-blur sm:col-span-2">
+      <p className="text-xs leading-5 text-[#10251a]/60 sm:text-sm">
+        Lưu nháp để kiểm tra trước, hoặc xuất bản ngay lên website.
+      </p>
+      <div className="flex flex-1 justify-end gap-2 sm:flex-none">
+        <button
+          type="submit"
+          name="intent"
+          value="save-draft"
+          className="min-h-12 flex-1 rounded-full border border-[#10251a]/20 bg-white px-5 font-semibold sm:flex-none"
+        >
+          Lưu nháp
+        </button>
+        <button
+          type="submit"
+          name="intent"
+          value="publish"
+          className="min-h-12 flex-1 rounded-full bg-[#5e7f3b] px-5 font-semibold text-white sm:flex-none"
+        >
+          Xuất bản
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function MediaUploadForm() {
   return (
     <section className="rounded-3xl bg-white p-6 sm:p-8">
+      <h2 className="font-serif text-2xl">Tải ảnh hoặc video</h2>
+      <p className="mt-2 text-sm leading-6 text-[#10251a]/60">
+        Upload có thể tiếp tục khi mạng gián đoạn; ảnh tối đa 10 MB, video tối đa 250 MB.
+      </p>
+      <MediaUploadManager />
+      <div className="my-8 border-t border-[#10251a]/10" />
       <h2 className="font-serif text-2xl">Tải ảnh có nguồn</h2>
       <p className="mt-2 text-sm leading-6 text-[#10251a]/60">JPEG, PNG, WebP hoặc AVIF; tối đa 5 MB. Alt text, nguồn, credit và quyền sử dụng đều bắt buộc.</p>
       <form action={uploadMediaAction} className="mt-6 grid gap-4 sm:grid-cols-2">
@@ -502,6 +992,29 @@ function MediaUploadForm() {
           <button type="submit" className="min-h-12 rounded-full bg-[#10251a] px-7 font-semibold text-white">Tải ảnh lên</button>
         </div>
       </form>
+      <div className="my-8 border-t border-[#10251a]/10" />
+      <h2 className="font-serif text-2xl">Thêm media từ URL</h2>
+      <form action={createExternalMediaAction} className="mt-6 grid gap-4 sm:grid-cols-2">
+        <Field label="Tiêu đề" name="title" required />
+        <Field label="Mô tả ảnh/video" name="alt_text" required />
+        <Field label="URL media" name="external_url" type="url" required />
+        <SelectField
+          label="Loại media"
+          name="media_type"
+          defaultValue="image"
+          options={[
+            { value: "image", label: "Ảnh" },
+            { value: "video", label: "Video" },
+          ]}
+        />
+        <Field label="Credit nguồn" name="source_credit" />
+        <Field label="Khu vực sử dụng" name="section" />
+        <div className="sm:col-span-2">
+          <button type="submit" className="min-h-12 rounded-full bg-[#10251a] px-7 font-semibold text-white">
+            Thêm vào thư viện
+          </button>
+        </div>
+      </form>
     </section>
   );
 }
@@ -513,6 +1026,7 @@ function Field({
   required = false,
   placeholder,
   defaultValue,
+  readOnly = false,
 }: {
   label: string;
   name: string;
@@ -520,11 +1034,22 @@ function Field({
   required?: boolean;
   placeholder?: string;
   defaultValue?: string;
+  readOnly?: boolean;
 }) {
   return (
     <label>
       <span className="mb-2 block text-sm font-semibold">{label}</span>
-      <input name={name} type={type} required={required} placeholder={placeholder} defaultValue={defaultValue} className="min-h-12 w-full rounded-xl border border-[#10251a]/15 px-4 outline-none focus:ring-2 focus:ring-[#9bbe62]/40" />
+      <input
+        name={name}
+        type={type}
+        required={required}
+        placeholder={placeholder}
+        defaultValue={defaultValue}
+        readOnly={readOnly}
+        className={`min-h-12 w-full rounded-xl border border-[#10251a]/15 px-4 outline-none focus:ring-2 focus:ring-[#9bbe62]/40 ${
+          readOnly ? "cursor-not-allowed bg-[#10251a]/5 text-[#10251a]/60" : ""
+        }`}
+      />
     </label>
   );
 }

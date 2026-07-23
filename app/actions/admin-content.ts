@@ -7,10 +7,16 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { getAdminAccess } from "@/lib/supabase/access";
-import { getMediaBucketName } from "@/lib/supabase/config";
+import { buildAdminUpdatePayload } from "@/lib/cms/admin-fields";
+import { resolveEditorialIntent } from "@/lib/cms/admin-preview";
+import { getMediaBucketName, getPublicSupabaseConfig } from "@/lib/supabase/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { ContentStatus, ContentTableName } from "@/lib/supabase/types";
-import { validateImageUpload } from "@/lib/supabase/uploads";
+import {
+  MAX_IMAGE_SIZE,
+  MAX_VIDEO_SIZE,
+  validateMediaUpload,
+} from "@/lib/supabase/uploads";
 
 const tableSchema = z.enum([
   "site_settings",
@@ -23,6 +29,7 @@ const tableSchema = z.enum([
   "ginseng_products",
   "travel_guides",
   "media_assets",
+  "page_sections",
 ]);
 
 const slugSchema = z
@@ -90,8 +97,14 @@ function checked(formData: FormData, name: string): boolean {
   return value === "on" || value === "true" || value === "1";
 }
 
-function adminRedirect(table: ContentTableName, key: "notice" | "error", value: string): never {
-  redirect(`/admin?table=${table}&${key}=${encodeURIComponent(value)}`);
+function adminRedirect(
+  table: ContentTableName,
+  key: "notice" | "error",
+  value: string,
+  id?: string,
+): never {
+  const selected = id ? `&id=${encodeURIComponent(id)}` : "";
+  redirect(`/admin?table=${table}${selected}&${key}=${encodeURIComponent(value)}`);
 }
 
 async function requireAuthenticatedAdmin(table: ContentTableName) {
@@ -110,6 +123,10 @@ function parseCommon(formData: FormData) {
   const title = titleSchema.parse(formData.get("title"));
   const description = descriptionSchema.parse(formData.get("description"));
   const imageUrl = optionalUrlSchema.parse(text(formData, "image_url"));
+  const mediaAssetIdText = text(formData, "media_asset_id");
+  const mediaAssetId = mediaAssetIdText
+    ? z.string().uuid().parse(mediaAssetIdText)
+    : null;
   const altText = text(formData, "alt_text");
   const sourceUrlText = text(formData, "source_url");
   const sourceUrl = sourceUrlText
@@ -133,10 +150,8 @@ function parseCommon(formData: FormData) {
   if (
     status === "published" &&
     !isPlaceholder &&
-    (!sourceUrl ||
-      !sourceCredit ||
-      !usagePermission ||
-      usagePermission === "pending")
+    usagePermission === "official_publication" &&
+    (!sourceUrl || !sourceCredit)
   ) {
     throw new Error("missing-verification-source");
   }
@@ -146,6 +161,7 @@ function parseCommon(formData: FormData) {
     description,
     displayOrder,
     imageUrl,
+    mediaAssetId,
     isPlaceholder,
     sourceCredit,
     sourceUrl,
@@ -238,7 +254,7 @@ export async function createContentItemAction(formData: FormData): Promise<never
       legal_address: "Xã Trà Linh, thành phố Đà Nẵng",
     }));
   } else if (common.table === "hero_slides") {
-    if (!common.imageUrl || !common.altText) {
+    if ((!common.imageUrl && !common.mediaAssetId) || !common.altText) {
       adminRedirect(common.table, "error", "missing-image");
     }
     ({ error } = await supabase.from("hero_slides").insert({
@@ -246,6 +262,7 @@ export async function createContentItemAction(formData: FormData): Promise<never
       title: common.title,
       description: common.description,
       image_url: common.imageUrl,
+      media_asset_id: common.mediaAssetId,
       alt_text: common.altText,
       cta_label: "Khám phá hành trình",
       cta_href: "#hanh-trinh",
@@ -257,10 +274,11 @@ export async function createContentItemAction(formData: FormData): Promise<never
       description: common.description,
       body: [common.description],
       image_url: common.imageUrl || null,
+      media_asset_id: common.mediaAssetId,
       alt_text: common.altText || null,
     }));
   } else if (common.table === "journeys") {
-    if (!common.imageUrl || !common.altText || !slug.success) {
+    if ((!common.imageUrl && !common.mediaAssetId) || !common.altText || !slug.success) {
       adminRedirect(common.table, "error", "missing-required-fields");
     }
     const accessStatus = tableSpecific.accessStatus;
@@ -275,6 +293,7 @@ export async function createContentItemAction(formData: FormData): Promise<never
       short_description: common.description,
       body: [common.description],
       image_url: common.imageUrl,
+      media_asset_id: common.mediaAssetId,
       alt_text: common.altText,
       access_status: accessStatus,
       contact_required: accessStatus !== "open",
@@ -288,10 +307,11 @@ export async function createContentItemAction(formData: FormData): Promise<never
       title: common.title,
       description: common.description,
       image_url: common.imageUrl || null,
+      media_asset_id: common.mediaAssetId,
       alt_text: common.altText || null,
     }));
   } else if (common.table === "culture_stories") {
-    if (!common.imageUrl || !common.altText) {
+    if ((!common.imageUrl && !common.mediaAssetId) || !common.altText) {
       adminRedirect(common.table, "error", "missing-image");
     }
     ({ error } = await supabase.from("culture_stories").insert({
@@ -299,11 +319,12 @@ export async function createContentItemAction(formData: FormData): Promise<never
       title: common.title,
       description: common.description,
       image_url: common.imageUrl,
+      media_asset_id: common.mediaAssetId,
       alt_text: common.altText,
       caption: common.sourceCredit,
     }));
   } else if (common.table === "local_products") {
-    if (!common.imageUrl || !common.altText || !slug.success) {
+    if ((!common.imageUrl && !common.mediaAssetId) || !common.altText || !slug.success) {
       adminRedirect(common.table, "error", "missing-required-fields");
     }
     ({ error } = await supabase.from("local_products").insert({
@@ -313,11 +334,12 @@ export async function createContentItemAction(formData: FormData): Promise<never
       category: tableSpecific.category,
       description: common.description,
       image_url: common.imageUrl,
+      media_asset_id: common.mediaAssetId,
       alt_text: common.altText,
       origin_note: text(formData, "origin_note") || null,
     }));
   } else if (common.table === "ginseng_products") {
-    if (!common.imageUrl || !common.altText || !slug.success) {
+    if ((!common.imageUrl && !common.mediaAssetId) || !common.altText || !slug.success) {
       adminRedirect(common.table, "error", "missing-required-fields");
     }
     ({ error } = await supabase.from("ginseng_products").insert({
@@ -327,6 +349,7 @@ export async function createContentItemAction(formData: FormData): Promise<never
       product_type: tableSpecific.category,
       short_description: common.description,
       image_url: common.imageUrl,
+      media_asset_id: common.mediaAssetId,
       alt_text: common.altText,
       contact_url: null,
       origin_note: text(formData, "origin_note") || null,
@@ -346,6 +369,7 @@ export async function createContentItemAction(formData: FormData): Promise<never
       excerpt: common.description,
       body: [common.description],
       image_url: common.imageUrl || null,
+      media_asset_id: common.mediaAssetId,
       alt_text: common.altText || null,
       read_time_label: text(formData, "read_time_label") || null,
       season_label: text(formData, "season_label") || null,
@@ -360,7 +384,7 @@ export async function createContentItemAction(formData: FormData): Promise<never
   adminRedirect(common.table, "notice", "created");
 }
 
-export async function updateContentItemAction(formData: FormData): Promise<never> {
+async function legacyUpdateContentItemAction(formData: FormData): Promise<never> {
   const tableResult = tableSchema.safeParse(formData.get("table"));
   const idResult = z.string().uuid().safeParse(formData.get("id"));
   const statusResult = statusSchema.safeParse(formData.get("status"));
@@ -400,6 +424,79 @@ export async function updateContentItemAction(formData: FormData): Promise<never
   adminRedirect(table, "notice", "updated");
 }
 
+void legacyUpdateContentItemAction;
+
+export async function updateContentItemAction(formData: FormData): Promise<never> {
+  const tableResult = tableSchema.safeParse(formData.get("table"));
+  const idResult = z.string().uuid().safeParse(formData.get("id"));
+  const intent = text(formData, "intent");
+  const statusResult = intent
+    ? (() => {
+        try {
+          return { success: true as const, data: resolveEditorialIntent(intent) };
+        } catch {
+          return { success: false as const };
+        }
+      })()
+    : statusSchema.safeParse(formData.get("status"));
+
+  if (!tableResult.success || !idResult.success || !statusResult.success) {
+    adminRedirect(
+      tableResult.success ? tableResult.data : "stories",
+      "error",
+      "invalid-update",
+    );
+  }
+
+  const table = tableResult.data;
+  const supabase = await requireAuthenticatedAdmin(table);
+  const isPageSection = table === "page_sections";
+  const isPlaceholder = isPageSection ? false : checked(formData, "is_placeholder");
+  let payload: Record<string, unknown> = {
+    status: statusResult.data,
+    display_order: z.coerce.number().int().min(0).max(10_000).catch(0)
+      .parse(formData.get("display_order")),
+  };
+
+  if (!isPageSection) {
+    payload = {
+      ...payload,
+      is_placeholder: isPlaceholder,
+      placeholder_label: isPlaceholder ? "Nội dung đề xuất" : null,
+      verified_at:
+        statusResult.data === "published" && !isPlaceholder
+          ? new Date().toISOString()
+          : null,
+      ...(table === "media_assets"
+        ? { verification_status: isPlaceholder ? "placeholder" : "verified" }
+        : {}),
+    };
+  }
+
+  if (formData.has("title") || formData.has("site_name")) {
+    try {
+      payload = { ...payload, ...buildAdminUpdatePayload(formData, table) };
+    } catch {
+      adminRedirect(table, "error", "invalid-update", idResult.data);
+    }
+  }
+
+  const { error } = await supabase
+    .from(table)
+    .update(payload as never)
+    .eq("id", idResult.data);
+
+  if (error) adminRedirect(table, "error", "update-failed", idResult.data);
+  revalidatePath("/", "layout");
+  revalidatePath("/sitemap.xml");
+  adminRedirect(
+    table,
+    "notice",
+    statusResult.data === "published" ? "published" : "draft-saved",
+    idResult.data,
+  );
+}
+
 export async function deleteContentItemAction(formData: FormData): Promise<never> {
   const tableResult = tableSchema.safeParse(formData.get("table"));
   const idResult = z.string().uuid().safeParse(formData.get("id"));
@@ -437,9 +534,9 @@ export async function uploadMediaAction(formData: FormData): Promise<never> {
 
   if (!(file instanceof File)) adminRedirect(table, "error", "missing-file");
 
-  let validated: Awaited<ReturnType<typeof validateImageUpload>>;
+  let validated: Awaited<ReturnType<typeof validateMediaUpload>>;
   try {
-    validated = await validateImageUpload(file);
+    validated = await validateMediaUpload(file);
   } catch {
     adminRedirect(table, "error", "invalid-file");
   }
@@ -448,8 +545,8 @@ export async function uploadMediaAction(formData: FormData): Promise<never> {
     .object({
       title: titleSchema,
       altText: z.string().trim().min(5).max(300),
-      sourceUrl: externalUrlSchema,
-      sourceCredit: z.string().trim().min(2).max(300),
+      sourceUrl: z.union([z.literal(""), externalUrlSchema]),
+      sourceCredit: z.string().trim().max(300),
       usagePermission: z.enum([
         "client_confirmed",
         "official_publication",
@@ -484,15 +581,18 @@ export async function uploadMediaAction(formData: FormData): Promise<never> {
     title: metadata.data.title,
     file_url: `storage://${bucket}/${storagePath}`,
     storage_path: storagePath,
+    media_type: validated.mediaType,
+    mime_type: validated.mimeType,
+    file_size_bytes: file.size,
     alt_text: metadata.data.altText,
     source_url: metadata.data.sourceUrl,
     source_credit: metadata.data.sourceCredit,
     usage_permission: metadata.data.usagePermission,
     section: metadata.data.section || null,
-    status: "review",
-    verification_status: "placeholder",
-    is_placeholder: true,
-    placeholder_label: "Nội dung đề xuất",
+    status: "draft",
+    verification_status: "verified",
+    is_placeholder: false,
+    placeholder_label: null,
   });
 
   if (insertError) {
@@ -502,4 +602,149 @@ export async function uploadMediaAction(formData: FormData): Promise<never> {
 
   revalidatePath("/admin");
   adminRedirect(table, "notice", "uploaded");
+}
+
+const resumableMimeSchema = z.enum([
+  "image/avif",
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "video/mp4",
+  "video/webm",
+]);
+
+const uploadExtensions: Record<z.infer<typeof resumableMimeSchema>, string[]> = {
+  "image/avif": [".avif"],
+  "image/jpeg": [".jpg", ".jpeg"],
+  "image/png": [".png"],
+  "image/webp": [".webp"],
+  "video/mp4": [".mp4"],
+  "video/webm": [".webm"],
+};
+
+export async function prepareMediaUploadAction(input: {
+  fileName: string;
+  mimeType: string;
+  fileSize: number;
+}) {
+  await requireAuthenticatedAdmin("media_assets");
+  const parsed = z.object({
+    fileName: z.string().trim().min(1).max(240),
+    mimeType: resumableMimeSchema,
+    fileSize: z.number().int().positive(),
+  }).safeParse(input);
+  if (!parsed.success) return { ok: false as const, error: "invalid-file" };
+
+  const { fileName, mimeType, fileSize } = parsed.data;
+  const isVideo = mimeType.startsWith("video/");
+  if (fileSize > (isVideo ? MAX_VIDEO_SIZE : MAX_IMAGE_SIZE)) {
+    return { ok: false as const, error: "file-too-large" };
+  }
+  const lowerName = fileName.toLowerCase();
+  if (!uploadExtensions[mimeType].some((extension) => lowerName.endsWith(extension))) {
+    return { ok: false as const, error: "invalid-extension" };
+  }
+
+  const config = getPublicSupabaseConfig();
+  if (!config) return { ok: false as const, error: "cms-unavailable" };
+  const projectId = new URL(config.url).hostname.split(".")[0];
+  const extension = uploadExtensions[mimeType][0] === ".jpeg"
+    ? ".jpg"
+    : uploadExtensions[mimeType][0];
+  const storagePath = `${new Date().getUTCFullYear()}/${randomUUID()}${extension}`;
+
+  return {
+    ok: true as const,
+    bucket: getMediaBucketName(),
+    storagePath,
+    endpoint: `https://${projectId}.storage.supabase.co/storage/v1/upload/resumable`,
+  };
+}
+
+export async function finalizeMediaUploadAction(formData: FormData) {
+  const supabase = await requireAuthenticatedAdmin("media_assets");
+  const parsed = z.object({
+    title: titleSchema,
+    altText: z.string().trim().min(5).max(300),
+    storagePath: z.string().regex(/^[0-9]{4}\/[a-f0-9-]+\.(avif|jpe?g|png|webp|mp4|webm)$/),
+    mimeType: resumableMimeSchema,
+    fileSize: z.coerce.number().int().positive().max(MAX_VIDEO_SIZE),
+    sourceUrl: z.union([z.literal(""), externalUrlSchema]),
+    sourceCredit: z.string().trim().max(300),
+    section: z.string().trim().max(80),
+  }).safeParse({
+    title: formData.get("title"),
+    altText: formData.get("alt_text"),
+    storagePath: formData.get("storage_path"),
+    mimeType: formData.get("mime_type"),
+    fileSize: formData.get("file_size"),
+    sourceUrl: formData.get("source_url") ?? "",
+    sourceCredit: formData.get("source_credit") ?? "",
+    section: formData.get("section") ?? "",
+  });
+  if (!parsed.success) return { ok: false as const, error: "invalid-metadata" };
+
+  const bucket = getMediaBucketName();
+  const { error } = await supabase.from("media_assets").insert({
+    title: parsed.data.title,
+    file_url: `storage://${bucket}/${parsed.data.storagePath}`,
+    storage_path: parsed.data.storagePath,
+    alt_text: parsed.data.altText,
+    media_type: parsed.data.mimeType.startsWith("video/") ? "video" : "image",
+    mime_type: parsed.data.mimeType,
+    file_size_bytes: parsed.data.fileSize,
+    source_url: parsed.data.sourceUrl || null,
+    source_credit: parsed.data.sourceCredit || null,
+    usage_permission: "client_confirmed",
+    section: parsed.data.section || null,
+    status: "draft",
+    verification_status: "verified",
+    is_placeholder: false,
+    placeholder_label: null,
+  });
+  if (error) return { ok: false as const, error: "save-failed" };
+
+  revalidatePath("/admin");
+  return { ok: true as const };
+}
+
+export async function createExternalMediaAction(formData: FormData): Promise<never> {
+  const table: ContentTableName = "media_assets";
+  const supabase = await requireAuthenticatedAdmin(table);
+  const parsed = z.object({
+    title: titleSchema,
+    altText: z.string().trim().min(5).max(300),
+    externalUrl: externalUrlSchema,
+    mediaType: z.enum(["image", "video"]),
+    sourceCredit: z.string().trim().max(300),
+    section: z.string().trim().max(80),
+  }).safeParse({
+    title: formData.get("title"),
+    altText: formData.get("alt_text"),
+    externalUrl: formData.get("external_url"),
+    mediaType: formData.get("media_type"),
+    sourceCredit: formData.get("source_credit") ?? "",
+    section: formData.get("section") ?? "",
+  });
+  if (!parsed.success) adminRedirect(table, "error", "invalid-metadata");
+
+  const { error } = await supabase.from("media_assets").insert({
+    title: parsed.data.title,
+    file_url: parsed.data.externalUrl,
+    external_url: parsed.data.externalUrl,
+    storage_path: null,
+    alt_text: parsed.data.altText,
+    media_type: parsed.data.mediaType,
+    source_url: parsed.data.externalUrl,
+    source_credit: parsed.data.sourceCredit || null,
+    usage_permission: "client_confirmed",
+    section: parsed.data.section || null,
+    status: "draft",
+    verification_status: "verified",
+    is_placeholder: false,
+    placeholder_label: null,
+  });
+  if (error) adminRedirect(table, "error", "save-failed");
+  revalidatePath("/admin");
+  adminRedirect(table, "notice", "created");
 }

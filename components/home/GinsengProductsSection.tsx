@@ -6,6 +6,7 @@ import { ArrowGlyph, MediaFrame, PlaceholderPill, SectionIntro } from "./_shared
 
 type GinsengProductsSectionProps = {
   products: HomePageContent["products"];
+  section?: HomePageContent["sectionSettings"][string];
 };
 
 const productTypeLabels: Record<HomePageContent["products"][number]["productType"], string> = {
@@ -14,7 +15,7 @@ const productTypeLabels: Record<HomePageContent["products"][number]["productType
   "herbal-tea": "Trà dược liệu",
 };
 
-export function GinsengProductsSection({ products }: GinsengProductsSectionProps) {
+export function GinsengProductsSection({ products, section }: GinsengProductsSectionProps) {
   if (!products.length) return null;
 
   return (
@@ -22,9 +23,9 @@ export function GinsengProductsSection({ products }: GinsengProductsSectionProps
       <div className="mx-auto max-w-[1380px]">
         <div id="products-heading">
           <SectionIntro
-            eyebrow="Từ vùng sâm Ngọc Linh"
-            title="Sản phẩm mang câu chuyện nguồn gốc"
-            description="Danh mục đang được hoàn thiện cùng đơn vị địa phương. Thông tin chỉ giới thiệu dòng sản phẩm, không thay thế tư vấn chuyên môn."
+            eyebrow={section?.eyebrow ?? "Từ vùng sâm Ngọc Linh"}
+            title={section?.title ?? "Sản phẩm mang câu chuyện nguồn gốc"}
+            description={section?.description ?? "Danh mục đang được hoàn thiện cùng đơn vị địa phương. Thông tin chỉ giới thiệu dòng sản phẩm, không thay thế tư vấn chuyên môn."}
             tone="dark"
             align="center"
           />

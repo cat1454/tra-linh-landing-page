@@ -7,9 +7,10 @@ import { SectionIntro } from "./_shared";
 
 type JourneySectionProps = {
   journeys: HomePageContent["journeys"];
+  section?: HomePageContent["sectionSettings"][string];
 };
 
-export function JourneySection({ journeys }: JourneySectionProps) {
+export function JourneySection({ journeys, section }: JourneySectionProps) {
   if (!journeys.length) return null;
 
   return (
@@ -17,9 +18,9 @@ export function JourneySection({ journeys }: JourneySectionProps) {
       <div className="mx-auto max-w-[1440px]">
         <div id="journey-heading">
           <SectionIntro
-            eyebrow="Hành trình"
-            title="Chạm vào nhịp sống đại ngàn"
-            description="Không phải hành trình của những điểm check-in vội vã. Trà Linh mở ra qua từng cung đường, tán rừng, bản làng và câu chuyện của người dân vùng cao."
+            eyebrow={section?.eyebrow ?? "Hành trình"}
+            title={section?.title ?? "Chạm vào nhịp sống đại ngàn"}
+            description={section?.description ?? "Không phải hành trình của những điểm check-in vội vã. Trà Linh mở ra qua từng cung đường, tán rừng, bản làng và câu chuyện của người dân vùng cao."}
           />
         </div>
 

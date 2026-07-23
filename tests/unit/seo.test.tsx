@@ -24,22 +24,35 @@ describe('SEO and site URL helpers', () => {
     )
   })
 
-  it('uses Vercel URL fallbacks in priority order', () => {
+  it('uses the configured public URL and ignores deployment preview URLs', () => {
     vi.stubEnv('NEXT_PUBLIC_SITE_URL', 'not a valid host/%')
     vi.stubEnv('VERCEL_PROJECT_PRODUCTION_URL', 'tra-linh.vercel.app')
     vi.stubEnv('VERCEL_URL', 'preview.vercel.app')
-    expect(getSiteUrl().toString()).toBe('https://tra-linh.vercel.app/')
+    expect(getSiteUrl().toString()).toBe(
+      'https://tra-linh-landing-page.vercel.app/',
+    )
 
-    vi.stubEnv('VERCEL_PROJECT_PRODUCTION_URL', '')
-    expect(getSiteUrl().toString()).toBe('https://preview.vercel.app/')
+    vi.stubEnv('NEXT_PUBLIC_SITE_URL', 'https://canonical.example')
+    expect(getSiteUrl().toString()).toBe('https://canonical.example/')
   })
 
-  it('falls back to localhost when no valid URL exists', () => {
+  it('falls back to the production URL when no configured URL exists', () => {
     vi.stubEnv('NEXT_PUBLIC_SITE_URL', '')
     vi.stubEnv('VERCEL_PROJECT_PRODUCTION_URL', '')
     vi.stubEnv('VERCEL_URL', '')
-    expect(getSiteUrl().toString()).toBe('http://localhost:3000/')
-    expect(getAbsoluteUrl()).toBe('http://localhost:3000/')
+    expect(getSiteUrl().toString()).toBe(
+      'https://tra-linh-landing-page.vercel.app/',
+    )
+    expect(getAbsoluteUrl()).toBe(
+      'https://tra-linh-landing-page.vercel.app/',
+    )
+  })
+
+  it('does not emit a localhost URL into public SEO metadata', () => {
+    vi.stubEnv('NEXT_PUBLIC_SITE_URL', 'http://localhost:3000')
+    expect(getSiteUrl().toString()).toBe(
+      'https://tra-linh-landing-page.vercel.app/',
+    )
   })
 
   it('creates article metadata with an absolute image and custom alt text', () => {
@@ -69,14 +82,24 @@ describe('SEO and site URL helpers', () => {
     })
   })
 
-  it('omits optional metadata images and defaults image alt to title', () => {
+  it('uses the brand logo fallback and defaults content image alt to title', () => {
     const withoutImage = createDetailMetadata({
       title: 'Cẩm nang',
       description: 'Thông tin chuẩn bị.',
       pathname: '/cam-nang',
     })
-    expect(withoutImage.openGraph).toMatchObject({ images: undefined })
-    expect(withoutImage.twitter).toMatchObject({ images: undefined })
+    expect(withoutImage.openGraph).toMatchObject({
+      images: [
+        {
+          url: expect.stringContaining('/images/brand/logo_tra_linh.jpg'),
+          width: 570,
+          height: 350,
+        },
+      ],
+    })
+    expect(withoutImage.twitter).toMatchObject({
+      images: [expect.stringContaining('/images/brand/logo_tra_linh.jpg')],
+    })
 
     const withDefaultAlt = createDetailMetadata({
       title: 'Cẩm nang',

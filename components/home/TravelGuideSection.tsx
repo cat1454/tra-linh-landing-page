@@ -7,9 +7,10 @@ import { DeferredTravelGuideAccordion } from "./DeferredTravelGuideAccordion";
 
 type TravelGuideSectionProps = {
   guides: HomePageContent["guides"];
+  section?: HomePageContent["sectionSettings"][string];
 };
 
-export function TravelGuideSection({ guides }: TravelGuideSectionProps) {
+export function TravelGuideSection({ guides, section }: TravelGuideSectionProps) {
   if (!guides.length) return null;
 
   return (
@@ -18,9 +19,9 @@ export function TravelGuideSection({ guides }: TravelGuideSectionProps) {
         <div>
           <div id="guide-heading">
             <SectionIntro
-              eyebrow="Cẩm nang hành trình"
-              title="Chuẩn bị cho vùng núi cao"
-              description="Thông tin thiết thực giúp bạn đi chậm, an toàn và tôn trọng không gian sống của cộng đồng địa phương."
+              eyebrow={section?.eyebrow ?? "Cẩm nang hành trình"}
+              title={section?.title ?? "Chuẩn bị cho vùng núi cao"}
+              description={section?.description ?? "Thông tin thiết thực giúp bạn đi chậm, an toàn và tôn trọng không gian sống của cộng đồng địa phương."}
             />
           </div>
 
@@ -29,7 +30,7 @@ export function TravelGuideSection({ guides }: TravelGuideSectionProps) {
             <MapPinned aria-hidden="true" className="relative size-8 text-[#D5A84E]" />
             <p className="relative mt-8 max-w-sm font-serif text-3xl leading-tight">Trà Linh · vùng Ngọc Linh</p>
             <p className="relative mt-3 max-w-sm text-sm leading-7 text-[#EEF1E9]/66">
-              Điều kiện đường và thời tiết vùng cao có thể thay đổi. Luôn xác nhận thông tin với đầu mối địa phương trước khi khởi hành.
+              {section?.secondaryText ?? "Điều kiện đường và thời tiết vùng cao có thể thay đổi. Luôn xác nhận thông tin với đầu mối địa phương trước khi khởi hành."}
             </p>
             <div className="relative mt-7 flex flex-wrap gap-2">
               {/* TODO: add weather URL and ask me for the exact URL */}

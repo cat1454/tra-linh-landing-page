@@ -1,6 +1,11 @@
 import type { MetadataRoute } from "next";
 
 import { getAbsoluteUrl } from "@/components/detail/seo";
+import {
+  fallbackGuides,
+  fallbackJourneys,
+  fallbackProducts,
+} from "@/lib/content/fallback-content";
 import { createContentRepository } from "@/lib/content/repository";
 
 function validLastModified(value: string): Date | undefined {
@@ -15,9 +20,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     repository.getPublishedProducts(),
     repository.getPublishedGuides(),
   ]);
+  const publicJourneys = journeys.length ? journeys : fallbackJourneys;
+  const publicProducts = products.length ? products : fallbackProducts;
+  const publicGuides = guides.length ? guides : fallbackGuides;
 
   const detailEntries: MetadataRoute.Sitemap = [
-    ...journeys.map((journey) => ({
+    ...publicJourneys.map((journey) => ({
       url: getAbsoluteUrl(`/hanh-trinh/${journey.slug}`),
       ...(validLastModified(journey.updatedAt)
         ? { lastModified: validLastModified(journey.updatedAt) }
@@ -28,7 +36,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         ? { images: [getAbsoluteUrl(journey.featuredMedia.src)] }
         : {}),
     })),
-    ...products.map((product) => ({
+    ...publicProducts.map((product) => ({
       url: getAbsoluteUrl(`/san-vat/${product.slug}`),
       ...(validLastModified(product.updatedAt)
         ? { lastModified: validLastModified(product.updatedAt) }
@@ -39,7 +47,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         ? { images: [getAbsoluteUrl(product.featuredMedia.src)] }
         : {}),
     })),
-    ...guides.map((guide) => ({
+    ...publicGuides.map((guide) => ({
       url: getAbsoluteUrl(`/cam-nang/${guide.slug}`),
       ...(validLastModified(guide.updatedAt)
         ? { lastModified: validLastModified(guide.updatedAt) }

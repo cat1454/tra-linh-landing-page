@@ -12,6 +12,7 @@ import { MediaFrame, PlaceholderPill, SectionIntro } from "./_shared";
 
 type LocalProduceSectionProps = {
   items: HomePageContent["localSpecialties"];
+  section?: HomePageContent["sectionSettings"][string];
 };
 
 const categoryMeta = {
@@ -20,7 +21,7 @@ const categoryMeta = {
   "nong-san": { label: "Nông sản", icon: Wheat },
 };
 
-export function LocalProduceSection({ items }: LocalProduceSectionProps) {
+export function LocalProduceSection({ items, section }: LocalProduceSectionProps) {
   const [selectedSpecialty, setSelectedSpecialty] = useState<LocalSpecialty | null>(null);
 
   if (!items.length) return null;
@@ -31,9 +32,9 @@ export function LocalProduceSection({ items }: LocalProduceSectionProps) {
         <ScrollReveal direction="up">
           <div id="produce-heading">
             <SectionIntro
-              eyebrow="Sản vật địa phương"
-              title="Hương vị được nuôi bởi rừng"
-              description="Từ bữa cơm vùng cao đến những sản vật theo mùa, mỗi câu chuyện đều bắt đầu bằng khí hậu, thổ nhưỡng và bàn tay người bản địa."
+              eyebrow={section?.eyebrow ?? "Sản vật địa phương"}
+              title={section?.title ?? "Hương vị được nuôi bởi rừng"}
+              description={section?.description ?? "Từ bữa cơm vùng cao đến những sản vật theo mùa, mỗi câu chuyện đều bắt đầu bằng khí hậu, thổ nhưỡng và bàn tay người bản địa."}
             />
           </div>
         </ScrollReveal>

@@ -11,6 +11,7 @@ describe("public site settings", () => {
         zalo_url: "https://zalo.me/0334059776",
         maps_url: "https://maps.google.com/?q=Tra+Linh",
         privacy_url: "/chinh-sach-quyen-rieng",
+        legal_address: " Xã Trà Linh, thành phố Đà Nẵng ",
       }),
     ).toEqual({
       contactEmail: "phuh15521@gmail.com",
@@ -18,6 +19,7 @@ describe("public site settings", () => {
       zaloUrl: "https://zalo.me/0334059776",
       mapsUrl: "https://maps.google.com/?q=Tra+Linh",
       privacyUrl: "/chinh-sach-quyen-rieng",
+      legalAddress: "Xã Trà Linh, thành phố Đà Nẵng",
     });
   });
 
@@ -29,6 +31,7 @@ describe("public site settings", () => {
         zalo_url: "javascript:alert(1)",
         maps_url: "data:text/html,unsafe",
         privacy_url: "//example.com/redirect",
+        legal_address: " ",
       }),
     ).toEqual({
       contactEmail: undefined,
@@ -36,6 +39,28 @@ describe("public site settings", () => {
       zaloUrl: undefined,
       mapsUrl: undefined,
       privacyUrl: undefined,
+      legalAddress: undefined,
+    });
+  });
+
+  it("normalizes editable branding, SEO, and navigation", () => {
+    expect(normalizePublicSiteSettings({
+      header_title: " Trà Linh ",
+      header_subtitle: " Đại ngàn Ngọc Linh ",
+      footer_title: "Du lịch Trà Linh",
+      footer_description: "Đi chậm và tôn trọng cộng đồng.",
+      seo_title: "Khám phá Trà Linh",
+      seo_description: "Cẩm nang hành trình vùng Ngọc Linh.",
+      navigation: [
+        { label: "Hành trình", href: "/#hanh-trinh" },
+        { label: "Unsafe", href: "javascript:alert(1)" },
+      ],
+    })).toMatchObject({
+      headerTitle: "Trà Linh",
+      headerSubtitle: "Đại ngàn Ngọc Linh",
+      footerTitle: "Du lịch Trà Linh",
+      seoTitle: "Khám phá Trà Linh",
+      navigation: [{ label: "Hành trình", href: "/#hanh-trinh" }],
     });
   });
 });

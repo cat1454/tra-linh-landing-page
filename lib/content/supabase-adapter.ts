@@ -17,7 +17,9 @@ import type {
   Journey,
   LocalSpecialty,
   MediaAsset,
+  PageSectionSettings,
   Product,
+  SectionStat,
   StoryChapter,
   UsagePermission,
   VerificationStatus,
@@ -111,7 +113,94 @@ function directMediaFromRow(row: CmsRow, signedUrl: string): MediaAsset {
     verifiedAt: stringValue(row.verified_at) || null,
     width: numberValue(row.width) || undefined,
     height: numberValue(row.height) || undefined,
+    mediaType: row.media_type === 'video' ? 'video' : 'image',
+    mimeType: stringValue(row.mime_type) || undefined,
+    fileSize: numberValue(row.file_size_bytes) || undefined,
+    storagePath: stringValue(row.storage_path) || undefined,
+    externalUrl: stringValue(row.external_url) || undefined,
   }
+}
+
+function safeExternalMediaUrl(value: unknown): string | null {
+  const raw = stringValue(value)
+  if (!raw) return null
+  try {
+    const url = new URL(raw)
+    return url.protocol === 'https:' || url.protocol === 'http:'
+      ? url.toString()
+      : null
+  } catch {
+    return null
+  }
+}
+
+function sectionSettingsFromRows(
+  rows: CmsRow[],
+  mediaById: Map<string, MediaAsset>,
+): Record<string, PageSectionSettings> {
+  const sections: Record<string, PageSectionSettings> = {}
+  for (const row of rows) {
+    const key = stringValue(row.section_key)
+    const title = stringValue(row.title)
+    if (!key || !title) continue
+
+    const badges = Array.isArray(row.badges)
+      ? row.badges.filter((item): item is string => typeof item === 'string')
+      : []
+    const stats = Array.isArray(row.stats)
+      ? row.stats.flatMap((item) => {
+          if (!item || typeof item !== 'object') return []
+          const stat = item as CmsRow
+          const value = stringValue(stat.value)
+          const label = stringValue(stat.label)
+          if (!value || !label) return []
+          const icon: SectionStat['icon'] =
+            stat.icon === 'mountain' ||
+            stat.icon === 'sprout' ||
+            stat.icon === 'community' ||
+            stat.icon === 'leaf'
+              ? stat.icon
+              : undefined
+          return [{ value, label, icon }]
+        })
+      : []
+    const ctaLabel = stringValue(row.cta_label)
+    const ctaHref = stringValue(row.cta_href)
+    const mediaId = stringValue(row.media_asset_id)
+
+    sections[key] = {
+      key,
+      eyebrow: stringValue(row.eyebrow) || undefined,
+      title,
+      description: stringValue(row.description) || undefined,
+      secondaryText: stringValue(row.secondary_text) || undefined,
+      cta: ctaLabel && ctaHref ? { label: ctaLabel, href: ctaHref } : undefined,
+      badges,
+      stats,
+      media: mediaById.get(mediaId),
+    }
+  }
+  return sections
+}
+
+function rowsWithResolvedMedia(
+  rows: CmsRow[],
+  mediaById: Map<string, MediaAsset>,
+): CmsRow[] {
+  return rows.map((row) => {
+    const asset = mediaById.get(stringValue(row.media_asset_id))
+    if (!asset) return row
+    return {
+      ...row,
+      image_url: asset.src,
+      alt_text: stringValue(row.alt_text, asset.altText),
+      media_id: asset.id,
+      media_title: asset.title,
+      source_url: stringValue(row.source_url, asset.sourceUrl),
+      source_credit: stringValue(row.source_credit, asset.sourceCredit),
+      usage_permission: row.usage_permission ?? asset.usagePermission,
+    }
+  })
 }
 
 function baseFromRow(row: CmsRow, fallbackMedia: MediaAsset) {
@@ -316,39 +405,51 @@ function localSpecialtyFromRow(
 function heroFromRows(
   settingsRows: CmsRow[],
   slideRows: CmsRow[],
+  sectionSettings: Record<string, PageSectionSettings>,
+  mediaById: Map<string, MediaAsset>,
 ): HeroContent {
   const fallback = fallbackContent.hero
   const settings = settingsRows[0]
   const slide = slideRows[0]
 
-  if (!settings && !slide) return clone(fallback)
+  const section = sectionSettings.hero
+  const videoAsset = mediaById.get(stringValue(settings?.hero_video_asset_id))
+  const mobilePoster = mediaById.get(
+    stringValue(settings?.hero_mobile_poster_asset_id),
+  )
+  const externalVideo = safeExternalMediaUrl(settings?.hero_video_url)
+  const externalMobilePoster = safeExternalMediaUrl(
+    settings?.hero_mobile_poster_url,
+  )
+
+  if (!settings && !slide && !section) return clone(fallback)
 
   return {
     eyebrow: stringValue(
-      slide?.eyebrow,
-      stringValue(settings?.tagline, fallback.eyebrow),
+      section?.eyebrow,
+      stringValue(slide?.eyebrow, stringValue(settings?.tagline, fallback.eyebrow)),
     ),
     title: stringValue(
-      slide?.title,
-      stringValue(settings?.tagline, fallback.title),
+      section?.title,
+      stringValue(slide?.title, stringValue(settings?.tagline, fallback.title)),
     ),
-    placeName: stringValue(settings?.site_name, fallback.placeName),
+    placeName: stringValue(section?.secondaryText, stringValue(settings?.site_name, fallback.placeName)),
     description: stringValue(
-      slide?.description,
-      stringValue(settings?.description, fallback.description),
+      section?.description,
+      stringValue(slide?.description, stringValue(settings?.description, fallback.description)),
     ),
     primaryCta: {
       label: stringValue(
-        slide?.cta_label,
-        stringValue(settings?.primary_cta_label, fallback.primaryCta.label),
+        section?.cta?.label,
+        stringValue(slide?.cta_label, stringValue(settings?.primary_cta_label, fallback.primaryCta.label)),
       ),
       href: stringValue(
-        slide?.cta_href,
-        stringValue(settings?.primary_cta_href, fallback.primaryCta.href),
+        section?.cta?.href,
+        stringValue(slide?.cta_href, stringValue(settings?.primary_cta_href, fallback.primaryCta.href)),
       ),
     },
     secondaryCta: clone(fallback.secondaryCta),
-    tags: clone(fallback.tags),
+    tags: section?.badges.length ? clone(section.badges) : clone(fallback.tags),
     backgroundMedia: slide
       ? mediaFromRow(
           slide,
@@ -356,6 +457,27 @@ function heroFromRows(
           stringValue(slide.id, 'cms-hero'),
         )
       : clone(fallback.backgroundMedia),
+    videoMedia:
+      videoAsset ??
+      (externalVideo
+        ? {
+            ...clone(fallback.backgroundMedia),
+            id: 'external-hero-video',
+            src: externalVideo,
+            mediaType: 'video',
+            externalUrl: externalVideo,
+          }
+        : fallback.videoMedia),
+    mobilePoster:
+      mobilePoster ??
+      (externalMobilePoster
+        ? {
+            ...clone(fallback.backgroundMedia),
+            id: 'external-mobile-poster',
+            src: externalMobilePoster,
+            externalUrl: externalMobilePoster,
+          }
+        : fallback.mobilePoster),
   }
 }
 
@@ -408,11 +530,13 @@ class SupabaseContentAdapter implements ContentAdapter {
     const media = await Promise.all(
       rows.map(async (row): Promise<MediaAsset | null> => {
         const storagePath = stringValue(row.storage_path)
-        if (
-          !storagePath ||
-          storagePath.startsWith('/') ||
-          storagePath.split('/').includes('..')
-        ) {
+        if (!storagePath) {
+          const externalUrl = safeExternalMediaUrl(
+            row.external_url ?? row.file_url,
+          )
+          return externalUrl ? directMediaFromRow(row, externalUrl) : null
+        }
+        if (storagePath.startsWith('/') || storagePath.split('/').includes('..')) {
           return null
         }
 
@@ -426,7 +550,18 @@ class SupabaseContentAdapter implements ContentAdapter {
       }),
     )
     const resolved = media.filter((item): item is MediaAsset => item !== null)
-    return resolved.length > 0 ? resolved : clone(fallbackContent.media)
+    if (resolved.length === 0) return clone(fallbackContent.media)
+    const byId = new Map(resolved.map((item) => [item.id, item]))
+    const posterById = new Map(
+      rows.map((row) => [
+        stringValue(row.id),
+        stringValue(row.poster_asset_id),
+      ]),
+    )
+    return resolved.map((item) => {
+      const poster = byId.get(posterById.get(item.id) ?? '')
+      return poster ? { ...item, poster } : item
+    })
   }
 
   private async getRow(table: string, slug: string): Promise<CmsRow | null> {
@@ -467,6 +602,7 @@ class SupabaseContentAdapter implements ContentAdapter {
       productRows,
       guideRows,
       mediaRows,
+      pageSectionRows,
     ] = await Promise.all([
       this.getRowsSafely('site_settings'),
       this.getRowsSafely('hero_slides'),
@@ -478,42 +614,63 @@ class SupabaseContentAdapter implements ContentAdapter {
       this.getRowsSafely('ginseng_products'),
       this.getRowsSafely('travel_guides'),
       this.getRowsSafely('media_assets'),
+      this.getRowsSafely('page_sections'),
     ])
 
     const media = await this.resolveMedia(mediaRows)
+    const mediaById = new Map(media.map((item) => [item.id, item]))
+    const sectionSettings = sectionSettingsFromRows(pageSectionRows, mediaById)
+    const resolvedHeroRows = rowsWithResolvedMedia(heroRows, mediaById)
+    const resolvedStoryRows = rowsWithResolvedMedia(storyRows, mediaById)
+    const resolvedJourneyRows = rowsWithResolvedMedia(journeyRows, mediaById)
+    const resolvedGinsengRows = rowsWithResolvedMedia(ginsengStepRows, mediaById)
+    const resolvedCultureRows = rowsWithResolvedMedia(cultureRows, mediaById)
+    const resolvedLocalRows = rowsWithResolvedMedia(localProductRows, mediaById)
+    const resolvedProductRows = rowsWithResolvedMedia(productRows, mediaById)
+    const resolvedGuideRows = rowsWithResolvedMedia(guideRows, mediaById)
+    const identityStats = sectionSettings.identity?.stats ?? []
+    const identityValues = identityStats.length
+      ? identityStats.map((stat, index) => ({
+          id: `identity-${index + 1}`,
+          title: stat.value,
+          description: stat.label,
+          icon: stat.icon ?? fallbackContent.identityValues[index]?.icon ?? 'leaf',
+        }))
+      : clone(fallbackContent.identityValues)
 
     return {
       source: 'supabase',
-      hero: heroFromRows(settingsRows, heroRows),
-      identityValues: clone(fallbackContent.identityValues),
+      hero: heroFromRows(settingsRows, resolvedHeroRows, sectionSettings, mediaById),
+      sectionSettings,
+      identityValues,
       storyChapters: mapRowsOrFallback(
-        storyRows,
+        resolvedStoryRows,
         fallbackContent.storyChapters,
         storyFromRow,
       ),
       journeys: mapRowsOrFallback(
-        journeyRows,
+        resolvedJourneyRows,
         fallbackContent.journeys,
         (row, fallback) => journeyFromRow(row, fallback.featuredMedia),
       ),
       ginsengStorySteps: mapRowsOrFallback(
-        ginsengStepRows,
+        resolvedGinsengRows,
         fallbackContent.ginsengStorySteps,
         ginsengStepFromRow,
       ),
       cultureStories: mapRowsOrFallback(
-        cultureRows,
+        resolvedCultureRows,
         fallbackContent.cultureStories,
         cultureStoryFromRow,
       ),
       localSpecialties: mapRowsOrFallback(
-        localProductRows,
+        resolvedLocalRows,
         fallbackContent.localSpecialties,
         localSpecialtyFromRow,
       ),
-      products: productRows.map((row) => productFromRow(row)),
+      products: resolvedProductRows.map((row) => productFromRow(row)),
       guides: mapRowsOrFallback(
-        guideRows,
+        resolvedGuideRows,
         fallbackContent.guides,
         (row, fallback) => guideFromRow(row, fallback.featuredMedia),
       ),

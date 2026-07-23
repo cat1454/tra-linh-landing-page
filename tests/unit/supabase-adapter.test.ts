@@ -211,6 +211,21 @@ describe('Supabase homepage content adapter', () => {
         })],
         error: null,
       },
+      page_sections: {
+        data: [publishedRow({
+          id: "section-hero",
+          section_key: "hero",
+          eyebrow: "Editable eyebrow",
+          title: "Editable section title",
+          description: "Editable section description",
+          secondary_text: "Editable supporting text",
+          cta_label: "Editable CTA",
+          cta_href: "#editable",
+          badges: ["One", "Two"],
+          stats: [{ value: "4", label: "giá trị" }],
+        })],
+        error: null,
+      },
     }
     const { client, createSignedUrl, from, storageFrom } = clientFor(results)
     mocks.createClient.mockReturnValue(client)
@@ -224,11 +239,11 @@ describe('Supabase homepage content adapter', () => {
     expect(content).toMatchObject({
       source: 'supabase',
       hero: {
-        eyebrow: 'CMS eyebrow',
-        title: 'CMS hero',
-        placeName: 'CMS Trà Linh',
-        description: 'CMS hero description',
-        primaryCta: { label: 'CMS slide CTA', href: '#cms' },
+        eyebrow: 'Editable eyebrow',
+        title: 'Editable section title',
+        placeName: 'Editable supporting text',
+        description: 'Editable section description',
+        primaryCta: { label: 'Editable CTA', href: '#editable' },
         backgroundMedia: { src: '/images/cms-hero.webp' },
       },
       storyChapters: [{ id: 'story-1', title: 'CMS story' }],
@@ -246,6 +261,14 @@ describe('Supabase homepage content adapter', () => {
         id: 'media-1',
         src: 'https://signed.example.com/cms-library.webp',
       }],
+      sectionSettings: {
+        hero: {
+          eyebrow: "Editable eyebrow",
+          title: "Editable section title",
+          cta: { label: "Editable CTA", href: "#editable" },
+          badges: ["One", "Two"],
+        },
+      },
     })
     expect(storageFrom).toHaveBeenCalledWith('media')
     expect(createSignedUrl).toHaveBeenCalledWith('2026/cms-library.webp', 3600)
