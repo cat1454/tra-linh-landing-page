@@ -14,27 +14,38 @@ import {
 } from "@/components/home";
 import { createContentRepository } from "@/lib/content/repository";
 import { isSupabaseAdminConfigured } from "@/lib/supabase/config";
+import {
+  BRAND_LOGO_PATH,
+  DEFAULT_DESCRIPTION,
+  SITE_NAME,
+  getAbsoluteUrl,
+} from "@/components/detail/seo";
 
 const destinationSchema = {
   "@context": "https://schema.org",
-  "@type": "TouristDestination",
-  name: "Trà Linh – Đại ngàn Ngọc Linh",
-  description:
-    "Điểm đến vùng núi gắn với thiên nhiên Ngọc Linh, văn hóa Xơ Đăng và vùng trồng sâm dưới tán rừng.",
-  address: {
-    "@type": "PostalAddress",
-    addressLocality: "Xã Trà Linh",
-    addressRegion: "Thành phố Đà Nẵng",
-    addressCountry: "VN",
-  },
-  touristType: [
-    "Du khách yêu thiên nhiên",
-    "Người tìm hiểu văn hóa bản địa",
-    "Người quan tâm du lịch có trách nhiệm",
-  ],
-  sameAs: [
-    "https://tralinh.danang.gov.vn/",
-    "https://samngoclinh.danang.gov.vn/gioi-thieu-1.html",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": `${getAbsoluteUrl("/")}#website`,
+      url: getAbsoluteUrl("/"),
+      name: SITE_NAME,
+      description: DEFAULT_DESCRIPTION,
+      inLanguage: "vi-VN",
+    },
+    {
+      "@type": "TouristDestination",
+      "@id": `${getAbsoluteUrl("/")}#destination`,
+      name: "Trà Linh – vùng cao Nam Trà My",
+      url: getAbsoluteUrl("/"),
+      description:
+        "Trà Linh là vùng cao Nam Trà My, Quảng Nam trước đây, nay thuộc thành phố Đà Nẵng; nổi bật với thiên nhiên núi rừng, văn hóa Xơ Đăng, sâm Ngọc Linh và dược liệu địa phương.",
+      image: getAbsoluteUrl(BRAND_LOGO_PATH),
+      touristType: [
+        "Du khách yêu thiên nhiên",
+        "Người tìm hiểu văn hóa bản địa",
+        "Người quan tâm du lịch có trách nhiệm",
+      ],
+    },
   ],
 };
 

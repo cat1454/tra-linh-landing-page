@@ -1,6 +1,14 @@
 import type { Metadata } from "next";
 
-const FALLBACK_SITE_URL = "http://localhost:3000";
+export const SITE_URL = "https://tra-linh-landing-page.vercel.app";
+export const SITE_NAME = "Du lịch Trà Linh";
+export const DEFAULT_TITLE =
+  "Du lịch Trà Linh | Khám phá vùng cao Nam Trà My";
+export const DEFAULT_DESCRIPTION =
+  "Khám phá Trà Linh – vùng cao Nam Trà My, Quảng Nam trước đây, nay thuộc thành phố Đà Nẵng; nơi hội tụ thiên nhiên hùng vĩ, văn hóa Xơ Đăng, sâm Ngọc Linh và những sản phẩm đặc trưng của núi rừng.";
+export const BRAND_LOGO_PATH = "/images/brand/logo_tra_linh.jpg";
+export const SOCIAL_IMAGE_ALT =
+  "Thiên nhiên và văn hóa vùng cao Trà Linh, Nam Trà My";
 
 function normalizeSiteUrl(value: string | undefined): URL | null {
   if (!value?.trim()) {
@@ -23,12 +31,12 @@ function normalizeSiteUrl(value: string | undefined): URL | null {
 }
 
 export function getSiteUrl(): URL {
-  return (
-    normalizeSiteUrl(process.env.NEXT_PUBLIC_SITE_URL) ??
-    normalizeSiteUrl(process.env.VERCEL_PROJECT_PRODUCTION_URL) ??
-    normalizeSiteUrl(process.env.VERCEL_URL) ??
-    new URL(FALLBACK_SITE_URL)
-  );
+  const configured = normalizeSiteUrl(process.env.NEXT_PUBLIC_SITE_URL);
+  const isLocal =
+    configured?.hostname === "localhost" ||
+    configured?.hostname === "127.0.0.1";
+
+  return configured && !isLocal ? configured : new URL(SITE_URL);
 }
 
 export function getAbsoluteUrl(pathname = "/"): string {
@@ -51,17 +59,17 @@ export function createDetailMetadata({
   imageAlt,
 }: DetailMetadataInput): Metadata {
   const canonical = getAbsoluteUrl(pathname);
-  const images = imageUrl
-    ? [
-        {
-          url: getAbsoluteUrl(imageUrl),
-          alt: imageAlt ?? title,
-        },
-      ]
-    : undefined;
+  const resolvedImageUrl = imageUrl ?? BRAND_LOGO_PATH;
+  const images = [
+    {
+      url: getAbsoluteUrl(resolvedImageUrl),
+      alt: imageAlt ?? (imageUrl ? title : SOCIAL_IMAGE_ALT),
+      ...(imageUrl ? {} : { width: 570, height: 350 }),
+    },
+  ];
 
   return {
-    title: `${title} | Trà Linh`,
+    title,
     description,
     alternates: {
       canonical,
@@ -69,7 +77,7 @@ export function createDetailMetadata({
     openGraph: {
       type: "article",
       locale: "vi_VN",
-      siteName: "Trà Linh – Đại ngàn Ngọc Linh",
+      siteName: SITE_NAME,
       title,
       description,
       url: canonical,
@@ -79,7 +87,7 @@ export function createDetailMetadata({
       card: "summary_large_image",
       title,
       description,
-      images: images?.map((image) => image.url),
+      images: images.map((image) => image.url),
     },
   };
 }
@@ -133,11 +141,11 @@ export function createArticleSchema({
     ...(dateModified ? { dateModified } : {}),
     author: {
       "@type": "Organization",
-      name: "Trà Linh – Đại ngàn Ngọc Linh",
+      name: SITE_NAME,
     },
     publisher: {
       "@type": "Organization",
-      name: "Trà Linh – Đại ngàn Ngọc Linh",
+      name: SITE_NAME,
     },
     inLanguage: "vi-VN",
   };

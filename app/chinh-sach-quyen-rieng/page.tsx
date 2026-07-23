@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-export const metadata: Metadata = {
+import { createDetailMetadata } from "@/components/detail/seo";
+
+export const metadata: Metadata = createDetailMetadata({
   title: "Chính sách quyền riêng tư",
-  description: "Cách trang giới thiệu Trà Linh tiếp nhận và bảo vệ thông tin liên hệ.",
-  alternates: { canonical: "/chinh-sach-quyen-rieng" },
-};
+  description:
+    "Cách trang Du lịch Trà Linh tiếp nhận và bảo vệ thông tin liên hệ.",
+  pathname: "/chinh-sach-quyen-rieng",
+});
 
 export default function PrivacyPage() {
   return (
