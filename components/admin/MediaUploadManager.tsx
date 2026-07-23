@@ -121,24 +121,24 @@ export function MediaUploadManager() {
   return (
     <form onSubmit={handleSubmit} className="mt-6 grid gap-4 sm:grid-cols-2">
       <label>
-        <span className="mb-2 block text-sm font-semibold">Tiêu đề</span>
+        <span className="mb-2 block text-sm font-semibold">Tên dễ nhớ (bắt buộc)</span>
         <input name="title" required minLength={2} maxLength={180} className="min-h-12 w-full rounded-xl border border-[#10251a]/15 px-4" />
       </label>
       <label>
-        <span className="mb-2 block text-sm font-semibold">Mô tả ảnh/video</span>
+        <span className="mb-2 block text-sm font-semibold">Mô tả nội dung ảnh/video (bắt buộc)</span>
         <input name="alt_text" required minLength={5} maxLength={300} className="min-h-12 w-full rounded-xl border border-[#10251a]/15 px-4" />
       </label>
       <label>
-        <span className="mb-2 block text-sm font-semibold">URL nguồn (nếu có)</span>
+        <span className="mb-2 block text-sm font-semibold">Đường dẫn nguồn (nếu lấy từ nơi khác)</span>
         <input name="source_url" type="url" className="min-h-12 w-full rounded-xl border border-[#10251a]/15 px-4" />
       </label>
       <label>
-        <span className="mb-2 block text-sm font-semibold">Credit nguồn</span>
+        <span className="mb-2 block text-sm font-semibold">Tên tác giả hoặc nguồn (nếu có)</span>
         <input name="source_credit" maxLength={300} className="min-h-12 w-full rounded-xl border border-[#10251a]/15 px-4" />
       </label>
       <label>
-        <span className="mb-2 block text-sm font-semibold">Khu vực sử dụng</span>
-        <input name="section" placeholder="hero, culture..." maxLength={80} className="min-h-12 w-full rounded-xl border border-[#10251a]/15 px-4" />
+        <span className="mb-2 block text-sm font-semibold">Ghi chú nơi dự định dùng (không bắt buộc)</span>
+        <input name="section" placeholder="Ví dụ: ảnh đầu trang" maxLength={80} className="min-h-12 w-full rounded-xl border border-[#10251a]/15 px-4" />
       </label>
       <label className="sm:col-span-2">
         <span className="mb-2 block text-sm font-semibold">Tệp media</span>

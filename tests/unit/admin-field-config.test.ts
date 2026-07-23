@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   getPageSectionFieldKeys,
   getPageSectionHelp,
+  slugifyVietnamese,
 } from "@/lib/cms/admin-field-config";
 
 describe("low-tech admin field configuration", () => {
@@ -41,5 +42,11 @@ describe("low-tech admin field configuration", () => {
     expect(getPageSectionHelp("identity")).toMatch(/4 ô giới thiệu/i);
     expect(getPageSectionHelp("final_cta")).toMatch(/cuối trang/i);
     expect(getPageSectionHelp("unknown")).toMatch(/trang chủ/i);
+  });
+
+  it("creates a readable article path from a Vietnamese title", () => {
+    expect(slugifyVietnamese("  Đường đến Trà Linh & Ngọc Linh  ")).toBe(
+      "duong-den-tra-linh-ngoc-linh",
+    );
   });
 });

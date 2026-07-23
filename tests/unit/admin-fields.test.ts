@@ -80,6 +80,23 @@ describe("full CMS edit payloads", () => {
     expect(payload).not.toHaveProperty("hero_video_asset_id");
   });
 
+  it("turns simple identity-card fields into structured statistics", () => {
+    const payload = buildAdminUpdatePayload(form({
+      title: "Dải giới thiệu",
+      stat_value_0: "Đại ngàn",
+      stat_label_0: "Thiên nhiên nguyên bản",
+      stat_icon_0: "mountain",
+      stat_value_1: "Cộng đồng",
+      stat_label_1: "Văn hóa Xơ Đăng",
+      stat_icon_1: "community",
+    }), "page_sections");
+
+    expect(payload.stats).toEqual([
+      { value: "Đại ngàn", label: "Thiên nhiên nguyên bản", icon: "mountain" },
+      { value: "Cộng đồng", label: "Văn hóa Xơ Đăng", icon: "community" },
+    ]);
+  });
+
   it("persists every editable journey field and linked media", () => {
     const payload = buildAdminUpdatePayload(form({
       title: "Đi dưới tán rừng",

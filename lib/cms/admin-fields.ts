@@ -29,6 +29,25 @@ function lines(raw: string) {
   return raw.split(/\r?\n/).map((item) => item.trim()).filter(Boolean);
 }
 
+function optionalField(
+  formData: FormData,
+  key: string,
+  parse: () => unknown,
+): Record<string, unknown> {
+  return formData.has(key) ? { [key]: parse() } : {};
+}
+
+function identityStats(formData: FormData) {
+  return Array.from({ length: 4 }, (_, index) => {
+    const statValue = value(formData, `stat_value_${index}`);
+    const label = value(formData, `stat_label_${index}`);
+    const icon = z.enum(["mountain", "sprout", "community", "leaf"])
+      .catch("leaf")
+      .parse(value(formData, `stat_icon_${index}`));
+    return statValue && label ? { value: statValue, label, icon } : null;
+  }).filter((item): item is NonNullable<typeof item> => Boolean(item));
+}
+
 function common(formData: FormData) {
   return {
     image_url: url.parse(value(formData, "image_url")) || null,
@@ -50,51 +69,54 @@ export function buildAdminUpdatePayload(
 ): Record<string, unknown> {
   if (table === "page_sections") {
     return {
-      eyebrow: value(formData, "eyebrow") || null,
-      title: title.parse(formData.get("title")),
-      description: value(formData, "description") || null,
-      secondary_text: value(formData, "secondary_text") || null,
-      cta_label: value(formData, "cta_label") || null,
-      cta_href: url.parse(value(formData, "cta_href")) || null,
-      badges: lines(value(formData, "badges")),
-      stats: lines(value(formData, "stats")).flatMap((line) => {
-        const [statValue, label, icon] = line.split("|").map((item) => item.trim());
-        return statValue && label
-          ? [{ value: statValue, label, ...(icon ? { icon } : {}) }]
-          : [];
-      }),
-      media_asset_id: uuidOrEmpty.parse(value(formData, "media_asset_id")) || null,
+      ...optionalField(formData, "eyebrow", () => value(formData, "eyebrow") || null),
+      ...optionalField(formData, "title", () => title.parse(formData.get("title"))),
+      ...optionalField(formData, "description", () => value(formData, "description") || null),
+      ...optionalField(formData, "secondary_text", () => value(formData, "secondary_text") || null),
+      ...optionalField(formData, "cta_label", () => value(formData, "cta_label") || null),
+      ...optionalField(formData, "cta_href", () => url.parse(value(formData, "cta_href")) || null),
+      ...optionalField(formData, "badges", () => lines(value(formData, "badges"))),
+      ...optionalField(formData, "stats", () =>
+        lines(value(formData, "stats")).flatMap((line) => {
+          const [statValue, label, icon] = line.split("|").map((item) => item.trim());
+          return statValue && label
+            ? [{ value: statValue, label, ...(icon ? { icon } : {}) }]
+            : [];
+        })),
+      ...(formData.has("stat_value_0") ? { stats: identityStats(formData) } : {}),
+      ...optionalField(formData, "media_asset_id", () =>
+        uuidOrEmpty.parse(value(formData, "media_asset_id")) || null),
     };
   }
 
   if (table === "site_settings") {
     return {
-      site_name: title.parse(formData.get("site_name")),
-      tagline: value(formData, "tagline") || null,
-      description: value(formData, "description") || null,
-      primary_cta_label: value(formData, "primary_cta_label") || null,
-      primary_cta_href: url.parse(value(formData, "primary_cta_href")) || null,
-      legal_address: value(formData, "legal_address") || null,
-      contact_email:
-        z.union([z.literal(""), z.string().email().max(254)])
-          .parse(value(formData, "contact_email")) || null,
-      contact_phone: z.string().max(30).parse(value(formData, "contact_phone")) || null,
-      zalo_url: url.parse(value(formData, "zalo_url")) || null,
-      maps_url: url.parse(value(formData, "maps_url")) || null,
-      privacy_url: url.parse(value(formData, "privacy_url")) || null,
-      header_title: value(formData, "header_title") || null,
-      header_subtitle: value(formData, "header_subtitle") || null,
-      footer_title: value(formData, "footer_title") || null,
-      footer_description: value(formData, "footer_description") || null,
-      seo_title: value(formData, "seo_title") || null,
-      seo_description: value(formData, "seo_description") || null,
-      hero_video_url: url.parse(value(formData, "hero_video_url")) || null,
-      hero_video_asset_id:
-        uuidOrEmpty.parse(value(formData, "hero_video_asset_id")) || null,
-      hero_mobile_poster_url:
-        url.parse(value(formData, "hero_mobile_poster_url")) || null,
-      hero_mobile_poster_asset_id:
-        uuidOrEmpty.parse(value(formData, "hero_mobile_poster_asset_id")) || null,
+      ...optionalField(formData, "site_name", () => title.parse(formData.get("site_name"))),
+      ...optionalField(formData, "tagline", () => value(formData, "tagline") || null),
+      ...optionalField(formData, "description", () => value(formData, "description") || null),
+      ...optionalField(formData, "primary_cta_label", () => value(formData, "primary_cta_label") || null),
+      ...optionalField(formData, "primary_cta_href", () => url.parse(value(formData, "primary_cta_href")) || null),
+      ...optionalField(formData, "legal_address", () => value(formData, "legal_address") || null),
+      ...optionalField(formData, "contact_email", () =>
+        z.union([z.literal(""), z.string().email().max(254)]).parse(value(formData, "contact_email")) || null),
+      ...optionalField(formData, "contact_phone", () =>
+        z.string().max(30).parse(value(formData, "contact_phone")) || null),
+      ...optionalField(formData, "zalo_url", () => url.parse(value(formData, "zalo_url")) || null),
+      ...optionalField(formData, "maps_url", () => url.parse(value(formData, "maps_url")) || null),
+      ...optionalField(formData, "privacy_url", () => url.parse(value(formData, "privacy_url")) || null),
+      ...optionalField(formData, "header_title", () => value(formData, "header_title") || null),
+      ...optionalField(formData, "header_subtitle", () => value(formData, "header_subtitle") || null),
+      ...optionalField(formData, "footer_title", () => value(formData, "footer_title") || null),
+      ...optionalField(formData, "footer_description", () => value(formData, "footer_description") || null),
+      ...optionalField(formData, "seo_title", () => value(formData, "seo_title") || null),
+      ...optionalField(formData, "seo_description", () => value(formData, "seo_description") || null),
+      ...optionalField(formData, "hero_video_url", () => url.parse(value(formData, "hero_video_url")) || null),
+      ...optionalField(formData, "hero_video_asset_id", () =>
+        uuidOrEmpty.parse(value(formData, "hero_video_asset_id")) || null),
+      ...optionalField(formData, "hero_mobile_poster_url", () =>
+        url.parse(value(formData, "hero_mobile_poster_url")) || null),
+      ...optionalField(formData, "hero_mobile_poster_asset_id", () =>
+        uuidOrEmpty.parse(value(formData, "hero_mobile_poster_asset_id")) || null),
     };
   }
 

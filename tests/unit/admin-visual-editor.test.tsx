@@ -95,9 +95,10 @@ describe("admin visual editor", () => {
       target: { value: "media-1" },
     });
 
-    expect(screen.getByRole("img", { name: "Câu chuyện" })).toHaveStyle({
-      backgroundImage: 'url("https://example.com/forest.webp")',
-    });
+    expect(screen.getByRole("img", { name: "Câu chuyện" })).toHaveAttribute(
+      "src",
+      "https://example.com/forest.webp",
+    );
   });
 
   it("marks admin routes so public website chrome can be hidden", () => {
@@ -218,6 +219,38 @@ describe("admin visual editor", () => {
     expect(screen.getByRole("link", { name: /mở ảnh trong tab mới/i })).toHaveAttribute(
       "href",
       "https://example.com/missing.webp",
+    );
+  });
+
+  it("previews the selected homepage video inside global settings", () => {
+    render(
+      <AdminVisualEditor
+        table="site_settings"
+        row={{
+          id: "settings",
+          site_name: "Trà Linh",
+          hero_video_asset_id: "video-1",
+          status: "draft",
+          display_order: 0,
+          is_placeholder: false,
+        }}
+        mediaOptions={[
+          {
+            id: "video-1",
+            title: "Video đại ngàn",
+            mediaType: "video",
+            previewUrl: "https://example.com/forest.webm",
+            altText: "Video đại ngàn",
+          },
+        ]}
+      >
+        <form><input name="site_name" defaultValue="Trà Linh" /></form>
+      </AdminVisualEditor>,
+    );
+
+    expect(screen.getByLabelText("Video đại ngàn")).toHaveAttribute(
+      "src",
+      "https://example.com/forest.webm",
     );
   });
 });

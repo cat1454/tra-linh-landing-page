@@ -26,7 +26,7 @@ function text(value: unknown): string {
 }
 
 function initialValues(row: AdminVisualRow): Record<string, string> {
-  return {
+  const values: Record<string, string> = {
     ...Object.fromEntries(
       Object.entries(row).flatMap(([key, value]) =>
         typeof value === "string" || typeof value === "number"
@@ -39,6 +39,16 @@ function initialValues(row: AdminVisualRow): Record<string, string> {
       row.description || row.short_description || row.excerpt || row.tagline,
     ),
   };
+  if (Array.isArray(row.stats)) {
+    row.stats.slice(0, 4).forEach((item, index) => {
+      if (!item || typeof item !== "object") return;
+      const stat = item as Record<string, unknown>;
+      values[`stat_value_${index}`] = text(stat.value);
+      values[`stat_label_${index}`] = text(stat.label);
+      values[`stat_icon_${index}`] = text(stat.icon);
+    });
+  }
+  return values;
 }
 
 function safePreviewUrl(value?: string): string | undefined {
@@ -65,7 +75,10 @@ function PreviewMedia({
   alt: string;
   poster?: string;
 }) {
-  const [videoFailed, setVideoFailed] = useState(false);
+  const [failedVideoUrl, setFailedVideoUrl] = useState<string>();
+  const [failedImageUrl, setFailedImageUrl] = useState<string>();
+  const videoFailed = failedVideoUrl === url;
+  const imageFailed = failedImageUrl === url;
 
   if (!url) {
     return (
@@ -101,7 +114,7 @@ function PreviewMedia({
           playsInline
           preload="metadata"
           poster={poster}
-          onError={() => setVideoFailed(true)}
+          onError={() => setFailedVideoUrl(url)}
           className="h-full w-full object-cover opacity-80"
           aria-label={alt}
         />
@@ -114,17 +127,39 @@ function PreviewMedia({
     );
   }
 
+  if (imageFailed) {
+    return (
+      <div className="flex h-full min-h-44 items-center justify-center bg-[#eee3cb] px-6 text-center text-[#10251a]/70">
+        <div>
+          <ImageIcon className="mx-auto" aria-hidden="true" />
+          <p className="mt-2 text-xs font-semibold">Không tải được ảnh xem trước</p>
+          <a className="mt-2 inline-block text-xs underline" href={url} target="_blank" rel="noreferrer">
+            Mở ảnh trong tab mới
+          </a>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div
-      role="img"
-      aria-label={alt}
-      className="h-full min-h-44 bg-cover bg-center"
-      style={{ backgroundImage: `url(${JSON.stringify(url)})` }}
+    // Signed/private URLs cannot be passed through the Next image optimizer.
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={url}
+      alt={alt}
+      onError={() => setFailedImageUrl(url)}
+      className="h-full min-h-44 w-full object-cover"
     />
   );
 }
 
-function SiteSettingsPreview({ values }: { values: Record<string, string> }) {
+function SiteSettingsPreview({
+  values,
+  media,
+}: {
+  values: Record<string, string>;
+  media?: AdminMediaPreviewOption;
+}) {
   const title = values.header_title || values.site_name || "TRÀ LINH";
   const subtitle = values.header_subtitle || values.tagline || "Đại ngàn Ngọc Linh";
   return (
@@ -138,6 +173,16 @@ function SiteSettingsPreview({ values }: { values: Record<string, string> }) {
           Khám phá
         </span>
       </div>
+      {media?.previewUrl ? (
+        <div className="h-44 overflow-hidden bg-[#07100c]">
+          <PreviewMedia
+            url={media.previewUrl}
+            isVideo={media.mediaType === "video"}
+            alt={media.altText || media.title}
+            poster={media.posterUrl}
+          />
+        </div>
+      ) : null}
       <div className="p-5">
         <p className="text-[0.6rem] font-bold uppercase tracking-[0.18em] text-[#5e7f3b]">
           Thông tin liên hệ
@@ -169,6 +214,10 @@ function SectionPreview({
   const mediaUrl = media?.previewUrl ?? safePreviewUrl(values.image_url);
   const title = values.title || "Tiêu đề khu vực";
   const description = values.description || "Mô tả của khu vực sẽ xuất hiện tại đây.";
+  const stats = Array.from({ length: 4 }, (_, index) => ({
+    value: values[`stat_value_${index}`],
+    label: values[`stat_label_${index}`],
+  })).filter((item) => item.value || item.label);
 
   return (
     <div
@@ -198,15 +247,25 @@ function SectionPreview({
             />
           </div>
         ) : null}
-        <p className={`text-[0.62rem] font-bold uppercase tracking-[0.2em] ${dark ? "text-[#d5a84e]" : "text-[#5e7f3b]"}`}>
+        {key === "identity" && stats.length ? (
+          <div className="grid grid-cols-2 gap-3">
+            {stats.map((stat, index) => (
+              <div key={index} className="rounded-xl bg-[#10251a] p-4 text-white">
+                <p className="font-serif text-lg">{stat.value}</p>
+                <p className="mt-1 text-xs text-white/65">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+        ) : null}
+        {key !== "identity" ? <p className={`text-[0.62rem] font-bold uppercase tracking-[0.2em] ${dark ? "text-[#d5a84e]" : "text-[#5e7f3b]"}`}>
           {values.eyebrow || "Nhãn nhỏ"}
-        </p>
-        <h3 data-preview-title className={`mt-3 font-serif leading-tight ${hero ? "text-4xl" : "text-3xl"}`}>
+        </p> : null}
+        {key !== "identity" ? <h3 data-preview-title className={`mt-3 font-serif leading-tight ${hero ? "text-4xl" : "text-3xl"}`}>
           {title}
-        </h3>
-        <p className={`mt-4 max-w-md text-sm leading-6 ${dark ? "text-white/72" : "text-[#10251a]/65"}`}>
+        </h3> : null}
+        {key !== "identity" ? <p className={`mt-4 max-w-md text-sm leading-6 ${dark ? "text-white/72" : "text-[#10251a]/65"}`}>
           {description}
-        </p>
+        </p> : null}
         {values.cta_label ? (
           <span className={`mt-5 inline-flex rounded-full px-4 py-2 text-xs font-bold ${
             dark ? "bg-white text-[#10251a]" : "bg-[#10251a] text-white"
@@ -389,7 +448,7 @@ function AdminVisualEditorState({
           </a>
         </div>
         {table === "site_settings" ? (
-          <SiteSettingsPreview values={values} />
+          <SiteSettingsPreview values={values} media={activeMedia} />
         ) : table === "page_sections" ? (
           <SectionPreview values={values} media={activeMedia} />
         ) : (
@@ -411,7 +470,10 @@ function AdminVisualEditorState({
           </p>
         ) : null}
         <p className="mt-3 rounded-xl bg-[#eee3cb]/75 px-4 py-3 text-xs leading-5 text-[#10251a]/65">
-          Đây là bản xem trước. Website thật chỉ thay đổi sau khi bạn bấm <strong>Xuất bản</strong>.
+          Đây là bản xem trước.{" "}
+          {row.status === "published"
+            ? "Chọn “Gỡ xuống & lưu nháp” sẽ tạm ẩn nội dung này; chọn “Xuất bản” để áp dụng thay đổi."
+            : <>Website thật chỉ hiển thị nội dung này sau khi bạn bấm <strong>Xuất bản</strong>.</>}
         </p>
       </aside>
       <section aria-label="Biểu mẫu chỉnh sửa" className="min-w-0 rounded-2xl border border-[#10251a]/10 bg-white p-4 sm:p-5">

@@ -34,6 +34,8 @@ interface FooterProps {
   contactPhone?: string;
   title?: string;
   description?: string;
+  legalAddress?: string;
+  privacyUrl?: string;
 }
 
 export function Footer({
@@ -41,7 +43,16 @@ export function Footer({
   contactPhone,
   title = "TRÀ LINH",
   description,
+  legalAddress,
+  privacyUrl = "/chinh-sach-quyen-rieng",
 }: FooterProps = {}) {
+  const groups = footerGroups.map((group) => ({
+    ...group,
+    links: group.links.map((link) =>
+      link.label === "Quyền riêng tư" ? { ...link, href: privacyUrl } : link,
+    ),
+  }));
+
   return (
     <footer className="site-footer bg-[#10251A] text-[#EEF1E9]">
       <div className="site-footer__inner mx-auto w-full max-w-[1440px] px-5 py-14 md:px-8 md:py-20 xl:px-12">
@@ -79,7 +90,7 @@ export function Footer({
           </div>
 
           <div className="site-footer__navigation grid gap-3 sm:grid-cols-3 sm:gap-6">
-            {footerGroups.map((group) => (
+            {groups.map((group) => (
               <details key={group.title} className="site-footer__group border-b border-white/10 pb-3 sm:border-0 sm:pb-0" open>
                 <summary className="site-footer__group-title flex min-h-11 cursor-pointer items-center text-sm font-semibold uppercase tracking-[0.12em] text-[#D5A84E] sm:cursor-default">
                   {group.title}
@@ -106,7 +117,7 @@ export function Footer({
         </div>
 
         <div className="site-footer__legal mt-12 flex flex-col gap-3 border-t border-white/10 pt-6 text-xs leading-5 text-[#EEF1E9]/55 md:flex-row md:items-center md:justify-between">
-          <p>Xã Trà Linh, thành phố Đà Nẵng, Việt Nam.</p>
+          <p>{legalAddress || "Xã Trà Linh, thành phố Đà Nẵng, Việt Nam."}</p>
           <p>Thông tin hành trình cần được xác nhận với đơn vị địa phương trước khi khởi hành.</p>
         </div>
       </div>

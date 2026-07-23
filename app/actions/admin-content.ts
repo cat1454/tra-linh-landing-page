@@ -8,6 +8,7 @@ import { z } from "zod";
 
 import { getAdminAccess } from "@/lib/supabase/access";
 import { buildAdminUpdatePayload } from "@/lib/cms/admin-fields";
+import { slugifyVietnamese } from "@/lib/cms/admin-field-config";
 import { resolveEditorialIntent } from "@/lib/cms/admin-preview";
 import { getMediaBucketName, getPublicSupabaseConfig } from "@/lib/supabase/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
@@ -229,7 +230,9 @@ export async function createContentItemAction(formData: FormData): Promise<never
         : null,
   };
 
-  const slug = slugSchema.safeParse(text(formData, "slug"));
+  const requestedSlug =
+    text(formData, "slug") || slugifyVietnamese(common.title);
+  const slug = slugSchema.safeParse(requestedSlug);
   const requiresSlug = [
     "journeys",
     "local_products",
