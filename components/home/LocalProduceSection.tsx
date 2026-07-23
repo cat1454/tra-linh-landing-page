@@ -46,10 +46,10 @@ export function LocalProduceSection({ items }: LocalProduceSectionProps) {
             return (
               <article
                 key={item.id}
-                className="produce-card group relative isolate h-[360px] overflow-hidden rounded-[1.5rem] bg-[#29452C]"
+                className="produce-card group relative isolate h-[360px] overflow-hidden rounded-[1.5rem] bg-[#29452C] transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
               >
                 <ScrollReveal direction="up" delay={0.15 * (index % 3)} className="h-full w-full block">
-                <MediaFrame hoverReveal={true} media={item.media} className="absolute inset-0 -z-20" sizes="(min-width: 1024px) 30vw, (min-width: 640px) 50vw, 100vw" imageClassName="transition duration-700 group-hover:scale-[1.04]" />
+                <MediaFrame hoverReveal={true} media={item.media} className="absolute inset-0 -z-20" sizes="(min-width: 1024px) 30vw, (min-width: 640px) 50vw, 100vw" imageClassName="transition duration-700 group-hover:scale-105" />
                 <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#07100C]/95 via-[#07100C]/25 to-transparent" />
                 <div className="flex h-full flex-col justify-between p-6 sm:p-8">
                   <div className="flex items-start justify-between gap-4">

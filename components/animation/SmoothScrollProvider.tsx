@@ -92,11 +92,73 @@ export function SmoothScrollProvider({ children }: SmoothScrollProviderProps) {
                     scrollTrigger: {
                       trigger: item,
                       start: 'top 78%',
-                      once: true,
+                      toggleActions: 'play none none reset',
                     },
                   },
                 )
               })
+
+            // Entrance fade-and-rise animations for LocalProduceSection cards
+            gsap.utils
+              .toArray<HTMLElement>('#san-vat .produce-card')
+              .forEach((item) => {
+                gsap.fromTo(
+                  item,
+                  { autoAlpha: 0, y: 35 },
+                  {
+                    autoAlpha: 1,
+                    y: 0,
+                    duration: 0.85,
+                    ease: 'power3.out',
+                    scrollTrigger: {
+                      trigger: item,
+                      start: 'top 85%',
+                      toggleActions: 'play none none reset',
+                    },
+                  },
+                )
+              })
+
+            // Entrance fade-and-rise animations for XoDangCultureSection cards
+            gsap.utils
+              .toArray<HTMLElement>('#van-hoa .culture-card')
+              .forEach((item) => {
+                gsap.fromTo(
+                  item,
+                  { autoAlpha: 0, y: 35 },
+                  {
+                    autoAlpha: 1,
+                    y: 0,
+                    duration: 0.85,
+                    ease: 'power3.out',
+                    scrollTrigger: {
+                      trigger: item,
+                      start: 'top 85%',
+                      toggleActions: 'play none none reset',
+                    },
+                  },
+                )
+              })
+
+            // Parallax scroll effect for FinalCTA background image
+            const finalCtaBg = document.querySelector<HTMLElement>('.final-cta-bg')
+            const finalCta = document.querySelector<HTMLElement>('section[aria-labelledby="final-cta-heading"]')
+            if (finalCtaBg && finalCta) {
+              gsap.fromTo(
+                finalCtaBg,
+                { yPercent: -8 },
+                {
+                  yPercent: 8,
+                  ease: 'none',
+                  scrollTrigger: {
+                    trigger: finalCta,
+                    start: 'top bottom',
+                    end: 'bottom top',
+                    scrub: 0.8,
+                  },
+                },
+              )
+            }
           },
         )
       })

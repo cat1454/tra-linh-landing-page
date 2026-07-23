@@ -62,7 +62,7 @@ export function HeroSection({ hero }: HeroSectionProps) {
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
                 <Link
                   href={hero.primaryCta.href}
-                  className="group animate-pulse-ring inline-flex min-h-12 items-center justify-center gap-3 whitespace-nowrap rounded-full bg-[#D5A84E] px-6 py-3 text-sm font-semibold text-[#10251A] transition-colors hover:bg-[#EEE3CB] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#EEF1E9]"
+                  className="group animate-pulse-ring inline-flex min-h-12 items-center justify-center gap-3 whitespace-nowrap rounded-full bg-[#D5A84E] px-6 py-3 text-sm font-semibold text-[#10251A] transition-all duration-300 hover:scale-[1.03] hover:bg-[#EEE3CB] active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#EEF1E9]"
                 >
                   {hero.primaryCta.label}
                   <ArrowGlyph />

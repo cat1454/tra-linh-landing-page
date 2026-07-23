@@ -30,10 +30,10 @@ export function XoDangCultureSection({ stories }: XoDangCultureSectionProps) {
           {stories.map((story, index) => (
             <article
               key={story.id}
-              className="culture-card group relative isolate h-[320px] sm:h-[380px] overflow-hidden rounded-[1.5rem] bg-[#29452C]"
+              className="culture-card group relative isolate h-[320px] sm:h-[380px] overflow-hidden rounded-[1.5rem] bg-[#29452C] transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
             >
               <ScrollReveal direction="up" delay={0.2 * index} className="h-full w-full block">
-                <MediaFrame hoverReveal={true} media={story.media} className="absolute inset-0 -z-20" sizes="(min-width: 1024px) 45vw, (min-width: 640px) 50vw, 100vw" imageClassName="transition duration-700 group-hover:scale-[1.035]" />
+                <MediaFrame hoverReveal={true} media={story.media} className="absolute inset-0 -z-20" sizes="(min-width: 1024px) 45vw, (min-width: 640px) 50vw, 100vw" imageClassName="transition duration-700 group-hover:scale-105" />
                 <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#07100C]/90 via-[#07100C]/18 to-transparent" />
               <div className="flex h-full flex-col justify-end p-6 sm:p-8">
                 <h3 className="font-serif text-2xl text-[#EEF1E9] sm:text-3xl">{story.title}</h3>
