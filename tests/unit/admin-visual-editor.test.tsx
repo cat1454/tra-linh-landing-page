@@ -5,8 +5,10 @@ import { AdminVisualEditor } from "@/components/admin/AdminVisualEditor";
 import AdminLayout from "@/app/admin/layout";
 import {
   ADMIN_NAV_GROUPS,
+  buildAdminPreviewMediaMap,
   resolveEditorialIntent,
 } from "@/lib/cms/admin-preview";
+import { fallbackContent } from "@/lib/content/fallback-content";
 
 describe("admin visual editor", () => {
   it("uses friendly navigation labels instead of database names", () => {
@@ -106,5 +108,85 @@ describe("admin visual editor", () => {
     );
 
     expect(container.querySelector("[data-admin-root]")).toBeInTheDocument();
+  });
+
+  it("resets preview content when the selected record changes", () => {
+    const { rerender } = render(
+      <AdminVisualEditor
+        table="page_sections"
+        row={{
+          id: "hero-row",
+          section_key: "hero",
+          title: "Tiêu đề Hero",
+          status: "published",
+          display_order: 0,
+          is_placeholder: false,
+        }}
+        mediaOptions={[]}
+      >
+        <form><input name="title" defaultValue="Tiêu đề Hero" /></form>
+      </AdminVisualEditor>,
+    );
+
+    rerender(
+      <AdminVisualEditor
+        table="page_sections"
+        row={{
+          id: "story-row",
+          section_key: "story",
+          title: "Tiêu đề Câu chuyện",
+          status: "published",
+          display_order: 1,
+          is_placeholder: false,
+        }}
+        mediaOptions={[]}
+      >
+        <form><input name="title" defaultValue="Tiêu đề Câu chuyện" /></form>
+      </AdminVisualEditor>,
+    );
+
+    expect(screen.getByText("Tiêu đề Câu chuyện", { selector: "[data-preview-title]" })).toBeVisible();
+    expect(screen.queryByText("Tiêu đề Hero", { selector: "[data-preview-title]" })).not.toBeInTheDocument();
+  });
+
+  it("shows the image currently used by the website when no media is linked", () => {
+    render(
+      <AdminVisualEditor
+        table="page_sections"
+        row={{
+          id: "story-fallback",
+          section_key: "story",
+          title: "Câu chuyện",
+          status: "published",
+          display_order: 1,
+          is_placeholder: false,
+        }}
+        mediaOptions={[]}
+        fallbackMedia={{
+          url: "/images/tra-linh/story.webp",
+          mediaType: "image",
+          altText: "Rừng Trà Linh",
+          source: "website",
+        }}
+      >
+        <form><input name="title" defaultValue="Câu chuyện" /></form>
+      </AdminVisualEditor>,
+    );
+
+    expect(screen.getByRole("img", { name: "Rừng Trà Linh" })).toBeVisible();
+    expect(screen.getByText("Ảnh hiện tại của website")).toBeVisible();
+  });
+
+  it("maps every homepage area to representative published media", () => {
+    const map = buildAdminPreviewMediaMap(fallbackContent);
+
+    expect(map.hero.url).toBe(fallbackContent.hero.backgroundMedia.src);
+    expect(map.story.url).toBe(fallbackContent.storyChapters[0].media.src);
+    expect(map.journeys.url).toBe(fallbackContent.journeys[0].featuredMedia.src);
+    expect(map.ginseng.url).toBe(fallbackContent.ginsengStorySteps[0].media.src);
+    expect(map.culture.url).toBe(fallbackContent.cultureStories[0].media.src);
+    expect(map.local_products.url).toBe(fallbackContent.localSpecialties[0].media.src);
+    expect(map.products.url).toBe(fallbackContent.products[0].featuredMedia.src);
+    expect(map.guides.url).toBe(fallbackContent.guides[0].featuredMedia.src);
   });
 });
