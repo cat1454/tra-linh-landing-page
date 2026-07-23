@@ -11,7 +11,7 @@ export function XoDangCultureSection({ stories }: XoDangCultureSectionProps) {
   if (!stories.length) return null;
 
   return (
-    <section id="van-hoa" aria-labelledby="culture-heading" className="bg-[#EEE3CB] px-5 py-24 text-[#10251A] sm:px-8 sm:py-28 lg:px-16 lg:py-36 xl:px-20">
+    <section id="van-hoa" aria-labelledby="culture-heading" className="bg-[#EEE3CB] px-5 py-12 text-[#10251A] sm:px-8 sm:py-16 lg:px-16 lg:py-20 xl:px-20">
       <div className="mx-auto max-w-[1380px]">
         <div className="grid gap-10 lg:grid-cols-[0.75fr_1.25fr] lg:items-end">
           <ScrollReveal direction="up" delay={0.1}>
@@ -26,7 +26,7 @@ export function XoDangCultureSection({ stories }: XoDangCultureSectionProps) {
           </ScrollReveal>
         </div>
 
-        <div className="mt-14 grid gap-6 sm:grid-cols-2">
+        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:mt-10">
           {stories.map((story, index) => (
             <article
               key={story.id}

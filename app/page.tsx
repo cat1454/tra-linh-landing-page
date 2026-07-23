@@ -68,7 +68,7 @@ export default async function Home() {
       {home.products.length ? <GinsengProductsSection products={home.products} /> : null}
       <TravelGuideSection guides={home.guides} />
       <FinalCTA media={finalMedia} />
-      <div id="lien-he" className="bg-[#EEF1E9] px-5 py-20 sm:px-8 sm:py-24 lg:px-16">
+      <div id="lien-he" className="bg-[#EEF1E9] px-5 py-12 sm:px-8 sm:py-16 lg:px-16 lg:py-20">
         <div className="mx-auto max-w-3xl rounded-[1.75rem] border border-[#10251A]/10 bg-[#EEE3CB]/70 p-6 shadow-[0_24px_80px_rgba(16,37,26,0.08)] sm:p-10">
           <ContactForm
             isEnabled={formsEnabled}

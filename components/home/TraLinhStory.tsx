@@ -13,8 +13,8 @@ export function TraLinhStory({ chapters }: TraLinhStoryProps) {
   if (!primary) return null;
 
   return (
-    <section id="cau-chuyen" aria-labelledby="story-heading" className="bg-[#EEF1E9] px-5 py-24 text-[#10251A] sm:px-8 sm:py-28 lg:px-16 lg:py-36 xl:px-20">
-      <div className="mx-auto grid max-w-[1380px] items-center gap-14 lg:grid-cols-[1.1fr_0.9fr] lg:gap-20">
+    <section id="cau-chuyen" aria-labelledby="story-heading" className="bg-[#EEF1E9] px-5 py-12 text-[#10251A] sm:px-8 sm:py-16 lg:px-16 lg:py-20 xl:px-20">
+      <div className="mx-auto grid max-w-[1380px] items-center gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:gap-10">
         <ScrollReveal direction="left" duration={0.8}>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 sm:items-start">
             <MediaFrame

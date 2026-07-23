@@ -21,7 +21,7 @@ export function Section({
     <section
       {...props}
       className={clsx(
-        'ui-section relative overflow-clip py-16 sm:py-20 lg:py-28',
+        'ui-section relative overflow-clip py-12 sm:py-16 lg:py-20',
         `ui-section--${tone}`,
         toneClasses[tone],
         className,

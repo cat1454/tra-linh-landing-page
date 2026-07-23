@@ -26,7 +26,7 @@ export function LocalProduceSection({ items }: LocalProduceSectionProps) {
   if (!items.length) return null;
 
   return (
-    <section id="san-vat" aria-labelledby="produce-heading" className="bg-[#EEF1E9] px-5 py-24 text-[#10251A] sm:px-8 sm:py-28 lg:px-16 lg:py-36 xl:px-20">
+    <section id="san-vat" aria-labelledby="produce-heading" className="bg-[#EEF1E9] px-5 py-12 text-[#10251A] sm:px-8 sm:py-16 lg:px-16 lg:py-20 xl:px-20">
       <div className="mx-auto max-w-[1380px]">
         <ScrollReveal direction="up">
           <div id="produce-heading">
@@ -38,7 +38,7 @@ export function LocalProduceSection({ items }: LocalProduceSectionProps) {
           </div>
         </ScrollReveal>
 
-        <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:mt-10 lg:grid-cols-3">
           {items.map((item, index) => {
             const meta = categoryMeta[item.category];
             const Icon = meta.icon;

@@ -13,7 +13,7 @@ export function GinsengForestStory({ steps }: GinsengForestStoryProps) {
   if (!steps.length) return null;
 
   return (
-    <section id="vung-sam" aria-labelledby="ginseng-heading" className="bg-[#10251A] px-5 py-24 text-[#EEF1E9] sm:px-8 sm:py-28 lg:px-16 lg:py-36 xl:px-20">
+    <section id="vung-sam" aria-labelledby="ginseng-heading" className="bg-[#10251A] px-5 py-12 text-[#EEF1E9] sm:px-8 sm:py-16 lg:px-16 lg:py-20 xl:px-20">
       <div className="mx-auto max-w-[1380px]">
         <ScrollReveal direction="fade">
           <div id="ginseng-heading">
@@ -26,7 +26,7 @@ export function GinsengForestStory({ steps }: GinsengForestStoryProps) {
           </div>
         </ScrollReveal>
 
-        <div className="mt-16 grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-20">
+        <div className="mt-8 grid gap-8 lg:mt-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-10">
           <div className="lg:sticky lg:top-24 lg:h-fit">
             <ScrollReveal direction="left">
               <MediaFrame
@@ -47,7 +47,7 @@ export function GinsengForestStory({ steps }: GinsengForestStoryProps) {
 
           <ol className="relative border-l border-[#9BBE62]/25 pl-7 sm:pl-10">
             {steps.map((step) => (
-              <li key={step.id} className="relative pb-14 last:pb-0 lg:min-h-[310px] lg:pb-20">
+              <li key={step.id} className="relative pb-10 last:pb-0 lg:min-h-[250px] lg:pb-12">
                 <ScrollReveal direction="up">
                   <span
                     aria-hidden="true"
@@ -69,7 +69,7 @@ export function GinsengForestStory({ steps }: GinsengForestStoryProps) {
         </div>
 
         <ScrollReveal direction="up" delay={0.2}>
-          <aside className="mt-16 flex flex-col gap-5 rounded-2xl border border-[#EEF1E9]/12 bg-[#07100C]/38 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
+          <aside className="mt-10 flex flex-col gap-5 rounded-2xl border border-[#EEF1E9]/12 bg-[#07100C]/38 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
             <div className="flex items-start gap-4">
               <ContactRound aria-hidden="true" className="mt-1 size-6 shrink-0 text-[#D5A84E]" />
               <div>

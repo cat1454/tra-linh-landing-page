@@ -13,8 +13,8 @@ export function TravelGuideSection({ guides }: TravelGuideSectionProps) {
   if (!guides.length) return null;
 
   return (
-    <section id="cam-nang" aria-labelledby="guide-heading" className="bg-[#EEE3CB] px-5 py-24 text-[#10251A] sm:px-8 sm:py-28 lg:px-16 lg:py-36 xl:px-20">
-      <div className="mx-auto grid max-w-[1380px] gap-14 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
+    <section id="cam-nang" aria-labelledby="guide-heading" className="bg-[#EEE3CB] px-5 py-12 text-[#10251A] sm:px-8 sm:py-16 lg:px-16 lg:py-20 xl:px-20">
+      <div className="mx-auto grid max-w-[1380px] gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:gap-10">
         <div>
           <div id="guide-heading">
             <SectionIntro
