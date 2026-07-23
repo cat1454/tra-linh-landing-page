@@ -13,7 +13,7 @@ export function JourneySection({ journeys }: JourneySectionProps) {
   if (!journeys.length) return null;
 
   return (
-    <section id="hanh-trinh" aria-labelledby="journey-heading" className="overflow-hidden bg-[#EEF1E9] px-5 py-24 sm:px-8 sm:py-28 lg:px-16 lg:py-36 xl:px-20">
+    <section id="hanh-trinh" aria-labelledby="journey-heading" className="overflow-hidden bg-[#EEF1E9] px-5 py-12 sm:px-8 sm:py-16 lg:px-16 lg:py-20 xl:px-20">
       <div className="mx-auto max-w-[1440px]">
         <div id="journey-heading">
           <SectionIntro
@@ -23,7 +23,7 @@ export function JourneySection({ journeys }: JourneySectionProps) {
           />
         </div>
 
-        <div className="mt-14 sm:mt-16">
+        <div className="mt-8 lg:mt-10">
           <DeferredJourneyCarousel journeys={journeys} />
           <HorizontalJourney className="journey-horizontal-track hidden lg:block" data-horizontal-track>
             {journeys.map((journey, index) => (

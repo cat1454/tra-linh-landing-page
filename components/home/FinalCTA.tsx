@@ -11,7 +11,7 @@ type FinalCTAProps = {
 
 export function FinalCTA({ media }: FinalCTAProps) {
   return (
-    <section aria-labelledby="final-cta-heading" className="relative isolate overflow-hidden bg-[#10251A] px-5 py-28 text-center text-[#EEF1E9] sm:px-8 sm:py-36 lg:px-16 lg:py-44">
+    <section aria-labelledby="final-cta-heading" className="relative isolate overflow-hidden bg-[#10251A] px-5 py-16 text-center text-[#EEF1E9] sm:px-8 sm:py-20 lg:px-16 lg:py-24">
       <MediaFrame media={media} className="final-cta-bg absolute inset-0 -z-30" sizes="100vw" imageClassName="brightness-[0.65]" />
       <div className="absolute inset-0 -z-20 bg-[linear-gradient(90deg,rgba(7,16,12,0.78),rgba(16,37,26,0.52),rgba(7,16,12,0.78))]" />
       <div aria-hidden="true" className="absolute inset-x-0 top-1/3 -z-10 h-48 bg-[radial-gradient(ellipse_at_center,rgba(238,241,233,0.17),transparent_67%)] blur-xl" />

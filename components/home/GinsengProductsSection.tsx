@@ -18,7 +18,7 @@ export function GinsengProductsSection({ products }: GinsengProductsSectionProps
   if (!products.length) return null;
 
   return (
-    <section id="san-pham-sam" aria-labelledby="products-heading" className="bg-[#07100C] px-5 py-24 text-[#EEF1E9] sm:px-8 sm:py-28 lg:px-16 lg:py-36 xl:px-20">
+    <section id="san-pham-sam" aria-labelledby="products-heading" className="bg-[#07100C] px-5 py-12 text-[#EEF1E9] sm:px-8 sm:py-16 lg:px-16 lg:py-20 xl:px-20">
       <div className="mx-auto max-w-[1380px]">
         <div id="products-heading">
           <SectionIntro
@@ -30,7 +30,7 @@ export function GinsengProductsSection({ products }: GinsengProductsSectionProps
           />
         </div>
 
-        <div className="-mx-5 mt-14 flex snap-x gap-4 overflow-x-auto px-5 pb-6 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 lg:grid-cols-3">
+        <div className="-mx-5 mt-8 flex snap-x gap-4 overflow-x-auto px-5 pb-6 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 lg:mt-10 lg:grid-cols-3">
           {products.map((product) => (
             <article
               key={product.id}
