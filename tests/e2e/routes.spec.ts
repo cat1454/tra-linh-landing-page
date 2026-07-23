@@ -40,6 +40,8 @@ test('admin redirects anonymous visitors to the configured login', async ({ page
   await expect(page.locator('main#noi-dung-chinh')).toBeVisible()
   await expect(page).toHaveURL(/\/admin\/login$/)
   await expect(page.getByRole('heading', { name: 'Đăng nhập quản trị' })).toBeVisible()
+  await expect(page.locator('.site-header')).toBeHidden()
+  await expect(page.locator('.public-site-chrome').last()).toBeHidden()
 })
 
 test('configured admin login accepts an allowlisted email', async ({ page }) => {

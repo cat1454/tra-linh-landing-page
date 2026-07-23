@@ -126,25 +126,29 @@ export default async function RootLayout({
             Bỏ qua điều hướng
           </a>
 
-          <Header
-            title={siteSettings.headerTitle}
-            subtitle={siteSettings.headerSubtitle}
-            navigation={siteSettings.navigation}
-          />
+          <div className="public-site-chrome contents">
+            <Header
+              title={siteSettings.headerTitle}
+              subtitle={siteSettings.headerSubtitle}
+              navigation={siteSettings.navigation}
+            />
+          </div>
 
           {children}
 
-          <Footer
-            contactEmail={siteSettings.contactEmail}
-            contactPhone={siteSettings.contactPhone}
-            title={siteSettings.footerTitle ?? siteSettings.headerTitle}
-            description={siteSettings.footerDescription}
-          />
-          <MobileStickyCta
-            contactPhone={siteSettings.contactPhone}
-            mapsUrl={siteSettings.mapsUrl}
-            zaloUrl={siteSettings.zaloUrl}
-          />
+          <div className="public-site-chrome contents">
+            <Footer
+              contactEmail={siteSettings.contactEmail}
+              contactPhone={siteSettings.contactPhone}
+              title={siteSettings.footerTitle ?? siteSettings.headerTitle}
+              description={siteSettings.footerDescription}
+            />
+            <MobileStickyCta
+              contactPhone={siteSettings.contactPhone}
+              mapsUrl={siteSettings.mapsUrl}
+              zaloUrl={siteSettings.zaloUrl}
+            />
+          </div>
         </SmoothScrollProvider>
 
         <SpeedInsights />

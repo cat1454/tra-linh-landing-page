@@ -8,6 +8,7 @@ import { z } from "zod";
 
 import { getAdminAccess } from "@/lib/supabase/access";
 import { buildAdminUpdatePayload } from "@/lib/cms/admin-fields";
+import { resolveEditorialIntent } from "@/lib/cms/admin-preview";
 import { getMediaBucketName, getPublicSupabaseConfig } from "@/lib/supabase/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { ContentStatus, ContentTableName } from "@/lib/supabase/types";
@@ -96,8 +97,14 @@ function checked(formData: FormData, name: string): boolean {
   return value === "on" || value === "true" || value === "1";
 }
 
-function adminRedirect(table: ContentTableName, key: "notice" | "error", value: string): never {
-  redirect(`/admin?table=${table}&${key}=${encodeURIComponent(value)}`);
+function adminRedirect(
+  table: ContentTableName,
+  key: "notice" | "error",
+  value: string,
+  id?: string,
+): never {
+  const selected = id ? `&id=${encodeURIComponent(id)}` : "";
+  redirect(`/admin?table=${table}${selected}&${key}=${encodeURIComponent(value)}`);
 }
 
 async function requireAuthenticatedAdmin(table: ContentTableName) {
@@ -422,7 +429,16 @@ void legacyUpdateContentItemAction;
 export async function updateContentItemAction(formData: FormData): Promise<never> {
   const tableResult = tableSchema.safeParse(formData.get("table"));
   const idResult = z.string().uuid().safeParse(formData.get("id"));
-  const statusResult = statusSchema.safeParse(formData.get("status"));
+  const intent = text(formData, "intent");
+  const statusResult = intent
+    ? (() => {
+        try {
+          return { success: true as const, data: resolveEditorialIntent(intent) };
+        } catch {
+          return { success: false as const };
+        }
+      })()
+    : statusSchema.safeParse(formData.get("status"));
 
   if (!tableResult.success || !idResult.success || !statusResult.success) {
     adminRedirect(
@@ -461,7 +477,7 @@ export async function updateContentItemAction(formData: FormData): Promise<never
     try {
       payload = { ...payload, ...buildAdminUpdatePayload(formData, table) };
     } catch {
-      adminRedirect(table, "error", "invalid-update");
+      adminRedirect(table, "error", "invalid-update", idResult.data);
     }
   }
 
@@ -470,10 +486,15 @@ export async function updateContentItemAction(formData: FormData): Promise<never
     .update(payload as never)
     .eq("id", idResult.data);
 
-  if (error) adminRedirect(table, "error", "update-failed");
+  if (error) adminRedirect(table, "error", "update-failed", idResult.data);
   revalidatePath("/", "layout");
   revalidatePath("/sitemap.xml");
-  adminRedirect(table, "notice", "updated");
+  adminRedirect(
+    table,
+    "notice",
+    statusResult.data === "published" ? "published" : "draft-saved",
+    idResult.data,
+  );
 }
 
 export async function deleteContentItemAction(formData: FormData): Promise<never> {

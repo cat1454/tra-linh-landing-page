@@ -10,31 +10,33 @@ import {
 } from "@/app/actions/admin-content";
 import { signOutAdmin } from "@/app/actions/admin-auth";
 import { updateContactSubmissionStatusAction } from "@/app/actions/admin-leads";
+import { AdminVisualEditor } from "@/components/admin/AdminVisualEditor";
+import { DeleteRecordButton } from "@/components/admin/DeleteRecordButton";
 import { MediaUploadManager } from "@/components/admin/MediaUploadManager";
+import {
+  ADMIN_NAV_GROUPS,
+  getAdminPublicAnchor,
+  getAdminTableLabel,
+  type AdminMediaPreviewOption,
+} from "@/lib/cms/admin-preview";
 import { getAdminAccess } from "@/lib/supabase/access";
-import { getSupabaseEnvironmentStatus } from "@/lib/supabase/config";
+import { getMediaBucketName, getSupabaseEnvironmentStatus } from "@/lib/supabase/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { ContentStatus, ContentTableName } from "@/lib/supabase/types";
 
 export const dynamic = "force-dynamic";
 
-const contentTables: { name: ContentTableName; label: string }[] = [
-  { name: "page_sections", label: "Nội dung từng khu vực" },
-  { name: "site_settings", label: "Thiết lập" },
-  { name: "hero_slides", label: "Hero" },
-  { name: "stories", label: "Câu chuyện" },
-  { name: "journeys", label: "Hành trình" },
-  { name: "ginseng_story_steps", label: "Vùng sâm" },
-  { name: "culture_stories", label: "Văn hóa" },
-  { name: "local_products", label: "Sản vật" },
-  { name: "ginseng_products", label: "Sản phẩm sâm" },
-  { name: "travel_guides", label: "Cẩm nang" },
-  { name: "media_assets", label: "Thư viện ảnh" },
-];
+const contentTables = ADMIN_NAV_GROUPS.flatMap((group) =>
+  group.items.flatMap((item) =>
+    item.table ? [{ name: item.table, label: item.label }] : [],
+  ),
+);
 
 const noticeMessages: Record<string, string> = {
   created: "Đã tạo nội dung mới.",
   updated: "Đã lưu toàn bộ thay đổi.",
+  "draft-saved": "Đã lưu bản nháp. Website công khai chưa thay đổi.",
+  published: "Đã xuất bản. Nội dung mới đang hiển thị trên website.",
   deleted: "Đã xóa nội dung.",
   uploaded: "Đã tải ảnh lên ở trạng thái chờ duyệt.",
   "lead-updated": "Đã cập nhật trạng thái liên hệ.",
@@ -73,10 +75,16 @@ interface AdminPreview {
   [key: string]: unknown;
 }
 
-interface MediaOption {
+type MediaOption = AdminMediaPreviewOption;
+
+interface RawMediaOption {
   id: string;
   title: string;
   media_type: "image" | "video";
+  storage_path: string | null;
+  external_url: string | null;
+  file_url: string | null;
+  poster_asset_id: string | null;
 }
 
 interface ContactSubmissionPreview {
@@ -106,6 +114,55 @@ function rowTitle(row: AdminPreview): string {
   return row.title ?? row.name ?? row.site_name ?? row.slug ?? row.file_url ?? row.id;
 }
 
+const sectionNames: Record<string, string> = {
+  hero: "Đầu trang nổi bật",
+  identity: "Dải số liệu giới thiệu",
+  story: "Câu chuyện Trà Linh",
+  journeys: "Các hành trình",
+  ginseng: "Vùng sâm Ngọc Linh",
+  culture: "Văn hóa Xơ Đăng",
+  local_products: "Sản vật địa phương",
+  products: "Sản phẩm sâm",
+  guides: "Cẩm nang chuyến đi",
+  final_cta: "Lời mời cuối trang",
+  contact: "Biểu mẫu liên hệ",
+};
+
+function friendlyRowTitle(table: ContentTableName, row: AdminPreview): string {
+  if (table === "page_sections") {
+    const key = rowText(row, "section_key");
+    return sectionNames[key] ?? rowTitle(row);
+  }
+  return rowTitle(row);
+}
+
+function safeAdminPreviewUrl(value: unknown): string | undefined {
+  if (typeof value !== "string" || !value.trim()) return undefined;
+  const candidate = value.trim();
+  if (candidate.startsWith("/")) return candidate;
+  try {
+    const parsed = new URL(candidate);
+    return parsed.protocol === "http:" || parsed.protocol === "https:"
+      ? parsed.toString()
+      : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+function rowPreviewUrl(row: AdminPreview, mediaOptions: MediaOption[]): string | undefined {
+  const mediaId =
+    rowText(row, "media_asset_id") ||
+    rowText(row, "hero_video_asset_id") ||
+    (rowText(row, "media_type") ? row.id : "");
+  return (
+    mediaOptions.find((item) => item.id === mediaId)?.previewUrl ??
+    safeAdminPreviewUrl(row.image_url) ??
+    safeAdminPreviewUrl(row.external_url) ??
+    safeAdminPreviewUrl(row.file_url)
+  );
+}
+
 function CmsUnavailable({ partial }: { partial: boolean }) {
   return (
     <main id="noi-dung-chinh" className="min-h-screen bg-[#eef1e9] px-5 py-16 text-[#10251a]">
@@ -133,7 +190,7 @@ function CmsUnavailable({ partial }: { partial: boolean }) {
 export default async function AdminPage({
   searchParams,
 }: {
-  searchParams: Promise<{ table?: string; view?: string; notice?: string; error?: string }>;
+  searchParams: Promise<{ table?: string; id?: string; view?: string; notice?: string; error?: string }>;
 }) {
   const environment = getSupabaseEnvironmentStatus();
   if (environment !== "ready") {
@@ -170,12 +227,43 @@ export default async function AdminPage({
     ? null
     : await supabase
         .from("media_assets")
-        .select("id, title, media_type")
+        .select("id, title, media_type, storage_path, external_url, file_url, poster_asset_id")
         .order("title", { ascending: true })
         .limit(500);
   const rows = (contentResult?.data ?? []) as unknown as AdminPreview[];
   const leads = (leadsResult?.data ?? []) as unknown as ContactSubmissionPreview[];
-  const mediaOptions = (mediaResult?.data ?? []) as unknown as MediaOption[];
+  const rawMediaOptions = (mediaResult?.data ?? []) as unknown as RawMediaOption[];
+  const bucket = supabase.storage.from(getMediaBucketName());
+  const signedMediaOptions = await Promise.all(
+    rawMediaOptions.map(async (item): Promise<MediaOption> => {
+      let previewUrl =
+        safeAdminPreviewUrl(item.external_url) ??
+        safeAdminPreviewUrl(item.file_url);
+      if (item.storage_path && !item.storage_path.includes("..")) {
+        const { data } = await bucket.createSignedUrl(item.storage_path, 3600);
+        previewUrl = data?.signedUrl ?? previewUrl;
+      }
+      return {
+        id: item.id,
+        title: item.title,
+        mediaType: item.media_type,
+        previewUrl,
+        posterUrl: undefined,
+      };
+    }),
+  );
+  const mediaById = new Map(signedMediaOptions.map((item) => [item.id, item]));
+  const mediaOptions = signedMediaOptions.map((item) => {
+    const raw = rawMediaOptions.find((candidate) => candidate.id === item.id);
+    const poster = raw?.poster_asset_id
+      ? mediaById.get(raw.poster_asset_id)?.previewUrl
+      : undefined;
+    return poster ? { ...item, posterUrl: poster } : item;
+  });
+  const selectedRow =
+    rows.find((row) => row.id === params.id) ??
+    rows[0] ??
+    null;
   const loadError = contentResult?.error ?? leadsResult?.error;
   const flash = params.error
     ? errorMessages[params.error] ?? "Có lỗi xảy ra."
@@ -184,74 +272,96 @@ export default async function AdminPage({
       : null;
 
   return (
-    <main id="noi-dung-chinh" className="min-h-screen bg-[#eef1e9] text-[#10251a]">
+    <main id="noi-dung-chinh" className="min-h-screen bg-[#eef1e9] text-[#10251a]" data-testid="visual-admin">
       <header className="border-b border-[#10251a]/10 bg-white px-5 py-4">
-        <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-4">
+        <div className="mx-auto flex max-w-[1580px] flex-wrap items-center justify-between gap-4">
           <div>
-            <Link href="/" className="font-serif text-2xl font-bold tracking-wide">
-              TRÀ LINH
-            </Link>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#5e7f3b]">Trà Linh CMS</p>
+            <h1 className="mt-1 font-serif text-2xl font-bold">Quản trị website</h1>
             <p className="mt-1 text-xs text-[#10251a]/60">
               {access.email} · {access.role}
             </p>
           </div>
-          <form action={signOutAdmin}>
-            <button
-              type="submit"
-              className="min-h-11 rounded-full border border-[#10251a]/20 px-5 text-sm font-semibold"
-            >
-              Đăng xuất
-            </button>
-          </form>
+          <div className="flex flex-wrap items-center gap-2">
+            <a href="/" target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center rounded-full bg-[#10251a] px-5 text-sm font-semibold text-white">
+              Mở website
+            </a>
+            <form action={signOutAdmin}>
+              <button type="submit" className="min-h-11 rounded-full border border-[#10251a]/20 px-5 text-sm font-semibold">
+                Đăng xuất
+              </button>
+            </form>
+          </div>
         </div>
       </header>
 
-      <div className="mx-auto grid max-w-[1400px] gap-6 px-5 py-8 lg:grid-cols-[250px_minmax(0,1fr)]">
-        <nav aria-label="Nhóm quản trị" className="rounded-3xl bg-[#10251a] p-3 text-white lg:self-start">
-          <Link
-            href="/admin?view=contacts"
-            aria-current={showLeads ? "page" : undefined}
-            className={`mb-2 flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold transition ${
-              showLeads
-                ? "bg-[#9bbe62] text-[#10251a]"
-                : "hover:bg-white/10"
-            }`}
-          >
-            Liên hệ
-          </Link>
-          {contentTables.map((table) => (
-            <Link
-              key={table.name}
-              href={`/admin?table=${table.name}`}
-              aria-current={!showLeads && selectedTable === table.name ? "page" : undefined}
-              className={`flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold transition ${
-                !showLeads && selectedTable === table.name
-                  ? "bg-[#9bbe62] text-[#10251a]"
-                  : "hover:bg-white/10"
-              }`}
-            >
-              {table.label}
-            </Link>
+      <div className="mx-auto grid max-w-[1580px] gap-6 px-4 py-6 sm:px-5 lg:grid-cols-[280px_minmax(0,1fr)]">
+        <nav aria-label="Nhóm quản trị" className="rounded-3xl bg-[#10251a] p-3 text-white lg:sticky lg:top-5 lg:self-start">
+          {ADMIN_NAV_GROUPS.map((group) => (
+            <div key={group.label} className="mb-4 last:mb-0">
+              <p className="px-4 pb-2 pt-3 text-[0.65rem] font-bold uppercase tracking-[0.18em] text-white/45">
+                {group.label}
+              </p>
+              {group.items.map((item) => {
+                const active = item.table
+                  ? !showLeads && selectedTable === item.table
+                  : showLeads && item.view === "contacts";
+                const href = item.table ? `/admin?table=${item.table}` : "/admin?view=contacts";
+                return (
+                  <Link
+                    key={item.label}
+                    href={href}
+                    aria-current={active ? "page" : undefined}
+                    className={`mb-1 block rounded-2xl px-4 py-3 transition ${
+                      active ? "bg-[#9bbe62] text-[#10251a]" : "hover:bg-white/10"
+                    }`}
+                  >
+                    <span className="block text-sm font-semibold">{item.label}</span>
+                    <span className={`mt-1 block text-[0.68rem] leading-4 ${active ? "text-[#10251a]/65" : "text-white/50"}`}>
+                      {item.description}
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
           ))}
         </nav>
 
         <div className="min-w-0 space-y-6">
-          <section className="rounded-3xl bg-white p-6 sm:p-8">
+          <section className="rounded-3xl bg-white p-5 sm:p-7">
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#5e7f3b]">
-                  {showLeads ? "Hộp thư liên hệ" : "Supabase CMS"}
+                  {showLeads ? "Hộp thư liên hệ" : "Chọn → Sửa → Xuất bản"}
                 </p>
                 <h1 className="mt-2 font-serif text-3xl">
                   {showLeads
                     ? "Yêu cầu đã nhận"
-                    : contentTables.find((item) => item.name === selectedTable)?.label}
+                    : getAdminTableLabel(selectedTable)}
                 </h1>
               </div>
               <p className="rounded-full bg-[#eef1e9] px-4 py-2 text-sm font-semibold">
                 {showLeads ? leads.length : rows.length} bản ghi
               </p>
             </div>
+
+            {!showLeads ? (
+              <ol className="mt-6 grid gap-3 sm:grid-cols-3">
+                {[
+                  ["1", "Chọn khu vực", "Chọn một thẻ nội dung bên dưới."],
+                  ["2", "Sửa và xem trước", "Gõ tới đâu, preview đổi tới đó."],
+                  ["3", "Lưu hoặc xuất bản", "Bản nháp không hiện ra website."],
+                ].map(([step, title, description]) => (
+                  <li key={step} className="flex gap-3 rounded-2xl bg-[#eef1e9] p-3">
+                    <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#10251a] text-xs font-bold text-white">{step}</span>
+                    <span>
+                      <strong className="block text-sm">{title}</strong>
+                      <span className="mt-0.5 block text-xs leading-5 text-[#10251a]/60">{description}</span>
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            ) : null}
 
             {flash ? (
               <p role="status" className="mt-5 rounded-2xl bg-[#eee3cb] px-4 py-3 text-sm">
@@ -271,52 +381,93 @@ export default async function AdminPage({
             <>
               {selectedTable === "media_assets" ? (
                 <MediaUploadForm />
-              ) : selectedTable === "site_settings" || selectedTable === "page_sections" ? (
-                <p className="rounded-3xl bg-white p-6 text-sm text-[#10251a]/65 sm:p-8">
-                  Mở một bản ghi bên dưới để chỉnh sửa đầy đủ rồi lưu nháp hoặc xuất bản.
-                </p>
-              ) : (
-                <CreateContentForm table={selectedTable} />
-              )}
+              ) : !["site_settings", "page_sections"].includes(selectedTable) ? (
+                <details className="rounded-3xl bg-white p-5 sm:p-7">
+                  <summary className="cursor-pointer font-semibold">＋ Tạo nội dung mới</summary>
+                  <CreateContentForm table={selectedTable} embedded />
+                </details>
+              ) : null}
 
-              <section className="overflow-hidden rounded-3xl bg-white">
-            <h2 className="px-6 pt-6 font-serif text-2xl sm:px-8">Nội dung hiện có</h2>
-            {rows.length ? (
-              <div className="mt-5 divide-y divide-[#10251a]/10">
-                {rows.map((row) => (
-                  <article key={row.id} className="grid gap-4 px-6 py-5 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-center sm:px-8">
-                    <div className="min-w-0">
-                      <h3 className="truncate font-semibold">{rowTitle(row)}</h3>
-                      <p className="mt-1 truncate text-xs text-[#10251a]/55">
-                        {row.slug ?? row.id}
+              <section className="rounded-3xl bg-white p-5 sm:p-7">
+                <div className="flex flex-wrap items-end justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#5e7f3b]">Bước 1</p>
+                    <h2 className="mt-2 font-serif text-2xl">Chọn nội dung cần sửa</h2>
+                  </div>
+                  <p className="text-xs text-[#10251a]/55">Thẻ có viền xanh đang được chọn</p>
+                </div>
+                {rows.length ? (
+                  <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                    {rows.map((row) => {
+                      const selected = selectedRow?.id === row.id;
+                      const previewUrl = rowPreviewUrl(row, mediaOptions);
+                      return (
+                        <Link
+                          key={row.id}
+                          href={`/admin?table=${selectedTable}&id=${row.id}#trinh-chinh-sua`}
+                          aria-current={selected ? "true" : undefined}
+                          className={`group overflow-hidden rounded-2xl border-2 bg-white transition hover:-translate-y-0.5 hover:shadow-lg ${
+                            selected ? "border-[#5e7f3b] shadow-md" : "border-[#10251a]/10"
+                          }`}
+                        >
+                          <div
+                            className="flex h-28 items-end bg-gradient-to-br from-[#dfe7d8] to-[#eee3cb] bg-cover bg-center p-3"
+                            style={previewUrl ? { backgroundImage: `linear-gradient(0deg, rgba(7,16,12,.72), rgba(7,16,12,.05)), url(${JSON.stringify(previewUrl)})` } : undefined}
+                          >
+                            <span className={`rounded-full px-2.5 py-1 text-[0.65rem] font-bold ${
+                              previewUrl ? "bg-white/90 text-[#10251a]" : "bg-[#10251a] text-white"
+                            }`}>
+                              {row.status === "published" ? "Đang hiển thị" : "Bản nháp"}
+                            </span>
+                          </div>
+                          <div className="p-4">
+                            <h3 className="line-clamp-2 font-semibold">{friendlyRowTitle(selectedTable, row)}</h3>
+                            <p className="mt-2 text-xs font-bold text-[#5e7f3b]">
+                              {selected ? "Đang chỉnh sửa" : "Sửa khu vực này →"}
+                            </p>
+                          </div>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="mt-5 rounded-2xl bg-[#eef1e9] px-5 py-8 text-center text-sm text-[#10251a]/60">
+                    Chưa có nội dung trong nhóm này.
+                  </p>
+                )}
+              </section>
+
+              {selectedRow ? (
+                <section id="trinh-chinh-sua" className="scroll-mt-5 rounded-3xl bg-white p-5 sm:p-7">
+                  <div className="flex flex-wrap items-start justify-between gap-4">
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#5e7f3b]">Bước 2 & 3</p>
+                      <h2 className="mt-2 font-serif text-2xl">{friendlyRowTitle(selectedTable, selectedRow)}</h2>
+                      <p className="mt-2 text-sm text-[#10251a]/60">
+                        {selectedRow.status === "published" ? "Nội dung này đang hiển thị trên website." : "Nội dung này đang là bản nháp."}
                       </p>
                     </div>
-                    <div className="flex flex-wrap items-center gap-3">
-                      <span className="rounded-full bg-[#eef1e9] px-4 py-2 text-xs font-semibold">
-                        {row.status === "published" ? "Đã xuất bản" : "Bản nháp"}
-                      </span>
-                      <span className="rounded-full bg-[#eef1e9] px-4 py-2 text-xs">
-                        Thứ tự {row.display_order}
-                      </span>
+                    <div className="flex flex-wrap gap-2">
+                      <a
+                        href={`/${getAdminPublicAnchor(selectedTable, selectedRow.section_key)}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex min-h-11 items-center rounded-full border border-[#10251a]/15 px-4 text-sm font-semibold"
+                      >
+                        Xem trên website
+                      </a>
                       <form action={deleteContentItemAction}>
                         <input type="hidden" name="table" value={selectedTable} />
-                        <input type="hidden" name="id" value={row.id} />
-                        <button className="min-h-11 rounded-full border border-red-200 px-4 text-sm font-semibold text-red-700" type="submit">
-                          Xóa bản ghi
-                        </button>
+                        <input type="hidden" name="id" value={selectedRow.id} />
+                        <DeleteRecordButton title={friendlyRowTitle(selectedTable, selectedRow)} />
                       </form>
                     </div>
-                    <details className="xl:col-span-2 rounded-2xl border border-[#10251a]/10 bg-[#eef1e9]/50 p-4">
-                      <summary className="cursor-pointer font-semibold">Mở trình chỉnh sửa</summary>
-                      <EditContentForm table={selectedTable} row={row} mediaOptions={mediaOptions} />
-                    </details>
-                  </article>
-                ))}
-              </div>
-            ) : (
-              <p className="px-6 py-10 text-[#10251a]/60 sm:px-8">Chưa có bản ghi nào trong nhóm này.</p>
-            )}
-              </section>
+                  </div>
+                  <AdminVisualEditor table={selectedTable} row={selectedRow} mediaOptions={mediaOptions}>
+                    <EditContentForm table={selectedTable} row={selectedRow} mediaOptions={mediaOptions} />
+                  </AdminVisualEditor>
+                </section>
+              ) : null}
             </>
           )}
         </div>
@@ -377,10 +528,16 @@ function ContactSubmissionList({ leads }: { leads: ContactSubmissionPreview[] })
   );
 }
 
-function CreateContentForm({ table }: { table: Exclude<ContentTableName, "media_assets"> }) {
+function CreateContentForm({
+  table,
+  embedded = false,
+}: {
+  table: Exclude<ContentTableName, "media_assets">;
+  embedded?: boolean;
+}) {
   const needsSlug = ["journeys", "local_products", "ginseng_products", "travel_guides"].includes(table);
   return (
-    <section className="rounded-3xl bg-white p-6 sm:p-8">
+    <section className={embedded ? "pt-6" : "rounded-3xl bg-white p-6 sm:p-8"}>
       <h2 className="font-serif text-2xl">Tạo nội dung</h2>
       <p className="mt-2 text-sm leading-6 text-[#10251a]/60">
         Nội dung mới mặc định có thể giữ ở bản nháp hoặc chờ duyệt trước khi xuất bản.
@@ -515,8 +672,8 @@ function MediaSelect({
       <span className="mb-2 block text-sm font-semibold">{label}</span>
       <select name={name} defaultValue={value ?? ""} className="min-h-12 w-full rounded-xl border border-[#10251a]/15 px-3">
         <option value="">Không chọn</option>
-        {options.filter((item) => !only || item.media_type === only).map((item) => (
-          <option key={item.id} value={item.id}>{item.title} · {item.media_type === "video" ? "Video" : "Ảnh"}</option>
+        {options.filter((item) => !only || item.mediaType === only).map((item) => (
+          <option key={item.id} value={item.id}>{item.title} · {item.mediaType === "video" ? "Video" : "Ảnh"}</option>
         ))}
       </select>
     </label>
@@ -534,15 +691,6 @@ function EditContentForm({
 }) {
   const statusFields = (
     <>
-      <SelectField
-        label="Trạng thái"
-        name="status"
-        defaultValue={row.status === "published" ? "published" : "draft"}
-        options={[
-          { value: "draft", label: "Lưu nháp" },
-          { value: "published", label: "Xuất bản" },
-        ]}
-      />
       <Field label="Thứ tự" name="display_order" type="number" defaultValue={String(row.display_order ?? 0)} />
       {table !== "page_sections" ? (
         <label className="flex min-h-12 items-center gap-3 text-sm font-semibold">
@@ -590,12 +738,6 @@ function EditContentForm({
       <form action={updateContentItemAction} className="mt-5 grid gap-4 sm:grid-cols-2">
         <input type="hidden" name="table" value={table} />
         <input type="hidden" name="id" value={row.id} />
-        <Field
-          label="Khóa khu vực (cố định theo bố cục)"
-          name="section_key"
-          defaultValue={rowText(row, "section_key")}
-          readOnly
-        />
         <Field label="Nhãn nhỏ" name="eyebrow" defaultValue={rowText(row, "eyebrow")} />
         <Field label="Tiêu đề" name="title" defaultValue={rowText(row, "title")} required />
         <TextArea label="Mô tả" name="description" defaultValue={rowText(row, "description")} />
@@ -747,13 +889,28 @@ function TextArea({
 
 function SaveButton() {
   return (
-    <div className="sticky bottom-3 z-10 -mx-1 flex items-center justify-between gap-4 rounded-2xl border border-[#10251a]/10 bg-white/95 p-3 shadow-lg backdrop-blur sm:col-span-2">
-      <p className="hidden text-sm text-[#10251a]/65 sm:block">
-        Nút này lưu tất cả các ô trong trình chỉnh sửa.
+    <div className="sticky bottom-3 z-10 -mx-1 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#10251a]/10 bg-white/95 p-3 shadow-lg backdrop-blur sm:col-span-2">
+      <p className="text-xs leading-5 text-[#10251a]/60 sm:text-sm">
+        Lưu nháp để kiểm tra trước, hoặc xuất bản ngay lên website.
       </p>
-      <button type="submit" className="min-h-12 rounded-full bg-[#5e7f3b] px-7 font-semibold text-white">
-        Lưu toàn bộ thay đổi
-      </button>
+      <div className="flex flex-1 justify-end gap-2 sm:flex-none">
+        <button
+          type="submit"
+          name="intent"
+          value="save-draft"
+          className="min-h-12 flex-1 rounded-full border border-[#10251a]/20 bg-white px-5 font-semibold sm:flex-none"
+        >
+          Lưu nháp
+        </button>
+        <button
+          type="submit"
+          name="intent"
+          value="publish"
+          className="min-h-12 flex-1 rounded-full bg-[#5e7f3b] px-5 font-semibold text-white sm:flex-none"
+        >
+          Xuất bản
+        </button>
+      </div>
     </div>
   );
 }

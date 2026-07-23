@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { AdminVisualEditor } from "@/components/admin/AdminVisualEditor";
+import AdminLayout from "@/app/admin/layout";
 import {
   ADMIN_NAV_GROUPS,
   resolveEditorialIntent,
@@ -55,5 +56,55 @@ describe("admin visual editor", () => {
     expect(resolveEditorialIntent("save-draft")).toBe("draft");
     expect(resolveEditorialIntent("publish")).toBe("published");
     expect(() => resolveEditorialIntent("anything-else")).toThrow();
+  });
+
+  it("previews a newly selected library image immediately", () => {
+    render(
+      <AdminVisualEditor
+        table="page_sections"
+        row={{
+          id: "section-2",
+          section_key: "story",
+          title: "Câu chuyện",
+          status: "draft",
+          display_order: 1,
+          is_placeholder: false,
+        }}
+        mediaOptions={[
+          {
+            id: "media-1",
+            title: "Rừng Trà Linh",
+            mediaType: "image",
+            previewUrl: "https://example.com/forest.webp",
+          },
+        ]}
+      >
+        <form>
+          <label htmlFor="media">Ảnh từ thư viện</label>
+          <select id="media" name="media_asset_id" defaultValue="">
+            <option value="">Không chọn</option>
+            <option value="media-1">Rừng Trà Linh</option>
+          </select>
+        </form>
+      </AdminVisualEditor>,
+    );
+
+    fireEvent.change(screen.getByLabelText("Ảnh từ thư viện"), {
+      target: { value: "media-1" },
+    });
+
+    expect(screen.getByRole("img", { name: "Câu chuyện" })).toHaveStyle({
+      backgroundImage: 'url("https://example.com/forest.webp")',
+    });
+  });
+
+  it("marks admin routes so public website chrome can be hidden", () => {
+    const { container } = render(
+      <AdminLayout>
+        <main>Trang quản trị</main>
+      </AdminLayout>,
+    );
+
+    expect(container.querySelector("[data-admin-root]")).toBeInTheDocument();
   });
 });

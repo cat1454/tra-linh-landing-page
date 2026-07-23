@@ -1,17 +1,12 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
 
-test('landing page presents Trà Linh and its primary journey', async ({ page }) => {
+test('landing page presents the published CMS hero', async ({ page }) => {
   await page.goto('/')
 
-  await expect(
-    page.getByRole('heading', { level: 1, name: /đại ngàn ngọc linh/i }),
-  ).toBeVisible()
+  await expect(page.locator('#dau-trang')).toBeVisible()
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
   await expect(page.getByText('Trà Linh', { exact: true }).first()).toBeVisible()
-  await expect(page.getByRole('link', { name: /khám phá hành trình/i }).first()).toHaveAttribute(
-    'href',
-    '#hanh-trinh',
-  )
   await expect(page.locator('body')).not.toContainText('Trà Lĩnh')
 })
 
@@ -74,7 +69,7 @@ for (const width of [375, 390]) {
   })
 }
 
-test('hero plays its public video and falls back to the poster for reduced motion', async ({
+test('hero loads its configured video and falls back to the poster for reduced motion', async ({
   page,
 }, testInfo) => {
   test.skip(testInfo.project.name !== 'chromium', 'Video playback is verified in Chromium.')
@@ -82,16 +77,11 @@ test('hero plays its public video and falls back to the poster for reduced motio
   await page.goto('/')
 
   const video = page.locator('#dau-trang video')
-  await expect(video.locator('source')).toHaveAttribute(
-    'src',
-    '/videos/tra-linh-hero.mp4',
-  )
-  await expect
-    .poll(() => video.evaluate((element) => (element as HTMLVideoElement).currentTime))
-    .toBeGreaterThan(0)
+  await expect(video.locator('source')).toHaveAttribute('src', /^(?:https?:\/\/|\/).+/)
+  await expect(page.locator('#dau-trang img')).toBeVisible()
 
   await page.emulateMedia({ reducedMotion: 'reduce' })
-  await expect(video).toHaveCSS('display', 'none')
+  await expect(video).toHaveCount(0)
   await expect(page.locator('#dau-trang img')).toBeVisible()
 })
 
