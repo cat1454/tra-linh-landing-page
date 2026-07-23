@@ -17,8 +17,8 @@ export function JourneyCard({
     : "https://maps.app.goo.gl/X4rMVecthoadSjcb6";
 
   return (
-    <article className="group relative isolate min-h-[500px] overflow-hidden rounded-[1.5rem] bg-[#29452C]">
-      <MediaFrame media={journey.featuredMedia} className="absolute inset-0 -z-20" sizes="(min-width: 1024px) 32vw, 88vw" imageClassName="transition duration-700 group-hover:scale-[1.035]" />
+    <article className="group relative isolate min-h-[500px] overflow-hidden rounded-[1.5rem] bg-[#29452C] transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
+      <MediaFrame media={journey.featuredMedia} className="absolute inset-0 -z-20" sizes="(min-width: 1024px) 32vw, 88vw" imageClassName="transition duration-700 group-hover:scale-105" />
       <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#07100C] via-[#07100C]/30 to-[#07100C]/5" />
       <div className="flex min-h-[500px] flex-col justify-between p-6 sm:p-8">
         <div className="flex items-start justify-between gap-4">

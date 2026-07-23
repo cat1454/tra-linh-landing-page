@@ -33,8 +33,14 @@ export function TravelGuideSection({ guides, section }: TravelGuideSectionProps)
               {section?.secondaryText ?? "Điều kiện đường và thời tiết vùng cao có thể thay đổi. Luôn xác nhận thông tin với đầu mối địa phương trước khi khởi hành."}
             </p>
             <div className="relative mt-7 flex flex-wrap gap-2">
-              <span className="inline-flex items-center gap-2 rounded-full border border-[#EEF1E9]/16 px-3 py-2 text-xs"><CloudSun className="size-4 text-[#D5A84E]" aria-hidden="true" /> Theo dõi thời tiết</span>
-              <span className="inline-flex items-center gap-2 rounded-full border border-[#EEF1E9]/16 px-3 py-2 text-xs"><ShieldCheck className="size-4 text-[#D5A84E]" aria-hidden="true" /> Đi cùng hướng dẫn</span>
+              {/* TODO: add weather URL and ask me for the exact URL */}
+              <a
+                href="#"
+                className="inline-flex items-center gap-2 rounded-full border border-[#EEF1E9]/16 px-3 py-2 text-xs hover:bg-[#EEF1E9]/10 transition-colors focus-visible:outline-2 focus-visible:outline-[#D5A84E]"
+              >
+                <CloudSun className="size-4 text-[#D5A84E]" aria-hidden="true" />
+                Theo dõi thời tiết
+              </a>
             </div>
           </div>
         </div>

@@ -62,16 +62,9 @@ export function HeroSection({ hero }: HeroSectionProps) {
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
                 <Link
                   href={hero.primaryCta.href}
-                  className="group animate-pulse-ring inline-flex min-h-12 items-center justify-center gap-3 whitespace-nowrap rounded-full bg-[#D5A84E] px-6 py-3 text-sm font-semibold text-[#10251A] transition-colors hover:bg-[#EEE3CB] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#EEF1E9]"
+                  className="group animate-pulse-ring inline-flex min-h-12 items-center justify-center gap-3 whitespace-nowrap rounded-full bg-[#D5A84E] px-6 py-3 text-sm font-semibold text-[#10251A] transition-all duration-300 hover:scale-[1.03] hover:bg-[#EEE3CB] active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#EEF1E9]"
                 >
                   {hero.primaryCta.label}
-                  <ArrowGlyph />
-                </Link>
-                <Link
-                  href={hero.secondaryCta.href}
-                  className="group inline-flex min-h-12 items-center justify-center gap-3 whitespace-nowrap rounded-full border border-[#EEF1E9]/35 bg-[#07100C]/20 px-6 py-3 text-sm font-semibold text-[#EEF1E9] backdrop-blur-sm transition-colors hover:border-[#D5A84E] hover:text-[#D5A84E] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#EEF1E9]"
-                >
-                  {hero.secondaryCta.label}
                   <ArrowGlyph />
                 </Link>
               </div>

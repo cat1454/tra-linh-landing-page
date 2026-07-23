@@ -39,7 +39,7 @@ export function LocalProduceSection({ items, section }: LocalProduceSectionProps
           </div>
         </ScrollReveal>
 
-        <div className="mt-8 grid auto-rows-[360px] gap-5 md:grid-cols-2 lg:mt-10 lg:grid-cols-12">
+        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:mt-10 lg:grid-cols-3">
           {items.map((item, index) => {
             const meta = categoryMeta[item.category];
             const Icon = meta.icon;
@@ -47,12 +47,10 @@ export function LocalProduceSection({ items, section }: LocalProduceSectionProps
             return (
               <article
                 key={item.id}
-                className={`produce-card group relative isolate overflow-hidden rounded-[1.5rem] bg-[#29452C] ${
-                  index % 4 === 0 || index % 4 === 3 ? "lg:col-span-7" : "lg:col-span-5"
-                }`}
+                className="produce-card group relative isolate h-[360px] overflow-hidden rounded-[1.5rem] bg-[#29452C] transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
               >
-                <ScrollReveal direction="up" delay={0.15 * (index % 4)} className="h-full w-full block">
-                <MediaFrame hoverReveal={true} media={item.media} className="absolute inset-0 -z-20" sizes="(min-width: 1024px) 58vw, 100vw" imageClassName="transition duration-700 group-hover:scale-[1.04]" />
+                <ScrollReveal direction="up" delay={0.15 * (index % 3)} className="h-full w-full block">
+                <MediaFrame hoverReveal={true} media={item.media} className="absolute inset-0 -z-20" sizes="(min-width: 1024px) 30vw, (min-width: 640px) 50vw, 100vw" imageClassName="transition duration-700 group-hover:scale-105" />
                 <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#07100C]/95 via-[#07100C]/25 to-transparent" />
                 <div className="flex h-full flex-col justify-between p-6 sm:p-8">
                   <div className="flex items-start justify-between gap-4">

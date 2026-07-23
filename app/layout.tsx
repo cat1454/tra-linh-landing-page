@@ -159,8 +159,6 @@ export default async function RootLayout({
               contactPhone={siteSettings.contactPhone}
               title={siteSettings.footerTitle ?? siteSettings.headerTitle}
               description={siteSettings.footerDescription}
-              legalAddress={siteSettings.legalAddress}
-              privacyUrl={siteSettings.privacyUrl}
             />
             <MobileStickyCta
               contactPhone={siteSettings.contactPhone}

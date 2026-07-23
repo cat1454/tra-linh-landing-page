@@ -31,20 +31,14 @@ export function XoDangCultureSection({ stories, section }: XoDangCultureSectionP
           </ScrollReveal>
         </div>
 
-        <div className="mt-8 grid auto-rows-[190px] grid-cols-1 gap-5 sm:auto-rows-[230px] sm:grid-cols-2 lg:mt-10 lg:grid-cols-12">
+        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:mt-10">
           {stories.map((story, index) => (
             <article
               key={story.id}
-              className={`culture-card group relative isolate overflow-hidden rounded-[1.5rem] bg-[#29452C] ${
-                index % 3 === 0
-                  ? "sm:row-span-2 lg:col-span-7"
-                  : index % 3 === 1
-                    ? "lg:col-span-5"
-                    : "lg:col-span-5"
-              }`}
+              className="culture-card group relative isolate h-[320px] sm:h-[380px] overflow-hidden rounded-[1.5rem] bg-[#29452C] transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
             >
               <ScrollReveal direction="up" delay={0.2 * index} className="h-full w-full block">
-                <MediaFrame hoverReveal={true} media={story.media} className="absolute inset-0 -z-20" sizes="(min-width: 1024px) 58vw, 100vw" imageClassName="transition duration-700 group-hover:scale-[1.035]" />
+                <MediaFrame hoverReveal={true} media={story.media} className="absolute inset-0 -z-20" sizes="(min-width: 1024px) 45vw, (min-width: 640px) 50vw, 100vw" imageClassName="transition duration-700 group-hover:scale-105" />
                 <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#07100C]/90 via-[#07100C]/18 to-transparent" />
               <div className="flex h-full flex-col justify-end p-6 sm:p-8">
                 <h3 className="font-serif text-2xl text-[#EEF1E9] sm:text-3xl">{story.title}</h3>

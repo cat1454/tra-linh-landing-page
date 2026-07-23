@@ -1,5 +1,9 @@
+"use client";
+
+import { motion } from "framer-motion";
 import clsx from "clsx";
-import type { CSSProperties, ReactNode } from "react";
+import type { ReactNode } from "react";
+import { useReducedMotionPreference } from "./useReducedMotionPreference";
 
 export type RevealDirection = "up" | "down" | "left" | "right" | "fade" | "zoom";
 
@@ -13,13 +17,19 @@ export interface ScrollRevealProps {
   readonly threshold?: number;
 }
 
-const transforms: Record<RevealDirection, string> = {
-  up: "translate3d(0, 2rem, 0)",
-  down: "translate3d(0, -2rem, 0)",
-  left: "translate3d(-2rem, 0, 0)",
-  right: "translate3d(2rem, 0, 0)",
-  fade: "none",
-  zoom: "scale(0.97)",
+const variants = {
+  hidden: (direction: RevealDirection) => ({
+    opacity: 0,
+    y: direction === "up" ? 30 : direction === "down" ? -30 : 0,
+    x: direction === "left" ? 30 : direction === "right" ? -30 : 0,
+    scale: direction === "zoom" ? 0.96 : 1,
+  }),
+  visible: {
+    opacity: 1,
+    x: 0,
+    y: 0,
+    scale: 1,
+  },
 };
 
 export function ScrollReveal({
@@ -28,17 +38,31 @@ export function ScrollReveal({
   direction = "up",
   delay = 0,
   duration = 0.7,
+  once = false,
+  threshold = 0.2,
 }: ScrollRevealProps) {
-  const style = {
-    "--reveal-delay": `${delay}s`,
-    "--reveal-duration": `${duration}s`,
-    "--reveal-transform": transforms[direction],
-  } as CSSProperties;
+  const prefersReducedMotion = useReducedMotionPreference();
+
+  if (prefersReducedMotion) {
+    return <div className={className}>{children}</div>;
+  }
 
   return (
-    <div className={clsx("scroll-reveal", className)} style={style}>
+    <motion.div
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once, amount: threshold }}
+      custom={direction}
+      variants={variants}
+      transition={{
+        delay,
+        duration,
+        ease: [0.16, 1, 0.3, 1],
+      }}
+      className={clsx("scroll-reveal-active", className)}
+    >
       {children}
-    </div>
+    </motion.div>
   );
 }
 
