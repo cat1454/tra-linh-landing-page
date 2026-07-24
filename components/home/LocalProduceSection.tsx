@@ -94,7 +94,8 @@ export function LocalProduceSection({ items, section }: LocalProduceSectionProps
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.35, ease: "easeOut" }}
                   key={item.id}
-                  className="produce-card group relative isolate h-[360px] overflow-hidden rounded-[1.5rem] bg-[#29452C] transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
+                  onClick={() => setSelectedSpecialty(item)}
+                  className="produce-card group relative isolate h-[360px] overflow-hidden rounded-[1.5rem] bg-[#29452C] transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl cursor-pointer"
                 >
                   <MediaFrame hoverReveal={true} media={item.media} className="absolute inset-0 -z-20" sizes="(min-width: 1024px) 30vw, (min-width: 640px) 50vw, 100vw" imageClassName="transition duration-700 group-hover:scale-105" />
                   <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#07100C]/95 via-[#07100C]/25 to-transparent" />
@@ -108,15 +109,12 @@ export function LocalProduceSection({ items, section }: LocalProduceSectionProps
                     </div>
                     <div>
                       <h3 className="font-serif text-2xl text-[#EEF1E9] sm:text-3xl leading-tight">{item.name}</h3>
-                      <p className="mt-3 max-w-lg text-sm leading-6 text-[#EEF1E9]/70 line-clamp-2">{item.description}</p>
-                      <button
-                        type="button"
-                        onClick={() => setSelectedSpecialty(item)}
-                        className="mt-4 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.14em] text-[#D5A84E] hover:text-[#EEF1E9] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D5A84E] rounded transition-colors text-left"
+                      <div
+                        className="mt-4 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.14em] text-[#D5A84E] group-hover:text-[#EEF1E9] transition-colors"
                       >
                         <span>Câu chuyện sản vật địa phương</span>
                         <span aria-hidden="true">→</span>
-                      </button>
+                      </div>
                     </div>
                   </div>
                 </motion.article>

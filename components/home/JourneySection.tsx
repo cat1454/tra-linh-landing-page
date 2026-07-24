@@ -98,11 +98,6 @@ export function JourneySection({ journeys, section, activityMedia = [] }: Journe
                     </div>
                   ))}
                 </div>
-                
-                <div className="mt-3 flex items-center justify-between text-[0.68rem] uppercase tracking-[0.16em] text-[#536258]/80">
-                  <span>Tự động di chuyển · Rê chuột để tạm dừng</span>
-                  <span>Trekking · Bản làng · Thu hoạch sâm</span>
-                </div>
               </div>
             </div>
           </ScrollReveal>

@@ -120,11 +120,6 @@ export function XoDangCultureSection({ stories, section, peopleMedia = [] }: XoD
                     </div>
                   ))}
                 </div>
-                
-                <div className="mt-3 flex items-center justify-between text-[0.68rem] uppercase tracking-[0.16em] text-[#536258]/80">
-                  <span>Tự động di chuyển · Rê chuột để tạm dừng</span>
-                  <span className="hidden sm:inline">Trà Linh, Nam Trà My</span>
-                </div>
               </div>
             </div>
           </ScrollReveal>

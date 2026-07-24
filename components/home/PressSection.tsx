@@ -1,8 +1,6 @@
-import Link from "next/link";
 import ScrollReveal from "@/components/animation/ScrollReveal";
 import type { PageSectionSettings, PressArticle } from "@/lib/content/types";
 import { MediaFrame, SectionIntro } from "./_shared";
-import { ExternalLink } from "lucide-react";
 
 type PressSectionProps = {
   articles: PressArticle[];
@@ -29,35 +27,29 @@ export function PressSection({ articles, section }: PressSectionProps) {
           {articles.map((article, index) => (
             <article
               key={article.id}
-              className="press-card group flex flex-col justify-between overflow-hidden rounded-[1.5rem] border border-[#10251A]/10 bg-white/60 p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:bg-white hover:shadow-xl"
+              className="press-card group relative overflow-hidden rounded-[1.5rem] border border-[#10251A]/10 bg-white/60 p-3 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:bg-white hover:shadow-xl"
             >
-              <ScrollReveal direction="up" delay={0.15 * index} className="flex flex-col h-full justify-between">
-                <div>
+              <ScrollReveal direction="up" delay={0.15 * index}>
+                <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl bg-[#10251A]/5">
                   <MediaFrame
                     media={article.media}
-                    className="aspect-[16/10] w-full rounded-xl"
+                    className="absolute inset-0"
                     sizes="(min-width: 1024px) 30vw, (min-width: 768px) 33vw, 100vw"
-                    imageClassName="transition duration-500 group-hover:scale-[1.03]"
+                    imageClassName="transition duration-700 group-hover:scale-[1.04]"
                     hoverReveal={false}
                   />
-
-                  <div className="mt-5 flex items-center justify-between">
-                    <span className="inline-block rounded-full bg-[#5E7F3B]/10 px-3 py-1 text-xs font-semibold text-[#49672D]">
-                      {article.publisher}
-                    </span>
-                    <span className="text-xs text-[#536258]">{article.publishedDate}</span>
+                  {/* Subtle metadata overlay on hover */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#07100C]/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4 z-10">
+                    <div className="text-left">
+                      <p className="text-[10px] text-[#D5A84E] font-bold uppercase tracking-widest mb-1">
+                        {article.publisher}
+                      </p>
+                      <p className="text-xs text-[#EEF1E9] font-medium line-clamp-2 leading-snug">
+                        {article.title}
+                      </p>
+                    </div>
                   </div>
-
-                  <h3 className="mt-3 font-serif text-xl font-semibold leading-tight text-[#10251A] transition-colors group-hover:text-[#49672D] sm:text-2xl">
-                    {article.title}
-                  </h3>
-
-                  <p className="mt-3 text-sm leading-relaxed text-[#10251A]/72">
-                    {article.summary}
-                  </p>
                 </div>
-
-
               </ScrollReveal>
             </article>
           ))}
