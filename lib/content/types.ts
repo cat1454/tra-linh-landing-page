@@ -134,6 +134,17 @@ export interface LocalSpecialty {
   displayOrder: number
 }
 
+export interface PressArticle {
+  id: string
+  title: string
+  publisher: string
+  publishedDate: string
+  summary: string
+  url: string
+  media: MediaAsset
+  displayOrder: number
+}
+
 export interface HeroContent {
   eyebrow: string
   title: string
@@ -177,6 +188,7 @@ export interface HomePageContent {
   localSpecialties: LocalSpecialty[]
   products: Product[]
   guides: Guide[]
+  pressArticles?: PressArticle[]
   media: MediaAsset[]
 }
 
