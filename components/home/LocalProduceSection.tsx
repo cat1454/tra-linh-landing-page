@@ -61,8 +61,9 @@ export function LocalProduceSection({ items, section }: LocalProduceSectionProps
                 <button
                   key={tab.id}
                   type="button"
+                  aria-pressed={isActive}
                   onClick={() => setActiveCategory(tab.id)}
-                  className={`inline-flex min-h-10 items-center gap-2 rounded-full px-5 py-2 text-xs font-bold uppercase tracking-[0.1em] transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#5E7F3B] active:scale-95 ${
+                  className={`inline-flex min-h-11 items-center gap-2 rounded-full px-5 py-2 text-xs font-bold uppercase tracking-[0.1em] transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#5E7F3B] active:scale-95 ${
                     isActive
                       ? "bg-[#29452C] text-[#EEF1E9] shadow-[0_8px_20px_rgba(41,69,44,0.2)] scale-[1.02]"
                       : "bg-[#10251A]/5 text-[#10251A]/70 hover:bg-[#10251A]/10 hover:text-[#10251A]"
@@ -82,7 +83,7 @@ export function LocalProduceSection({ items, section }: LocalProduceSectionProps
           className="mt-8 grid gap-6 sm:grid-cols-2 lg:mt-10 lg:grid-cols-3"
         >
           <AnimatePresence mode="popLayout">
-            {filteredItems.map((item, index) => {
+            {filteredItems.map((item) => {
               const meta = categoryMeta[item.category];
               const Icon = meta.icon;
 
@@ -94,12 +95,18 @@ export function LocalProduceSection({ items, section }: LocalProduceSectionProps
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.35, ease: "easeOut" }}
                   key={item.id}
-                  onClick={() => setSelectedSpecialty(item)}
-                  className="produce-card group relative isolate h-[360px] overflow-hidden rounded-[1.5rem] bg-[#29452C] transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl cursor-pointer"
+                  className="produce-card group relative isolate h-[360px] overflow-hidden rounded-[1.5rem] bg-[#29452C] transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
                 >
+                  <button
+                    type="button"
+                    aria-label={`Xem câu chuyện ${item.name}`}
+                    aria-haspopup="dialog"
+                    onClick={() => setSelectedSpecialty(item)}
+                    className="absolute inset-0 z-20 rounded-[1.5rem] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#D5A84E]"
+                  />
                   <MediaFrame hoverReveal={true} media={item.media} className="absolute inset-0 -z-20" sizes="(min-width: 1024px) 30vw, (min-width: 640px) 50vw, 100vw" imageClassName="transition duration-700 group-hover:scale-105" />
                   <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#07100C]/95 via-[#07100C]/25 to-transparent" />
-                  <div className="flex h-full flex-col justify-between p-6 sm:p-8">
+                  <div className="pointer-events-none flex h-full flex-col justify-between p-6 sm:p-8">
                     <div className="flex items-start justify-between gap-4">
                       <span className="inline-flex items-center gap-2 rounded-full bg-[#07100C]/55 px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#EEE3CB] backdrop-blur-sm">
                         <Icon aria-hidden="true" className="size-4 text-[#D5A84E]" />
@@ -109,6 +116,7 @@ export function LocalProduceSection({ items, section }: LocalProduceSectionProps
                     </div>
                     <div>
                       <h3 className="font-serif text-2xl text-[#EEF1E9] sm:text-3xl leading-tight">{item.name}</h3>
+                      <p className="mt-2 line-clamp-2 text-sm leading-6 text-[#EEF1E9]/78">{item.description}</p>
                       <div
                         className="mt-4 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.14em] text-[#D5A84E] group-hover:text-[#EEF1E9] transition-colors"
                       >

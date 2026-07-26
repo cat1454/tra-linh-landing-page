@@ -339,6 +339,7 @@ export const PRESS_ARTICLES = [
     summary:
       "Bài phân tích chuyên sâu về định hướng phát triển vùng dược liệu bền vững, kết hợp bảo tồn đa dạng sinh học và nâng cao đời sống cho đồng bào Xơ Đăng dưới chân đỉnh Ngọc Linh.",
     url: "https://nhandan.vn",
+    isVerified: false,
     displayOrder: 1,
     // TODO: Swap this image path if it does not match the first Press item.
     imagePath:
@@ -352,6 +353,7 @@ export const PRESS_ARTICLES = [
     summary:
       "Phóng sự chân thực khắc họa đời sống, văn hóa tuần tra bảo vệ rừng già của bà con bản địa Trà Linh để gìn giữ môi trường sống tự nhiên tốt nhất cho cây sâm Ngọc Linh.",
     url: "https://vtv.vn",
+    isVerified: false,
     displayOrder: 2,
     // TODO: Swap this image path if it does not match the second Press item.
     imagePath:
@@ -365,6 +367,7 @@ export const PRESS_ARTICLES = [
     summary:
       "Từ những gốc sâm mọc hoang dã nơi đại ngàn, qua bàn tay gìn giữ của bà con Trà Linh và khoa học hiện đại, sâm Ngọc Linh đã trở thành Quốc bảo vươn tầm quốc tế.",
     url: "https://tuoitre.vn",
+    isVerified: false,
     displayOrder: 3,
     // TODO: Swap this image path if it does not match the third Press item.
     imagePath:

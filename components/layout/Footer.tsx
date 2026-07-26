@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-const footerGroups = [
+const footerGroups = (privacyUrl: string) => [
   {
     title: 'Khám phá',
     links: [
@@ -23,7 +23,7 @@ const footerGroups = [
     links: [
       { href: '/#cam-nang', label: 'Cẩm nang' },
       { href: '/#lien-he', label: 'Liên hệ' },
-      { href: '/chinh-sach-quyen-rieng', label: 'Quyền riêng tư' },
+      { href: privacyUrl, label: 'Quyền riêng tư' },
       { href: 'https://tralinh.danang.gov.vn/', label: 'Cổng thông tin xã' },
     ],
   },
@@ -34,6 +34,8 @@ interface FooterProps {
   contactPhone?: string;
   title?: string;
   description?: string;
+  legalAddress?: string;
+  privacyUrl?: string;
 }
 
 export function Footer({
@@ -41,6 +43,8 @@ export function Footer({
   contactPhone,
   title = "TRÀ LINH",
   description,
+  legalAddress,
+  privacyUrl = "/chinh-sach-quyen-rieng",
 }: FooterProps = {}) {
   return (
     <footer className="site-footer bg-[#10251A] text-[#EEF1E9]">
@@ -79,7 +83,7 @@ export function Footer({
           </div>
 
           <div className="site-footer__navigation grid gap-3 sm:grid-cols-3 sm:gap-6">
-            {footerGroups.map((group) => (
+            {footerGroups(privacyUrl).map((group) => (
               <details key={group.title} className="site-footer__group border-b border-white/10 pb-3 sm:border-0 sm:pb-0" open>
                 <summary className="site-footer__group-title flex min-h-11 cursor-pointer items-center text-sm font-semibold uppercase tracking-[0.12em] text-[#D5A84E] sm:cursor-default">
                   {group.title}
@@ -106,7 +110,7 @@ export function Footer({
         </div>
 
         <div className="site-footer__legal mt-12 flex flex-col gap-3 border-t border-white/10 pt-6 text-xs leading-5 text-[#EEF1E9]/55 md:flex-row md:items-center md:justify-between">
-          <p>Xã Trà Linh, thành phố Đà Nẵng, Việt Nam.</p>
+          <p>{legalAddress ?? "Xã Trà Linh, thành phố Đà Nẵng, Việt Nam."}</p>
           <p>Thông tin hành trình cần được xác nhận với đơn vị địa phương trước khi khởi hành.</p>
         </div>
       </div>

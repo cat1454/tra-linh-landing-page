@@ -178,7 +178,7 @@ export function SpecialtyStoryModal({ isOpen, onClose, specialty }: SpecialtySto
           <h2 id={titleId} className="mt-4 font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
             {story.title}
           </h2>
-          <p className="mt-2 text-base font-medium italic text-[#5E7F3B] sm:text-lg">
+          <p className="mt-2 text-base font-medium italic text-[#3D5133] sm:text-lg">
             {story.introduction}
           </p>
 
@@ -192,17 +192,17 @@ export function SpecialtyStoryModal({ isOpen, onClose, specialty }: SpecialtySto
 
           <div className="mt-6 grid gap-4 border-t border-[#10251A]/10 pt-5 sm:grid-cols-2">
             <div>
-              <h4 className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#10251A]/80">
+              <h3 className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#10251A]/80">
                 <MapPin className="size-3.5 text-[#5E7F3B]" />
                 Nguồn gốc
-              </h4>
+              </h3>
               <p className="mt-1.5 text-xs leading-5 text-[#536258]">{story.origin}</p>
             </div>
             <div>
-              <h4 className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#10251A]/80">
+              <h3 className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#10251A]/80">
                 <UtensilsCrossed className="size-3.5 text-[#5E7F3B]" />
                 Chế biến gợi ý
-              </h4>
+              </h3>
               <p className="mt-1.5 text-xs leading-5 text-[#536258]">{story.preparation}</p>
             </div>
           </div>

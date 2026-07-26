@@ -1,8 +1,8 @@
-import Image from "next/image";
 import ScrollReveal from "@/components/animation/ScrollReveal";
 import type { HomePageContent } from "@/lib/content/types";
 
 import { MediaFrame, SectionIntro } from "./_shared";
+import { ResponsiveMediaRail } from "./ResponsiveMediaRail";
 
 type XoDangCultureSectionProps = {
   stories: HomePageContent["cultureStories"];
@@ -45,11 +45,9 @@ export function XoDangCultureSection({ stories, section, peopleMedia = [] }: XoD
               <div className="flex h-full flex-col justify-end p-6 sm:p-8">
                 <h3 className="font-serif text-2xl text-[#EEF1E9] sm:text-3xl">{story.title}</h3>
                 <p className="mt-2 max-w-xl text-sm leading-6 text-[#EEF1E9]/68">{story.description}</p>
-                {story.caption || story.media.sourceCredit ? (
+                {story.media.sourceCredit ? (
                   <p className="mt-3 text-[0.65rem] uppercase tracking-[0.12em] text-[#EEF1E9]/80">
-                    {story.caption ?? story.media.caption}
-                    {(story.caption ?? story.media.caption) && story.media.sourceCredit ? " · " : ""}
-                    {story.media.sourceCredit ? `Nguồn: ${story.media.sourceCredit}` : ""}
+                    Nguồn: {story.media.sourceCredit}
                   </p>
                 ) : null}
               </div>
@@ -67,60 +65,11 @@ export function XoDangCultureSection({ stories, section, peopleMedia = [] }: XoD
                   Khoảnh khắc con người & đời sống
                 </h3>
                 <p className="text-xs text-[#536258] uppercase tracking-[0.12em]">
-                  Có {peopleMedia.length} tác phẩm ghi nhận thực địa
+                  {Math.min(peopleMedia.length, 12)} khoảnh khắc tiêu biểu
                 </p>
               </div>
 
-              <div className="relative mt-8 w-full overflow-hidden">
-                {/* Edge fade gradients for beautiful blending */}
-                <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-[#EEE3CB] to-transparent z-10 pointer-events-none" />
-                <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[#EEE3CB] to-transparent z-10 pointer-events-none" />
-                
-                {/* Infinite Marquee flex row */}
-                <div className="flex animate-marquee gap-5">
-                  {/* First Set */}
-                  {peopleMedia.map((mediaItem) => (
-                    <div
-                      key={mediaItem.id}
-                      className="relative h-[220px] w-[290px] shrink-0 overflow-hidden rounded-2xl bg-[#29452C]/5 group shadow-sm hover:shadow-md transition-shadow"
-                    >
-                      <Image
-                        src={mediaItem.src}
-                        alt={mediaItem.altText}
-                        fill
-                        sizes="290px"
-                        className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#07100C]/82 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4 z-10">
-                        <p className="text-xs text-[#EEF1E9] font-medium leading-tight">
-                          {mediaItem.altText}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-
-                  {/* Duplicate Set for Seamless Looping */}
-                  {peopleMedia.map((mediaItem) => (
-                    <div
-                      key={`${mediaItem.id}-dup`}
-                      className="relative h-[220px] w-[290px] shrink-0 overflow-hidden rounded-2xl bg-[#29452C]/5 group shadow-sm hover:shadow-md transition-shadow"
-                    >
-                      <Image
-                        src={mediaItem.src}
-                        alt={mediaItem.altText}
-                        fill
-                        sizes="290px"
-                        className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#07100C]/82 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4 z-10">
-                        <p className="text-xs text-[#EEF1E9] font-medium leading-tight">
-                          {mediaItem.altText}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <ResponsiveMediaRail media={peopleMedia} tone="cream" itemSize="large" />
             </div>
           </ScrollReveal>
         )}

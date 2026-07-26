@@ -20,6 +20,10 @@ describe('verified fallback content', () => {
     expect(fallbackContent.products).toEqual([])
   })
 
+  it('keeps unverified press claims out of the public fallback', () => {
+    expect(fallbackContent.pressArticles).toEqual([])
+  })
+
   it('records verification and a source for every public editorial record', () => {
     for (const record of publicRecords) {
       expect(record.sourceUrl).toMatch(/^https?:\/\//)

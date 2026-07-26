@@ -56,10 +56,6 @@ const baseMetadata: Metadata = {
   ],
   alternates: { canonical: "/" },
   formatDetection: { email: false, address: false, telephone: false },
-  icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon.ico",
-  },
   openGraph: {
     type: "website",
     locale: "vi_VN",
@@ -159,6 +155,8 @@ export default async function RootLayout({
               contactPhone={siteSettings.contactPhone}
               title={siteSettings.footerTitle ?? siteSettings.headerTitle}
               description={siteSettings.footerDescription}
+              legalAddress={siteSettings.legalAddress}
+              privacyUrl={siteSettings.privacyUrl}
             />
             <MobileStickyCta
               contactPhone={siteSettings.contactPhone}

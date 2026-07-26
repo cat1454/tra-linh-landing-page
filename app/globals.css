@@ -220,3 +220,32 @@ li {
   animation-play-state: paused;
 }
 
+.responsive-media-rail__scroller {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(41 69 44 / 45%) transparent;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (min-width: 1024px) {
+  .responsive-media-rail__track {
+    animation: marquee-scroll 60s linear infinite;
+  }
+
+  .responsive-media-rail:hover .responsive-media-rail__track,
+  .responsive-media-rail:focus-within .responsive-media-rail__track,
+  .responsive-media-rail__scroller:hover .responsive-media-rail__track {
+    animation-play-state: paused;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .responsive-media-rail__scroller {
+    overflow-x: auto !important;
+  }
+
+  .responsive-media-rail__track {
+    animation: none !important;
+    scroll-snap-type: x mandatory;
+  }
+}
+

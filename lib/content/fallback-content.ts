@@ -1875,7 +1875,7 @@ export const allMediaList: MediaAsset[] = [
 
 // --- 2. PRESS ARTICLES (Bao) ---
 // --- 2. PRESS ARTICLES (Bao) ---
-const pressArticles: PressArticle[] = PRESS_ARTICLES.map(item => ({
+const pressArticles: PressArticle[] = PRESS_ARTICLES.filter(item => item.isVerified).map(item => ({
   id: item.id,
   title: item.title,
   publisher: item.publisher,
@@ -1884,6 +1884,7 @@ const pressArticles: PressArticle[] = PRESS_ARTICLES.map(item => ({
   url: item.url,
   media: allMediaList.find(m => m.src === item.imagePath) || media.heroPoster,
   displayOrder: item.displayOrder,
+  isVerified: item.isVerified,
 }));
 
 // --- 3. JOURNEYS & ACTIVITIES ---
@@ -1967,8 +1968,7 @@ const ginsengStorySteps: GinsengStoryStep[] = GINSENG_STORY_STEPS.map(item => ({
 const cultureStories: CultureStory[] = CULTURE_STORIES.map(item => ({
   id: item.id,
   title: item.title,
-  description: item.description,
-  caption: item.caption,
+  description: item.caption,
   media: allMediaList.find(m => m.src === item.imagePath) || media.culture1,
   displayOrder: item.displayOrder,
 }));

@@ -143,6 +143,7 @@ export interface PressArticle {
   url: string
   media: MediaAsset
   displayOrder: number
+  isVerified: boolean
 }
 
 export interface HeroContent {
