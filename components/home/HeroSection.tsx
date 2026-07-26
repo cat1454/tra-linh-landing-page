@@ -42,7 +42,7 @@ export function HeroSection({ hero }: HeroSectionProps) {
             <ScrollReveal direction="up" delay={0.4}>
               <h1
                 id="hero-title"
-                className="mt-5 max-w-[15ch] font-serif text-[clamp(2.75rem,7vw,7.2rem)] leading-[0.88] tracking-[-0.045em] text-balance"
+                className="mt-5 max-w-[min(18ch,100%)] text-balance font-serif text-[clamp(2.5rem,11vw,6.2rem)] leading-[0.92] tracking-[-0.04em] sm:text-[clamp(3.25rem,8vw,6.2rem)] lg:max-w-[17ch] lg:text-[clamp(4rem,5.8vw,6.2rem)]"
               >
                 {hero.title}
               </h1>

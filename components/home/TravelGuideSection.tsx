@@ -1,4 +1,4 @@
-import { CloudSun, MapPinned, ShieldCheck } from "lucide-react";
+import { CloudSun, MapPinned } from "lucide-react";
 
 import type { HomePageContent } from "@/lib/content/types";
 

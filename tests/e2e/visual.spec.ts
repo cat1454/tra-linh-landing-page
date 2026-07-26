@@ -32,6 +32,12 @@ test('hero visual baseline', async ({ page }) => {
   expect(screenshot).toMatchSnapshot('hero.png', { maxDiffPixelRatio: 0.002 })
 })
 
+test('mobile hero visual baseline', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  const screenshot = await page.locator('#dau-trang').screenshot({ animations: 'disabled' })
+  expect(screenshot).toMatchSnapshot('hero-mobile.png', { maxDiffPixelRatio: 0.002 })
+})
+
 test('journey visual baseline', async ({ page }) => {
   const section = page.locator('#hanh-trinh')
   await section.scrollIntoViewIfNeeded()

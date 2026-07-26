@@ -50,51 +50,48 @@ export function buildAdminUpdatePayload(
 ): Record<string, unknown> {
   if (table === "page_sections") {
     return {
-      eyebrow: value(formData, "eyebrow") || null,
-      title: title.parse(formData.get("title")),
-      description: value(formData, "description") || null,
-      secondary_text: value(formData, "secondary_text") || null,
-      cta_label: value(formData, "cta_label") || null,
-      cta_href: url.parse(value(formData, "cta_href")) || null,
-      badges: lines(value(formData, "badges")),
-      stats: lines(value(formData, "stats")).flatMap((line) => {
+      ...(formData.has("eyebrow") ? { eyebrow: value(formData, "eyebrow") || null } : {}),
+      ...(formData.has("title") ? { title: title.parse(formData.get("title")) } : {}),
+      ...(formData.has("description") ? { description: value(formData, "description") || null } : {}),
+      ...(formData.has("secondary_text") ? { secondary_text: value(formData, "secondary_text") || null } : {}),
+      ...(formData.has("cta_label") ? { cta_label: value(formData, "cta_label") || null } : {}),
+      ...(formData.has("cta_href") ? { cta_href: url.parse(value(formData, "cta_href")) || null } : {}),
+      ...(formData.has("badges") ? { badges: lines(value(formData, "badges")) } : {}),
+      ...(formData.has("stats") ? { stats: lines(value(formData, "stats")).flatMap((line) => {
         const [statValue, label, icon] = line.split("|").map((item) => item.trim());
         return statValue && label
           ? [{ value: statValue, label, ...(icon ? { icon } : {}) }]
           : [];
-      }),
-      media_asset_id: uuidOrEmpty.parse(value(formData, "media_asset_id")) || null,
+      }) } : {}),
+      ...(formData.has("media_asset_id") ? { media_asset_id: uuidOrEmpty.parse(value(formData, "media_asset_id")) || null } : {}),
     };
   }
 
   if (table === "site_settings") {
     return {
-      site_name: title.parse(formData.get("site_name")),
-      tagline: value(formData, "tagline") || null,
-      description: value(formData, "description") || null,
-      primary_cta_label: value(formData, "primary_cta_label") || null,
-      primary_cta_href: url.parse(value(formData, "primary_cta_href")) || null,
-      legal_address: value(formData, "legal_address") || null,
-      contact_email:
+      ...(formData.has("site_name") ? { site_name: title.parse(formData.get("site_name")) } : {}),
+      ...(formData.has("tagline") ? { tagline: value(formData, "tagline") || null } : {}),
+      ...(formData.has("description") ? { description: value(formData, "description") || null } : {}),
+      ...(formData.has("primary_cta_label") ? { primary_cta_label: value(formData, "primary_cta_label") || null } : {}),
+      ...(formData.has("primary_cta_href") ? { primary_cta_href: url.parse(value(formData, "primary_cta_href")) || null } : {}),
+      ...(formData.has("legal_address") ? { legal_address: value(formData, "legal_address") || null } : {}),
+      ...(formData.has("contact_email") ? { contact_email:
         z.union([z.literal(""), z.string().email().max(254)])
-          .parse(value(formData, "contact_email")) || null,
-      contact_phone: z.string().max(30).parse(value(formData, "contact_phone")) || null,
-      zalo_url: url.parse(value(formData, "zalo_url")) || null,
-      maps_url: url.parse(value(formData, "maps_url")) || null,
-      privacy_url: url.parse(value(formData, "privacy_url")) || null,
-      header_title: value(formData, "header_title") || null,
-      header_subtitle: value(formData, "header_subtitle") || null,
-      footer_title: value(formData, "footer_title") || null,
-      footer_description: value(formData, "footer_description") || null,
-      seo_title: value(formData, "seo_title") || null,
-      seo_description: value(formData, "seo_description") || null,
-      hero_video_url: url.parse(value(formData, "hero_video_url")) || null,
-      hero_video_asset_id:
-        uuidOrEmpty.parse(value(formData, "hero_video_asset_id")) || null,
-      hero_mobile_poster_url:
-        url.parse(value(formData, "hero_mobile_poster_url")) || null,
-      hero_mobile_poster_asset_id:
-        uuidOrEmpty.parse(value(formData, "hero_mobile_poster_asset_id")) || null,
+          .parse(value(formData, "contact_email")) || null } : {}),
+      ...(formData.has("contact_phone") ? { contact_phone: z.string().max(30).parse(value(formData, "contact_phone")) || null } : {}),
+      ...(formData.has("zalo_url") ? { zalo_url: url.parse(value(formData, "zalo_url")) || null } : {}),
+      ...(formData.has("maps_url") ? { maps_url: url.parse(value(formData, "maps_url")) || null } : {}),
+      ...(formData.has("privacy_url") ? { privacy_url: url.parse(value(formData, "privacy_url")) || null } : {}),
+      ...(formData.has("header_title") ? { header_title: value(formData, "header_title") || null } : {}),
+      ...(formData.has("header_subtitle") ? { header_subtitle: value(formData, "header_subtitle") || null } : {}),
+      ...(formData.has("footer_title") ? { footer_title: value(formData, "footer_title") || null } : {}),
+      ...(formData.has("footer_description") ? { footer_description: value(formData, "footer_description") || null } : {}),
+      ...(formData.has("seo_title") ? { seo_title: value(formData, "seo_title") || null } : {}),
+      ...(formData.has("seo_description") ? { seo_description: value(formData, "seo_description") || null } : {}),
+      ...(formData.has("hero_video_url") ? { hero_video_url: url.parse(value(formData, "hero_video_url")) || null } : {}),
+      ...(formData.has("hero_video_asset_id") ? { hero_video_asset_id: uuidOrEmpty.parse(value(formData, "hero_video_asset_id")) || null } : {}),
+      ...(formData.has("hero_mobile_poster_url") ? { hero_mobile_poster_url: url.parse(value(formData, "hero_mobile_poster_url")) || null } : {}),
+      ...(formData.has("hero_mobile_poster_asset_id") ? { hero_mobile_poster_asset_id: uuidOrEmpty.parse(value(formData, "hero_mobile_poster_asset_id")) || null } : {}),
     };
   }
 

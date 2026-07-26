@@ -11,6 +11,7 @@ import {
   TraLinhStory,
   TravelGuideSection,
   XoDangCultureSection,
+  PressSection,
 } from "@/components/home";
 import { createContentRepository } from "@/lib/content/repository";
 import { isSupabaseAdminConfigured } from "@/lib/supabase/config";
@@ -72,12 +73,23 @@ export default async function Home() {
       <HeroSection hero={home.hero} />
       <IdentityStrip items={home.identityValues} />
       <TraLinhStory chapters={home.storyChapters} section={home.sectionSettings.story} />
-      <JourneySection journeys={home.journeys} section={home.sectionSettings.journeys} />
+      <JourneySection
+        journeys={home.journeys}
+        section={home.sectionSettings.journeys}
+        activityMedia={home.media.filter((item) => item.id.startsWith("media-activity-"))}
+      />
       <GinsengForestStory steps={home.ginsengStorySteps} section={home.sectionSettings.ginseng} />
-      <XoDangCultureSection stories={home.cultureStories} section={home.sectionSettings.culture} />
+      <XoDangCultureSection
+        stories={home.cultureStories}
+        section={home.sectionSettings.culture}
+        peopleMedia={home.media.filter((item) => item.id.startsWith("media-people-"))}
+      />
       <LocalProduceSection items={home.localSpecialties} section={home.sectionSettings.local_products} />
       {home.products.length ? <GinsengProductsSection products={home.products} section={home.sectionSettings.products} /> : null}
       <TravelGuideSection guides={home.guides} section={home.sectionSettings.guides} />
+      {home.pressArticles && home.pressArticles.length ? (
+        <PressSection articles={home.pressArticles} section={home.sectionSettings.press} />
+      ) : null}
       <FinalCTA media={home.sectionSettings.final_cta?.media ?? finalMedia} section={home.sectionSettings.final_cta} />
       <div id="lien-he" className="bg-[#EEF1E9] px-5 py-12 sm:px-8 sm:py-16 lg:px-16 lg:py-20">
         <div className="mx-auto max-w-3xl rounded-[1.75rem] border border-[#10251A]/10 bg-[#EEE3CB]/70 p-6 shadow-[0_24px_80px_rgba(16,37,26,0.08)] sm:p-10">

@@ -2,13 +2,15 @@ import ScrollReveal from "@/components/animation/ScrollReveal";
 import type { HomePageContent } from "@/lib/content/types";
 
 import { MediaFrame, SectionIntro } from "./_shared";
+import { ResponsiveMediaRail } from "./ResponsiveMediaRail";
 
 type XoDangCultureSectionProps = {
   stories: HomePageContent["cultureStories"];
   section?: HomePageContent["sectionSettings"][string];
+  peopleMedia?: HomePageContent["media"];
 };
 
-export function XoDangCultureSection({ stories, section }: XoDangCultureSectionProps) {
+export function XoDangCultureSection({ stories, section, peopleMedia = [] }: XoDangCultureSectionProps) {
   if (!stories.length) return null;
 
   return (
@@ -43,11 +45,9 @@ export function XoDangCultureSection({ stories, section }: XoDangCultureSectionP
               <div className="flex h-full flex-col justify-end p-6 sm:p-8">
                 <h3 className="font-serif text-2xl text-[#EEF1E9] sm:text-3xl">{story.title}</h3>
                 <p className="mt-2 max-w-xl text-sm leading-6 text-[#EEF1E9]/68">{story.description}</p>
-                {story.caption || story.media.sourceCredit ? (
+                {story.media.sourceCredit ? (
                   <p className="mt-3 text-[0.65rem] uppercase tracking-[0.12em] text-[#EEF1E9]/80">
-                    {story.caption ?? story.media.caption}
-                    {(story.caption ?? story.media.caption) && story.media.sourceCredit ? " · " : ""}
-                    {story.media.sourceCredit ? `Nguồn: ${story.media.sourceCredit}` : ""}
+                    Nguồn: {story.media.sourceCredit}
                   </p>
                 ) : null}
               </div>
@@ -56,7 +56,25 @@ export function XoDangCultureSection({ stories, section }: XoDangCultureSectionP
           ))}
         </div>
 
-        <p className="mt-8 max-w-3xl text-sm leading-7 text-[#3D5133]">
+        {/* Culture People Gallery (30 real images) */}
+        {peopleMedia.length > 0 && (
+          <ScrollReveal direction="up" delay={0.2}>
+            <div className="mt-16 border-t border-[#10251A]/10 pt-12">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between">
+                <h3 className="font-serif text-2xl text-[#29452C] sm:text-3xl">
+                  Khoảnh khắc con người & đời sống
+                </h3>
+                <p className="text-xs text-[#536258] uppercase tracking-[0.12em]">
+                  {Math.min(peopleMedia.length, 12)} khoảnh khắc tiêu biểu
+                </p>
+              </div>
+
+              <ResponsiveMediaRail media={peopleMedia} tone="cream" itemSize="large" />
+            </div>
+          </ScrollReveal>
+        )}
+
+        <p className="mt-12 max-w-3xl text-sm leading-7 text-[#3D5133] border-t border-[#10251A]/10 pt-6">
           Khi ghé thăm, hãy xin phép trước khi chụp ảnh, tôn trọng không gian nghi lễ và lắng nghe hướng dẫn của cộng đồng địa phương.
         </p>
       </div>

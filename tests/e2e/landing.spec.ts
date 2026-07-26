@@ -85,7 +85,7 @@ test('hero loads its configured video and falls back to the poster for reduced m
   await expect(page.locator('#dau-trang img')).toBeVisible()
 })
 
-for (const width of [375, 390, 768, 1024, 1440]) {
+for (const width of [320, 390, 768, 1440]) {
   test(`does not overflow horizontally at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 })
     await page.goto('/')
@@ -96,3 +96,56 @@ for (const width of [375, 390, 768, 1024, 1440]) {
     expect(overflow).toBeLessThanOrEqual(1)
   })
 }
+
+test('mobile media rail scrolls manually and controls meet the 44px touch target', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 812 })
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await page.goto('/')
+
+  const rail = page.locator('[data-testid="media-rail"]').first()
+  await rail.evaluate((element) => element.scrollIntoView({ block: 'center' }))
+  const scroller = rail.locator('.responsive-media-rail__scroller')
+  const before = await scroller.evaluate((element) => element.scrollLeft)
+  await scroller.evaluate((element) => element.scrollTo({ left: 320 }))
+  await expect.poll(() => scroller.evaluate((element) => element.scrollLeft)).toBeGreaterThan(before)
+
+  const filters = page.locator('#san-vat button[aria-pressed]')
+  const targets = await filters.evaluateAll((buttons) => buttons.map((button) => {
+    const rect = button.getBoundingClientRect()
+    return { width: rect.width, height: rect.height }
+  }))
+  expect(targets.every(({ width, height }) => width >= 44 && height >= 44)).toBe(true)
+})
+
+test('desktop media rail pauses and reduced motion disables autoplay', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'chromium', 'CSS animation state is verified in Chromium.')
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.emulateMedia({ reducedMotion: 'no-preference' })
+  await page.goto('/')
+
+  const rail = page.locator('[data-testid="media-rail"]').first()
+  await rail.scrollIntoViewIfNeeded()
+  const track = rail.locator('.responsive-media-rail__track')
+  await expect.poll(() => track.evaluate((element) => getComputedStyle(element).animationName)).toBe('marquee-scroll')
+  await rail.locator('.responsive-media-rail__scroller').focus()
+  await expect.poll(() => track.evaluate((element) => getComputedStyle(element).animationPlayState)).toBe('paused')
+
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await expect.poll(() => track.evaluate((element) => getComputedStyle(element).animationName)).toBe('none')
+})
+
+test('specialty dialog has accessible names and restores keyboard focus', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await page.goto('/#san-vat')
+
+  const trigger = page.locator('#san-vat button[aria-haspopup="dialog"]').first()
+  await trigger.focus()
+  await page.keyboard.press('Enter')
+  const dialog = page.getByRole('dialog')
+  await expect(dialog).toBeVisible()
+  expect((await new AxeBuilder({ page }).include('[role="dialog"]').analyze()).violations).toEqual([])
+
+  await dialog.getByRole('button', { name: /đóng câu chuyện/i }).click()
+  await expect(dialog).toBeHidden()
+  await expect(trigger).toBeFocused()
+})
