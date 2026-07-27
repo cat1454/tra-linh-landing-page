@@ -7,7 +7,7 @@
 | Phiên bản | `1.0.0` |
 | Git tag | `v1.0.0` |
 | Release date | `2026-07-27` |
-| Commit SHA | Chạy `git rev-parse v1.0.0^{commit}` sau khi nhận repository |
+| Commit SHA | `$Format:%H$` (được `git archive` thay bằng SHA chính xác; trong repository chạy `git rev-parse v1.0.0^{commit}`) |
 | Source archive | `tra-linh-landing-page-v1.0.0.zip` |
 | SHA-256 | File đi kèm `tra-linh-landing-page-v1.0.0.zip.sha256` |
 
