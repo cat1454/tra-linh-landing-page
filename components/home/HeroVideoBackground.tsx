@@ -109,9 +109,11 @@ export function HeroVideoBackground({
   }, [shouldLoadVideo]);
 
   useEffect(() => {
-    if (!shouldLoadVideo || !isMuted) return;
+    if (!shouldLoadVideo) return;
 
     const enableSoundOnFirstInteraction = (event: PointerEvent) => {
+      if (!videoRef.current?.muted) return;
+
       const target = event.target;
       if (
         target instanceof Element &&
@@ -132,7 +134,7 @@ export function HeroVideoBackground({
         capture: true,
       });
     };
-  }, [enableSound, isMuted, shouldLoadVideo]);
+  }, [enableSound, shouldLoadVideo]);
 
   const toggleSound = async () => {
     const video = videoRef.current;
