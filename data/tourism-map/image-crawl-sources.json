@@ -1,0 +1,83 @@
+{
+  "sources": [
+    {
+      "slug": "diem-du-lich-vuon-sam-ngoc-linh-tak-ngo",
+      "pageUrls": [
+        "https://bvhttdl.gov.vn/quang-nam-cong-bo-diem-du-lich-vuon-sam-ngoc-linh-tak-ngo-20190301233432156.htm",
+        "https://plo.vn/gan-40000-cay-sam-ngoc-linh-bi-lang-quen-chua-duoc-ban-giao-cho-don-vi-moi-quan-ly-post907392.html",
+        "https://www.danang.gov.vn/vi/web/dng/w/day-manh-thuc-hien-chuong-trinh-phat-trien-sam-va-duoc-lieu-voi-nhiem-vu-cua-tung-nganh"
+      ]
+    },
+    {
+      "slug": "tram-duoc-lieu-tra-linh",
+      "pageUrls": ["https://www.danang.gov.vn/vi/web/dng/w/day-manh-thuc-hien-chuong-trinh-phat-trien-sam-va-duoc-lieu-voi-nhiem-vu-cua-tung-nganh"]
+    },
+    {
+      "slug": "khong-gian-van-hoa-kon-pin-den-tho-than-sam",
+      "pageUrls": [
+        "https://tralinh.danang.gov.vn/chi-tiet-tin/group/112/nid/4350/ubnd-xa-tra-linh-to-chuc-hop-trien-khai-cho-phien-nam-2-26",
+        "https://baodanang.vn/nguoi-xe-dang-to-chuc-le-cung-than-sam-ngoc-linh-3138616.html",
+        "https://tralinh.danang.gov.vn/chi-tiet-tin/group/112/nid/4446/hdnd-xa-tra-linh-khoa-xiii-to-chuc-ky-hop-thu-ba-ky-hop-chuyen-de--thong-qua-nghi-quyet-ve-sap-xep-cac-thon-tren-dia-ban-xa"
+      ]
+    },
+    {
+      "slug": "cho-phien-tra-linh",
+      "pageUrls": [
+        "https://tralinh.danang.gov.vn/chi-tiet-tin/group/112/nid/4350/ubnd-xa-tra-linh-to-chuc-hop-trien-khai-cho-phien-nam-2-26",
+        "https://tralinh.danang.gov.vn/chi-tiet-tin/group/119/nid/4370/cho-phien-tra-linh-thang-4-2-26-khong-gian-van-hoa-song-dong-lan-toa-sinh-ke-va-ban-sac-vung-cao"
+      ]
+    },
+    {
+      "slug": "khu-dan-cu-tak-lang",
+      "pageUrls": [
+        "https://thanhdoandanang.org.vn/news/sac-mau-co-so/xa-tra-linh-phat-dong-phong-trao-toan-dan-chung-tay-bao-ve-moi-truong-vi-mot-thanh-pho-da-nang-xanh-sach-dep-nam-2026-785.html",
+        "https://vtcnews.vn/nguoi-xo-dang-tang-nhau-loai-biet-duoc-quy-hon-vang-ar1003043.html",
+        "https://tralinh.danang.gov.vn/chi-tiet-tin/group/112/nid/4446/hdnd-xa-tra-linh-khoa-xiii-to-chuc-ky-hop-thu-ba-ky-hop-chuyen-de--thong-qua-nghi-quyet-ve-sap-xep-cac-thon-tren-dia-ban-xa"
+      ]
+    },
+    {
+      "slug": "khu-dan-cu-tak-ngo",
+      "pageUrls": [
+        "https://tralinh.danang.gov.vn/chi-tiet-tin/group/112/nid/4446/hdnd-xa-tra-linh-khoa-xiii-to-chuc-ky-hop-thu-ba-ky-hop-chuyen-de--thong-qua-nghi-quyet-ve-sap-xep-cac-thon-tren-dia-ban-xa",
+        "https://bvhttdl.gov.vn/quang-nam-cong-bo-diem-du-lich-vuon-sam-ngoc-linh-tak-ngo-20190301233432156.htm"
+      ]
+    },
+    {
+      "slug": "khu-dan-cu-mang-lung",
+      "pageUrls": [
+        "https://danang.gov.vn/web/dang-uy-ubnd-thanh-pho/chi-tiet/-/asset_publisher/wthp/content/thong-nhat-dieu-chinh-chu-truong-dau-tu-du-an-duong-giao-thong-den-vung-phat-trien-sam-ngoc-linh/37638",
+        "https://tralinh.danang.gov.vn/chi-tiet-tin/group/112/nid/4446/hdnd-xa-tra-linh-khoa-xiii-to-chuc-ky-hop-thu-ba-ky-hop-chuyen-de--thong-qua-nghi-quyet-ve-sap-xep-cac-thon-tren-dia-ban-xa"
+      ]
+    },
+    {
+      "slug": "thac-noong-lau",
+      "pageUrls": [
+        "https://baodanang.vn/video-trai-nghiem-thac-noong-lau-3127291.html",
+        "https://tralinh.danang.gov.vn/gioi-thieu/gioi-thieu-chung"
+      ]
+    },
+    {
+      "slug": "ubnd-xa-tra-linh",
+      "pageUrls": [
+        "https://tralinh.danang.gov.vn/gioi-thieu/gioi-thieu-chung",
+        "https://tralinh.danang.gov.vn/chi-tiet-tin/group/112/nid/4446/hdnd-xa-tra-linh-khoa-xiii-to-chuc-ky-hop-thu-ba-ky-hop-chuyen-de--thong-qua-nghi-quyet-ve-sap-xep-cac-thon-tren-dia-ban-xa"
+      ]
+    },
+    {
+      "slug": "tram-y-te-xa-tra-linh",
+      "pageUrls": ["https://tralinh.danang.gov.vn/chi-tiet-tin/group/112/nid/4447/xa-tra-linh-to-chuc-hoi-nghi-cong-bo-quyet-dinh-thanh-lap-tram-y-te-xa-va-cong-bo-cong-tac-can-bo"]
+    },
+    {
+      "slug": "diem-du-lich-cong-dong-tak-po",
+      "pageUrls": ["https://baodanang.vn/mo-huong-lam-kinh-te-cho-vung-cao-ho-tro-lam-du-lich-cong-dong-3341070.html"]
+    },
+    {
+      "slug": "trung-tam-to-chuc-su-kien-sam-ngoc-linh",
+      "pageUrls": ["https://namtramy.danang.gov.vn/chi-tiet-tin/group/113/nid/4289/le-hoi-sam-ngoc-linh-lan-thu-vii--nam-2-25-se-dien-ra-tu-ngay-1--3-8"]
+    },
+    {
+      "slug": "phien-cho-sam-ngoc-linh",
+      "pageUrls": ["https://namtramy.danang.gov.vn/chi-tiet-tin/group/113/nid/4289/le-hoi-sam-ngoc-linh-lan-thu-vii--nam-2-25-se-dien-ra-tu-ngay-1--3-8"]
+    }
+  ]
+}

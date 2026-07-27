@@ -15,7 +15,7 @@ import {
 } from "@/components/detail/seo";
 import { getPublicSiteSettings } from "@/lib/content/public-settings-server";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { AgentationWrapper } from "@/components/layout/AgentationWrapper";
+import "mapbox-gl/dist/mapbox-gl.css";
 import "./globals.css";
 
 const beVietnamPro = Be_Vietnam_Pro({
@@ -56,10 +56,6 @@ const baseMetadata: Metadata = {
   ],
   alternates: { canonical: "/" },
   formatDetection: { email: false, address: false, telephone: false },
-  icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon.ico",
-  },
   openGraph: {
     type: "website",
     locale: "vi_VN",
@@ -159,6 +155,8 @@ export default async function RootLayout({
               contactPhone={siteSettings.contactPhone}
               title={siteSettings.footerTitle ?? siteSettings.headerTitle}
               description={siteSettings.footerDescription}
+              legalAddress={siteSettings.legalAddress}
+              privacyUrl={siteSettings.privacyUrl}
             />
             <MobileStickyCta
               contactPhone={siteSettings.contactPhone}
@@ -169,7 +167,6 @@ export default async function RootLayout({
         </SmoothScrollProvider>
 
         <SpeedInsights />
-        <AgentationWrapper />
       </body>
     </html>
   );

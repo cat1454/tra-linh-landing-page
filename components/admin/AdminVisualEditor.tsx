@@ -65,7 +65,10 @@ function PreviewMedia({
   alt: string;
   poster?: string;
 }) {
-  const [videoFailed, setVideoFailed] = useState(false);
+  const [failedVideoUrl, setFailedVideoUrl] = useState<string>();
+  const [failedImageUrl, setFailedImageUrl] = useState<string>();
+  const videoFailed = failedVideoUrl === url;
+  const imageFailed = failedImageUrl === url;
 
   if (!url) {
     return (
@@ -101,7 +104,7 @@ function PreviewMedia({
           playsInline
           preload="metadata"
           poster={poster}
-          onError={() => setVideoFailed(true)}
+          onError={() => setFailedVideoUrl(url)}
           className="h-full w-full object-cover opacity-80"
           aria-label={alt}
         />
@@ -114,11 +117,28 @@ function PreviewMedia({
     );
   }
 
+  if (imageFailed) {
+    return (
+      <div className="flex h-full min-h-44 items-center justify-center bg-[#dfe7d8] px-6 text-center text-[#10251a]/70">
+        <div>
+          <ImageIcon className="mx-auto" aria-hidden="true" />
+          <p className="mt-2 text-xs font-semibold">Không tải được ảnh xem trước</p>
+          <a className="mt-2 inline-block text-xs underline" href={url} target="_blank" rel="noreferrer">
+            Mở ảnh trong tab mới
+          </a>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div
-      role="img"
-      aria-label={alt}
-      className="h-full min-h-44 bg-cover bg-center"
+    // A native image is intentional here so load failures from arbitrary CMS URLs can be recovered.
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={url}
+      alt={alt}
+      onError={() => setFailedImageUrl(url)}
+      className="h-full min-h-44 w-full bg-cover bg-center object-cover"
       style={{ backgroundImage: `url(${JSON.stringify(url)})` }}
     />
   );

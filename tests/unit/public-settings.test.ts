@@ -6,17 +6,17 @@ describe("public site settings", () => {
   it("normalizes configured contact values and safe public URLs", () => {
     expect(
       normalizePublicSiteSettings({
-        contact_email: "  phuh15521@gmail.com ",
-        contact_phone: " 0334059776 ",
-        zalo_url: "https://zalo.me/0334059776",
+        contact_email: "  admin@example.com ",
+        contact_phone: " 0900000000 ",
+        zalo_url: "https://zalo.me/0900000000",
         maps_url: "https://maps.google.com/?q=Tra+Linh",
         privacy_url: "/chinh-sach-quyen-rieng",
         legal_address: " Xã Trà Linh, thành phố Đà Nẵng ",
       }),
     ).toEqual({
-      contactEmail: "phuh15521@gmail.com",
-      contactPhone: "0334059776",
-      zaloUrl: "https://zalo.me/0334059776",
+      contactEmail: "admin@example.com",
+      contactPhone: "0900000000",
+      zaloUrl: "https://zalo.me/0900000000",
       mapsUrl: "https://maps.google.com/?q=Tra+Linh",
       privacyUrl: "/chinh-sach-quyen-rieng",
       legalAddress: "Xã Trà Linh, thành phố Đà Nẵng",

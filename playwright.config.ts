@@ -1,14 +1,18 @@
 import { defineConfig, devices } from '@playwright/test'
 
+const baseURL = process.env.BASE_URL ?? 'http://127.0.0.1:3100'
+const mapboxToken = process.env.E2E_MAPBOX_ACCESS_TOKEN?.trim() ?? ''
+const mapboxStyle = process.env.E2E_MAPBOX_STYLE_URL?.trim() ?? 'mapbox://styles/mapbox/standard'
+
 export default defineConfig({
   testDir: './tests/e2e',
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  workers: process.env.CI ? 1 : 4,
   reporter: [['list'], ['html', { outputFolder: 'playwright-report' }]],
   use: {
-    baseURL: process.env.BASE_URL ?? 'http://127.0.0.1:3000',
+    baseURL,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
@@ -20,9 +24,19 @@ export default defineConfig({
     { name: 'mobile-chrome', use: { ...devices['Pixel 5'] } },
   ],
   webServer: {
-    command: 'npm run dev -- --hostname 127.0.0.1',
-    url: 'http://127.0.0.1:3000',
-    reuseExistingServer: !process.env.CI,
+    command: 'npm run start -- --hostname 127.0.0.1 --port 3100',
+    url: baseURL,
+    reuseExistingServer: false,
     timeout: 120_000,
+    env: {
+      NEXT_PUBLIC_SITE_URL: baseURL,
+      NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN: mapboxToken,
+      NEXT_PUBLIC_MAPBOX_STYLE_URL: mapboxStyle,
+      NEXT_PUBLIC_SUPABASE_URL: 'http://127.0.0.1:54321',
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_e2e',
+      SUPABASE_SERVICE_ROLE_KEY: 'sb_secret_e2e',
+      RATE_LIMIT_SALT: 'tra-linh-e2e-rate-limit-salt',
+      SUPABASE_MEDIA_BUCKET: 'media',
+    },
   },
 })

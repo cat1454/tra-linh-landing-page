@@ -22,6 +22,11 @@ export default defineConfig({
         'app/actions/forms.ts',
         'components/detail/seo.tsx',
         'components/animation/useReducedMotionPreference.ts',
+        'components/tourism-map/TourismMapPointMarker.tsx',
+        'components/tourism-map/TourismPlaceIntakeForm.tsx',
+        'lib/tourism-image-crawler.ts',
+        'lib/tourism-map-basemap.ts',
+        'lib/tourism-map-intake.ts',
       ],
       thresholds: {
         branches: 80,

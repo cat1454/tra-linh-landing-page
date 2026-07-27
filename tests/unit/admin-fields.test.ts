@@ -13,7 +13,7 @@ describe("full CMS edit payloads", () => {
     const payload = buildAdminUpdatePayload(form({
       site_name: "Trà Linh",
       contact_email: "admin@example.com",
-      contact_phone: "0334059776",
+      contact_phone: "0900000000",
       primary_cta_href: "#hanh-trinh",
       header_title: "TRÀ LINH",
       footer_description: "Nội dung giới thiệu vùng cao.",
@@ -24,7 +24,7 @@ describe("full CMS edit payloads", () => {
     expect(payload).toMatchObject({
       site_name: "Trà Linh",
       contact_email: "admin@example.com",
-      contact_phone: "0334059776",
+      contact_phone: "0900000000",
       header_title: "TRÀ LINH",
       seo_title: "Trà Linh · Ngọc Linh",
       hero_video_asset_id: "11111111-1111-4111-8111-111111111111",

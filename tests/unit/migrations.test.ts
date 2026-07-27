@@ -93,4 +93,14 @@ describe("verified public content migration", () => {
     expect(sql).toContain("'video/mp4'");
     expect(sql).toContain("'video/webm'");
   });
+
+  it("neutralizes legacy owner contact data without provisioning a new admin", () => {
+    const sql = migration("202607270001_prepare_code_handover.sql");
+
+    expect(sql).toContain("contact_email = null");
+    expect(sql).toContain("contact_phone = null");
+    expect(sql).toContain("zalo_url = null");
+    expect(sql).toContain("is_active = false");
+    expect(sql).not.toContain("insert into public.admin_users");
+  });
 });

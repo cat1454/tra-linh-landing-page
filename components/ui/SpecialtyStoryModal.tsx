@@ -125,7 +125,7 @@ export function SpecialtyStoryModal({ isOpen, onClose, specialty }: SpecialtySto
       role="dialog"
       aria-modal="true"
       aria-labelledby={titleId}
-      className="fixed inset-0 z-[110] flex items-center justify-center bg-black/80 p-4 backdrop-blur-md"
+      className="fixed inset-0 z-[110] overflow-y-auto bg-black/80 p-4 backdrop-blur-md flex justify-center items-start"
       initial={prefersReducedMotion ? false : { opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -136,7 +136,7 @@ export function SpecialtyStoryModal({ isOpen, onClose, specialty }: SpecialtySto
     >
       <motion.div
         ref={panelRef}
-        className="relative w-full max-w-2xl overflow-hidden rounded-[1.75rem] md:rounded-[2rem] bg-[#EEF1E9] text-[#10251A] shadow-[0_24px_80px_rgba(0,0,0,0.4)] max-h-[85vh] sm:max-h-[88vh] flex flex-col"
+        className="relative w-full max-w-2xl my-auto rounded-[1.75rem] md:rounded-[2rem] bg-[#EEF1E9] text-[#10251A] shadow-[0_24px_80px_rgba(0,0,0,0.4)] overflow-hidden"
         initial={prefersReducedMotion ? false : { scale: 0.95, y: 15 }}
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.95, y: 15 }}
@@ -165,7 +165,7 @@ export function SpecialtyStoryModal({ isOpen, onClose, specialty }: SpecialtySto
         </div>
 
         {/* Modal content details */}
-        <div className="px-6 pb-8 pt-4 sm:px-8 sm:pb-10 overflow-y-auto flex-1">
+        <div className="px-6 pb-8 pt-4 sm:px-8 sm:pb-10">
           <div className="flex items-center gap-2">
             {Icon && (
               <span className="inline-flex items-center gap-1.5 rounded-full border border-[#10251A]/10 bg-white/60 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.1em] text-[#435348] backdrop-blur-sm">
@@ -178,7 +178,7 @@ export function SpecialtyStoryModal({ isOpen, onClose, specialty }: SpecialtySto
           <h2 id={titleId} className="mt-4 font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
             {story.title}
           </h2>
-          <p className="mt-2 text-base font-medium italic text-[#5E7F3B] sm:text-lg">
+          <p className="mt-2 text-base font-medium italic text-[#3D5133] sm:text-lg">
             {story.introduction}
           </p>
 
@@ -192,17 +192,17 @@ export function SpecialtyStoryModal({ isOpen, onClose, specialty }: SpecialtySto
 
           <div className="mt-6 grid gap-4 border-t border-[#10251A]/10 pt-5 sm:grid-cols-2">
             <div>
-              <h4 className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#10251A]/80">
+              <h3 className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#10251A]/80">
                 <MapPin className="size-3.5 text-[#5E7F3B]" />
                 Nguồn gốc
-              </h4>
+              </h3>
               <p className="mt-1.5 text-xs leading-5 text-[#536258]">{story.origin}</p>
             </div>
             <div>
-              <h4 className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#10251A]/80">
+              <h3 className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#10251A]/80">
                 <UtensilsCrossed className="size-3.5 text-[#5E7F3B]" />
                 Chế biến gợi ý
-              </h4>
+              </h3>
               <p className="mt-1.5 text-xs leading-5 text-[#536258]">{story.preparation}</p>
             </div>
           </div>

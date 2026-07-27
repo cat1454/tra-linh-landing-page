@@ -50,7 +50,7 @@ export function Header({
             : 'site-header--transparent border-white/10 bg-[#10251A]/80 py-2.5 shadow-lg shadow-black/5 backdrop-blur-xl lg:border-transparent lg:bg-transparent lg:py-4 lg:shadow-none lg:backdrop-blur-none',
         )}
       >
-        <div className="site-header__inner mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4 px-6 md:gap-6 md:px-8 xl:px-12">
+        <div className="site-header__inner mx-auto flex w-full max-w-[1440px] items-center justify-between gap-3 px-4 sm:px-6 md:gap-6 md:px-8 xl:px-12">
           <Link
             href="/"
             aria-label="Trà Linh — trang chủ"
@@ -77,16 +77,18 @@ export function Header({
             </ul>
           </nav>
 
-          <div className="site-header__actions flex items-center gap-2">
-            <Button
-              href="/#hanh-trinh"
-              variant="light"
-              size="sm"
-              className="site-header__cta hidden whitespace-nowrap md:inline-flex"
-            >
-              Khám phá Trà Linh
-              <ArrowRight aria-hidden="true" size={17} />
-            </Button>
+          <div className="site-header__actions flex shrink-0 items-center gap-2">
+            <span className="hidden md:inline-flex">
+              <Button
+                href="/#hanh-trinh"
+                variant="light"
+                size="sm"
+                className="site-header__cta whitespace-nowrap"
+              >
+                Khám phá Trà Linh
+                <ArrowRight aria-hidden="true" size={17} />
+              </Button>
+            </span>
             <button
               type="button"
               aria-label="Mở menu"

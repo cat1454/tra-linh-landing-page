@@ -24,7 +24,7 @@ export async function getPublicSiteSettings(): Promise<PublicSiteSettings> {
     });
     const { data, error } = await client
       .from("site_settings")
-      .select("contact_email, contact_phone, zalo_url, maps_url, privacy_url, header_title, header_subtitle, footer_title, footer_description, seo_title, seo_description, navigation")
+      .select("contact_email, contact_phone, zalo_url, maps_url, privacy_url, legal_address, header_title, header_subtitle, footer_title, footer_description, seo_title, seo_description, navigation")
       .eq("status", "published")
       .eq("is_placeholder", false)
       .order("display_order", { ascending: true })

@@ -1,5 +1,7 @@
 # Nguồn ảnh đã tuyển chọn
 
+> Lưu ý bàn giao: bảng này là metadata truy vết nguồn trong repo, không phải chứng cứ pháp lý về quyền sử dụng. Hồ sơ chấp thuận, giấy phép và quyền hình ảnh phải được bàn giao riêng; nếu không có hồ sơ tương ứng, bên nhận cần rà soát lại trước khi tiếp tục phát hành.
+
 Các ảnh trong thư mục này được sao chép từ bộ dữ liệu `dulich-tralinh-crawler`, sau khi đã loại bỏ nội dung sai địa danh và được người dùng xác nhận quyền sử dụng cho dự án.
 
 | Tệp | Nguồn lưu trữ | Ghi nhận | Quyền sử dụng |

@@ -189,3 +189,144 @@ li {
 .mobile-sticky-cta {
   padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
 }
+
+/* Continuous Auto-scrolling Marquee for Gallery Autoplay */
+@keyframes marquee-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll 60s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+.animate-marquee-fast {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll 40s linear infinite;
+}
+
+.animate-marquee-fast:hover {
+  animation-play-state: paused;
+}
+
+.responsive-media-rail__scroller {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(41 69 44 / 45%) transparent;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tourism-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(41 69 44 / 42%) transparent;
+}
+
+.tourism-scrollbar::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+.tourism-scrollbar::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgb(41 69 44 / 42%);
+}
+
+.tourism-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.mapboxgl-popup-content {
+  overflow: hidden;
+  border-radius: 1rem;
+  padding: 0;
+  box-shadow: 0 18px 50px rgb(16 37 26 / 24%);
+}
+
+.mapboxgl-popup-close-button {
+  z-index: 2;
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border-radius: 999px;
+  background: rgb(238 241 233 / 92%);
+  color: #10251a;
+  font-size: 1.25rem;
+}
+
+@media (max-width: 1023px) {
+  .tourism-map-frame .mapboxgl-ctrl-compass {
+    display: none;
+  }
+
+  .tourism-map-frame .mapboxgl-ctrl-group button {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+
+  .tourism-map-frame .mapboxgl-ctrl-bottom-right {
+    bottom: 0.25rem;
+  }
+
+  .tourism-map-frame[data-mobile-sheet-open="true"] .mapboxgl-ctrl-bottom-right {
+    bottom: calc(40% + 2rem);
+  }
+}
+
+@keyframes tourism-sheet-enter {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tourism-mobile-sheet {
+  animation: tourism-sheet-enter 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+:fullscreen .mapboxgl-map,
+:fullscreen [aria-label="Bản đồ tương tác các điểm du lịch Trà Linh"] {
+  height: 100vh !important;
+}
+
+@media (min-width: 1024px) {
+  .responsive-media-rail__track {
+    animation: marquee-scroll 60s linear infinite;
+  }
+
+  .responsive-media-rail:hover .responsive-media-rail__track,
+  .responsive-media-rail:focus-within .responsive-media-rail__track,
+  .responsive-media-rail__scroller:hover .responsive-media-rail__track {
+    animation-play-state: paused;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tourism-mobile-sheet {
+    animation: none;
+  }
+
+  .responsive-media-rail__scroller {
+    overflow-x: auto !important;
+  }
+
+  .responsive-media-rail__track {
+    animation: none !important;
+    scroll-snap-type: x mandatory;
+  }
+}
+

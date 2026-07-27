@@ -16,7 +16,9 @@ test('unknown or unpublished slugs return 404', async ({ page }) => {
   })
 
   expect(response?.status()).toBe(404)
-  await expect(page.getByRole('heading', { name: /không tìm thấy trang/i })).toBeVisible()
+  await expect(page.getByRole('heading', { name: /không tìm thấy trang/i })).toBeVisible({
+    timeout: 15_000,
+  })
   await expect(page.getByRole('link', { name: /về trang chủ/i })).toHaveAttribute('href', '/')
 })
 

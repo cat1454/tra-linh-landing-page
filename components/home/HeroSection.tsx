@@ -10,6 +10,9 @@ type HeroSectionProps = {
   hero: HomePageContent["hero"];
 };
 
+export const HERO_INTRO_VIDEO_SRC =
+  "/assets/ThienNhien/1784805090350_7825852089651351479_g3040039768026489372.mp4";
+
 export function HeroSection({ hero }: HeroSectionProps) {
   return (
     <section
@@ -18,7 +21,7 @@ export function HeroSection({ hero }: HeroSectionProps) {
       className="hero-section relative isolate flex min-h-[680px] overflow-hidden bg-[#07100C] text-[#EEF1E9] sm:min-h-[760px] lg:min-h-[100svh]"
     >
       <HeroVideoBackground
-        src={hero.videoMedia?.src ?? "/videos/tra-linh-hero.mp4"}
+        src={HERO_INTRO_VIDEO_SRC}
         poster={hero.backgroundMedia}
         mobilePosterSrc={hero.mobilePoster?.src ?? "/images/tra-linh/hero-ban-lang-ngoc-linh-mobile.webp"}
         className="hero-media absolute inset-0 -z-30"
@@ -42,7 +45,7 @@ export function HeroSection({ hero }: HeroSectionProps) {
             <ScrollReveal direction="up" delay={0.4}>
               <h1
                 id="hero-title"
-                className="mt-5 max-w-[15ch] font-serif text-[clamp(2.75rem,7vw,7.2rem)] leading-[0.88] tracking-[-0.045em] text-balance"
+                className="mt-5 max-w-[min(18ch,100%)] text-balance font-serif text-[clamp(2.5rem,11vw,6.2rem)] leading-[0.92] tracking-[-0.04em] sm:text-[clamp(3.25rem,8vw,6.2rem)] lg:max-w-[17ch] lg:text-[clamp(4rem,5.8vw,6.2rem)]"
               >
                 {hero.title}
               </h1>

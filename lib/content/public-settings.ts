@@ -4,6 +4,7 @@ export interface PublicSiteSettings {
   zaloUrl?: string;
   mapsUrl?: string;
   privacyUrl?: string;
+  legalAddress?: string;
   headerTitle?: string;
   headerSubtitle?: string;
   footerTitle?: string;
@@ -19,6 +20,7 @@ interface PublicSiteSettingsRow {
   zalo_url?: string | null;
   maps_url?: string | null;
   privacy_url?: string | null;
+  legal_address?: string | null;
   header_title?: string | null;
   header_subtitle?: string | null;
   footer_title?: string | null;
@@ -90,6 +92,7 @@ export function normalizePublicSiteSettings(
     zaloUrl: safeUrl(row?.zalo_url),
     mapsUrl: safeUrl(row?.maps_url),
     privacyUrl: safeUrl(row?.privacy_url, true),
+    legalAddress: trimmed(row?.legal_address),
     ...(trimmed(row?.header_title) ? { headerTitle: trimmed(row?.header_title) } : {}),
     ...(trimmed(row?.header_subtitle) ? { headerSubtitle: trimmed(row?.header_subtitle) } : {}),
     ...(trimmed(row?.footer_title) ? { footerTitle: trimmed(row?.footer_title) } : {}),

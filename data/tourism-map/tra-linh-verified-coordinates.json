@@ -1,0 +1,24 @@
+{
+  "exportedAt": "2026-07-27T10:01:00.000Z",
+  "assigned": 18,
+  "records": [
+    { "slug": "diem-du-lich-vuon-sam-ngoc-linh-tak-ngo", "coordinate": [15.0385, 108.0248] },
+    { "slug": "tram-duoc-lieu-tra-linh", "coordinate": [15.0352, 108.0205] },
+    { "slug": "khong-gian-van-hoa-kon-pin-den-tho-than-sam", "coordinate": [15.0372, 108.0215] },
+    { "slug": "cho-phien-tra-linh", "coordinate": [15.0372, 108.0215] },
+    { "slug": "khu-dan-cu-tak-lang", "coordinate": [15.0315, 108.0148] },
+    { "slug": "khu-dan-cu-tak-ngo", "coordinate": [15.039, 108.0265] },
+    { "slug": "khu-dan-cu-mang-lung", "coordinate": [15.0245, 108.0102] },
+    { "slug": "thac-noong-lau", "coordinate": [15.0148, 108.0412] },
+    { "slug": "ubnd-xa-tra-linh", "coordinate": [15.035753, 108.019359] },
+    { "slug": "tram-y-te-xa-tra-linh", "coordinate": [15.0361, 108.0191] },
+    { "slug": "diem-du-lich-cong-dong-tak-po", "coordinate": [15.0521, 108.0715] },
+    { "slug": "trung-tam-to-chuc-su-kien-sam-ngoc-linh", "coordinate": [15.0645, 108.113] },
+    { "slug": "phien-cho-sam-ngoc-linh", "coordinate": [15.0645, 108.113] },
+    { "slug": "thac-5-tang", "coordinate": [15.068, 108.1185] },
+    { "slug": "suoi-nuoc-nong-tac-to", "coordinate": [15.075, 108.095] },
+    { "slug": "ruong-bac-thang-long-tuc", "coordinate": [15.021, 108.055] },
+    { "slug": "lang-van-hoa-tak-chuom", "coordinate": [15.008, 108.072] },
+    { "slug": "rung-que-co-thu-tra-my", "coordinate": [15.082, 108.135] }
+  ]
+}

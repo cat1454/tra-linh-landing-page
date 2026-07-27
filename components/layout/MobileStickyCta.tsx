@@ -1,4 +1,7 @@
+"use client";
+
 import { MapPinned, MessageCircle, Phone } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 const DEFAULT_MAPS_URL =
   "https://www.google.com/maps/search/?api=1&query=UBND+x%C3%A3+Tr%C3%A0+Linh%2C+th%C3%A0nh+ph%E1%BB%91+%C4%90%C3%A0+N%E1%BA%B5ng";
@@ -14,8 +17,11 @@ export function MobileStickyCta({
   zaloUrl,
   contactPhone,
 }: MobileStickyCtaProps) {
+  const pathname = usePathname();
   const contactHref = zaloUrl ?? (contactPhone ? `tel:${contactPhone}` : "/#lien-he");
   const contactLabel = zaloUrl ? "Zalo" : contactPhone ? "Gọi điện" : "Liên hệ";
+
+  if (pathname === "/ban-do-du-lich") return null;
 
   return (
     <nav

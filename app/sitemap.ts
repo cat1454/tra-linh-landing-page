@@ -7,6 +7,9 @@ import {
   fallbackProducts,
 } from "@/lib/content/fallback-content";
 import { createContentRepository } from "@/lib/content/repository";
+import { tourismPlaces } from "@/data/tourism-map/places";
+import { tourismEvents } from "@/data/tourism-map/events";
+import { getAllTourismEntities } from "@/lib/tourism-map";
 
 function validLastModified(value: string): Date | undefined {
   const date = new Date(value);
@@ -60,6 +63,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
   ];
 
+  const tourismEntries: MetadataRoute.Sitemap = getAllTourismEntities(
+    tourismPlaces,
+    tourismEvents,
+  ).map((place) => ({
+    url: getAbsoluteUrl(`/dia-diem/${place.slug}`),
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+    ...(place.coverImage
+      ? { images: [getAbsoluteUrl(place.coverImage)] }
+      : {}),
+  }));
+
   return [
     {
       url: getAbsoluteUrl("/"),
@@ -67,10 +82,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1,
     },
     {
+      url: getAbsoluteUrl("/ban-do-du-lich"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
       url: getAbsoluteUrl("/chinh-sach-quyen-rieng"),
       changeFrequency: "yearly",
       priority: 0.3,
     },
     ...detailEntries,
+    ...tourismEntries,
   ];
 }

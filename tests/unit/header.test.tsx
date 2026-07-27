@@ -14,8 +14,9 @@ describe('Header', () => {
     const trigger = screen.getByRole('button', { name: /mở menu/i })
 
     expect(header).toHaveClass('bg-[#10251A]/80')
-    expect(inner).toHaveClass('px-6')
-    expect(cta).toHaveClass('hidden', 'whitespace-nowrap', 'md:inline-flex')
+    expect(inner).toHaveClass('px-4', 'sm:px-6')
+    expect(cta.parentElement).toHaveClass('hidden', 'md:inline-flex')
+    expect(cta).toHaveClass('whitespace-nowrap')
     expect(trigger).toHaveClass('size-10', 'rounded-xl')
   })
 

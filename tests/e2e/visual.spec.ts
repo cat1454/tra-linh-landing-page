@@ -1,7 +1,10 @@
 import { expect, test } from '@playwright/test'
 
 test.beforeEach(async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== 'chromium', 'Visual baselines are maintained in desktop Chromium.')
+  test.skip(
+    testInfo.project.name !== 'chromium' || process.platform !== 'win32',
+    'Visual baselines are maintained in desktop Chromium on Windows.',
+  )
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.goto('/', { waitUntil: 'networkidle' })
   await page.evaluate(() => document.fonts.ready)
@@ -30,6 +33,12 @@ test.beforeEach(async ({ page }, testInfo) => {
 test('hero visual baseline', async ({ page }) => {
   const screenshot = await page.locator('#dau-trang').screenshot({ animations: 'disabled' })
   expect(screenshot).toMatchSnapshot('hero.png', { maxDiffPixelRatio: 0.002 })
+})
+
+test('mobile hero visual baseline', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  const screenshot = await page.locator('#dau-trang').screenshot({ animations: 'disabled' })
+  expect(screenshot).toMatchSnapshot('hero-mobile.png', { maxDiffPixelRatio: 0.002 })
 })
 
 test('journey visual baseline', async ({ page }) => {

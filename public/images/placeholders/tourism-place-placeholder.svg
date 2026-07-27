@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800" role="img" aria-labelledby="title description">
+  <title id="title">Ảnh địa điểm đang cập nhật</title>
+  <desc id="description">Minh họa trung tính với dãy núi và điểm định vị, dùng khi chưa có ảnh đúng địa điểm.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#eef1e9"/>
+      <stop offset="1" stop-color="#eee3cb"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#background)"/>
+  <circle cx="930" cy="170" r="82" fill="#d5a84e" opacity=".32"/>
+  <path d="M0 610 250 355l150 150 180-230 265 315 145-160 210 235v135H0Z" fill="#9bbe62" opacity=".36"/>
+  <path d="M0 690 315 465l175 140 175-210 260 250 115-105 160 150v110H0Z" fill="#29452c" opacity=".78"/>
+  <g transform="translate(560 210)" fill="none" stroke="#10251a" stroke-linecap="round" stroke-linejoin="round" stroke-width="18">
+    <path d="M40 0C-35 0-96 60-96 135c0 103 136 239 136 239s136-136 136-239C176 60 115 0 40 0Z" fill="#eef1e9" opacity=".92"/>
+    <circle cx="40" cy="135" r="45"/>
+  </g>
+  <text x="600" y="665" text-anchor="middle" fill="#10251a" font-family="Arial, sans-serif" font-size="42" font-weight="700">Ảnh đang cập nhật</text>
+  <text x="600" y="718" text-anchor="middle" fill="#29452c" font-family="Arial, sans-serif" font-size="25">Trà Linh · Đại ngàn Ngọc Linh</text>
+</svg>

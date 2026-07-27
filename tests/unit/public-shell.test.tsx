@@ -35,35 +35,35 @@ describe("public shell", () => {
     render(
       <>
         <Footer
-          contactEmail="phuh15521@gmail.com"
-          contactPhone="0334059776"
+          contactEmail="admin@example.com"
+          contactPhone="0900000000"
         />
-        <MobileStickyCta contactPhone="0334059776" />
+        <MobileStickyCta contactPhone="0900000000" />
       </>,
     );
 
     expect(
-      screen.getByRole("link", { name: "phuh15521@gmail.com" }),
-    ).toHaveAttribute("href", "mailto:phuh15521@gmail.com");
-    expect(screen.getAllByRole("link", { name: "0334059776" })[0]).toHaveAttribute(
+      screen.getByRole("link", { name: "admin@example.com" }),
+    ).toHaveAttribute("href", "mailto:admin@example.com");
+    expect(screen.getAllByRole("link", { name: "0900000000" })[0]).toHaveAttribute(
       "href",
-      "tel:0334059776",
+      "tel:0900000000",
     );
     expect(screen.getByRole("link", { name: /gọi điện/i })).toHaveAttribute(
       "href",
-      "tel:0334059776",
+      "tel:0900000000",
     );
   });
 
   it("uses the editable address and privacy link in the public footer", () => {
     render(
       <Footer
-        legalAddress="Thôn 2, xã Trà Linh"
+        legalAddress="Xã Trà Linh, thành phố Đà Nẵng"
         privacyUrl="/quyen-rieng"
       />,
     );
 
-    expect(screen.getByText("Thôn 2, xã Trà Linh")).toBeVisible();
+    expect(screen.getByText(/Xã Trà Linh, thành phố Đà Nẵng/)).toBeVisible();
     expect(screen.getByRole("link", { name: /quyền riêng tư/i })).toHaveAttribute(
       "href",
       "/quyen-rieng",

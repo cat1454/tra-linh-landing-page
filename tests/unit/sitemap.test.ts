@@ -14,6 +14,13 @@ vi.mock("@/components/detail/seo", () => ({
 }));
 
 import sitemap from "@/app/sitemap";
+import { tourismEvents } from "@/data/tourism-map/events";
+import { tourismPlaces } from "@/data/tourism-map/places";
+import { getAllTourismEntities } from "@/lib/tourism-map";
+
+const tourismUrls = getAllTourismEntities(tourismPlaces, tourismEvents).map(
+  (entity) => `https://tralinh.example/dia-diem/${entity.slug}`,
+);
 
 describe("public sitemap", () => {
   beforeEach(() => {
@@ -28,6 +35,7 @@ describe("public sitemap", () => {
 
     expect(entries.map((entry) => entry.url)).toEqual([
       "https://tralinh.example/",
+      "https://tralinh.example/ban-do-du-lich",
       "https://tralinh.example/chinh-sach-quyen-rieng",
       "https://tralinh.example/hanh-trinh/trekking-duoi-tan-rung",
       "https://tralinh.example/hanh-trinh/ban-lang-trong-suong",
@@ -35,6 +43,7 @@ describe("public sitemap", () => {
       "https://tralinh.example/cam-nang/duong-den-tra-linh",
       "https://tralinh.example/cam-nang/thoi-diem-goi-y",
       "https://tralinh.example/cam-nang/luu-y-khi-vao-rung",
+      ...tourismUrls,
     ]);
     expect(entries.some((entry) => entry.url.includes("/san-vat/"))).toBe(false);
   });
@@ -54,10 +63,12 @@ describe("public sitemap", () => {
 
     expect(entries.map((entry) => entry.url)).toEqual([
       "https://tralinh.example/",
+      "https://tralinh.example/ban-do-du-lich",
       "https://tralinh.example/chinh-sach-quyen-rieng",
       "https://tralinh.example/hanh-trinh/trekking-duoi-tan-rung",
       "https://tralinh.example/san-vat/sam-ngoc-linh",
       "https://tralinh.example/cam-nang/duong-den-tra-linh",
+      ...tourismUrls,
     ]);
   });
 });
