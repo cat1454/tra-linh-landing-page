@@ -3,7 +3,6 @@
 body:has([data-admin-root]) {
   padding-bottom: 0;
 }
-
 body:has([data-admin-root]) .public-site-chrome {
   display: none;
 }

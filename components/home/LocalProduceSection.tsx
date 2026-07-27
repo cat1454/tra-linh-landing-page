@@ -34,8 +34,8 @@ export function LocalProduceSection({ items, section }: LocalProduceSectionProps
 
   if (!items.length) return null;
 
-  const filteredItems = activeCategory === "all" 
-    ? items 
+  const filteredItems = activeCategory === "all"
+    ? items
     : items.filter(item => item.category === activeCategory);
 
   return (
@@ -78,7 +78,7 @@ export function LocalProduceSection({ items, section }: LocalProduceSectionProps
         </ScrollReveal>
 
         {/* Grid List */}
-        <motion.div 
+        <motion.div
           layout
           className="mt-8 grid gap-6 sm:grid-cols-2 lg:mt-10 lg:grid-cols-3"
         >
