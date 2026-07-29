@@ -195,6 +195,8 @@ Không đưa secret token vào biến `NEXT_PUBLIC_*`. Ứng dụng chỉ chấp
 
 ## 11. Vận hành CMS
 
+Hướng dẫn thao tác dành cho người cập nhật nội dung được viết riêng tại [docs/ADMIN_GUIDE.md](docs/ADMIN_GUIDE.md). Phần dưới đây dành cho người quản trị kỹ thuật.
+
 ### Đăng nhập
 
 1. Mở `/admin/login`.
@@ -209,6 +211,8 @@ Không đưa secret token vào biến `NEXT_PUBLIC_*`. Ứng dụng chỉ chấp
 - `published`: có thể hiển thị công khai nếu thỏa guard của schema.
 
 Nội dung placeholder hoặc thiếu metadata nguồn/quyền sử dụng không được tự động coi là nội dung đã xác minh. Sau khi publish, kiểm tra lại trang công khai và metadata SEO.
+
+Backend xử lý cập nhật theo từng trường: chỉ những trường có trong biểu mẫu gửi lên mới được ghi vào Supabase. Các trường không gửi giữ nguyên giá trị hiện tại; dữ liệu sai định dạng bị từ chối trước khi thực hiện truy vấn cập nhật.
 
 ### Thêm hoặc thu hồi người dùng
 
