@@ -29,15 +29,11 @@ describe("public shell", () => {
     expect(
       screen.getByRole("link", { name: "quangnh3@danang.gov.vn" }),
     ).toHaveAttribute("href", "mailto:quangnh3@danang.gov.vn");
-    expect(
-      screen.getByText("Công trình Chuyển đổi số du lịch"),
-    ).toBeVisible();
-    expect(
-      screen.getByText(/do Trường Đại học Bách khoa.*hỗ trợ triển khai/i),
-    ).toBeVisible();
-    expect(screen.getByText("trong Chiến dịch Mùa hè Xanh 2026")).toHaveClass(
-      "block",
+    expect(screen.getByTestId("footer-project-credit")).toHaveTextContent(
+      "Công trình Chuyển đổi số du lịch do Trường Đại học Bách khoa - Đại học Đà Nẵng hỗ trợ triển khai trong Chiến dịch Mùa hè Xanh 2026",
     );
+    expect(screen.getByTestId("footer-project-credit").querySelectorAll("span"))
+      .toHaveLength(0);
     expect(
       screen.queryByText(/Thông tin hành trình cần được xác nhận/i),
     ).not.toBeInTheDocument();

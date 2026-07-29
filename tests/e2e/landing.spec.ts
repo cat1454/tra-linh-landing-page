@@ -69,6 +69,22 @@ for (const width of [375, 390]) {
   })
 }
 
+test('mobile footer keeps the project credit as one readable paragraph', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/')
+
+  const credit = page.getByTestId('footer-project-credit')
+  await credit.scrollIntoViewIfNeeded()
+  await expect(credit).toContainText(
+    'hỗ trợ triển khai trong Chiến dịch Mùa hè Xanh 2026',
+  )
+  const lineCount = await credit.evaluate((element) => {
+    const style = getComputedStyle(element)
+    return element.getBoundingClientRect().height / Number.parseFloat(style.lineHeight)
+  })
+  expect(lineCount).toBeLessThanOrEqual(5)
+})
+
 test('hero loads its configured video and falls back to the poster for reduced motion', async ({
   page,
 }, testInfo) => {

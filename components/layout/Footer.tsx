@@ -192,10 +192,11 @@ export function Footer({
               <span aria-hidden="true" className="hidden sm:inline"> · </span>
               <span className="block sm:inline">{address}</span>
             </p>
-            <p className="max-w-2xl text-xs leading-6 text-[#EEF1E9]/50 md:justify-self-end md:text-right md:text-[11px] md:leading-5">
-              <span className="block sm:inline">Công trình Chuyển đổi số du lịch</span>{' '}
-              <span className="block sm:inline">do Trường Đại học Bách khoa - Đại học Đà Nẵng hỗ trợ triển khai</span>
-              <span className="block">trong Chiến dịch Mùa hè Xanh 2026</span>
+            <p
+              data-testid="footer-project-credit"
+              className="max-w-2xl text-pretty text-xs leading-5 text-[#EEF1E9]/55 md:justify-self-end md:text-right md:text-[11px]"
+            >
+              Công trình Chuyển đổi số du lịch do Trường Đại học Bách khoa - Đại học Đà Nẵng hỗ trợ triển khai trong Chiến dịch Mùa hè Xanh 2026
             </p>
           </div>
         </div>
