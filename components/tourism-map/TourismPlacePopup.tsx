@@ -1,11 +1,11 @@
 import { ExternalLink, Navigation } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 
 import { getTourismCategoryLabel } from "@/data/tourism-map/categories";
 import type { TourismPlace } from "@/data/tourism-map/types";
-import { TOURISM_PLACEHOLDER_IMAGE } from "@/data/tourism-map/media";
 import { getPlaceDirectionsUrl, hasVerifiedCoordinates } from "@/lib/tourism-map";
+
+import { TourismPlaceVisual } from "./TourismPlaceVisual";
 
 const accessLabels: Record<TourismPlace["visitorAccess"], string> = {
   public: "Có thể tiếp cận công khai",
@@ -18,17 +18,10 @@ const accessLabels: Record<TourismPlace["visitorAccess"], string> = {
 
 export function TourismPlacePopup({ place }: { place: TourismPlace }) {
   const directionsUrl = getPlaceDirectionsUrl(place);
-  const imageSrc = place.coverImage ?? TOURISM_PLACEHOLDER_IMAGE;
   return (
     <article className="w-[min(280px,calc(100vw-64px))] overflow-hidden rounded-2xl bg-white text-[#10251A]">
       <div className="relative h-28 bg-[#DDE5D5]">
-        <Image
-          src={imageSrc}
-          alt={place.imageAlt}
-          fill
-          sizes="280px"
-          className="object-cover"
-        />
+        <TourismPlaceVisual place={place} sizes="280px" />
       </div>
       <div className="p-4">
         <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#49672D]">

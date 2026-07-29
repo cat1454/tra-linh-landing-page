@@ -17,7 +17,7 @@ export const tourismCategories: TourismCategory[] = [
   { key: "all", label: "Tất cả", shortLabel: "Tất cả", color: "#29452C" },
   { key: "ginseng", label: "Sâm & dược liệu", shortLabel: "Sâm", color: TOURISM_CATEGORY_COLORS.ginseng },
   { key: "culture", label: "Văn hóa", shortLabel: "Văn hóa", color: TOURISM_CATEGORY_COLORS.culture },
-  { key: "community", label: "Cộng đồng", shortLabel: "Cộng đồng", color: TOURISM_CATEGORY_COLORS.community },
+  { key: "community", label: "Cơ sở lưu trú", shortLabel: "Lưu trú", color: TOURISM_CATEGORY_COLORS.community },
   { key: "nature", label: "Thiên nhiên", shortLabel: "Thiên nhiên", color: TOURISM_CATEGORY_COLORS.nature },
   { key: "shopping", label: "Chợ & đặc sản", shortLabel: "Chợ", color: TOURISM_CATEGORY_COLORS.shopping },
   { key: "administrative", label: "Dịch vụ công", shortLabel: "Dịch vụ", color: TOURISM_CATEGORY_COLORS.administrative },
@@ -34,7 +34,7 @@ export const tourismExplorerCategories: TourismExplorerCategoryOption[] = [
   },
   {
     key: "culture_community",
-    label: "Văn hóa & cộng đồng",
+    label: "Văn hóa & cơ sở lưu trú",
     shortLabel: "Văn hóa",
     color: TOURISM_CATEGORY_COLORS.culture,
   },

@@ -31,16 +31,28 @@ function lines(raw: string) {
 
 function common(formData: FormData) {
   return {
-    image_url: url.parse(value(formData, "image_url")) || null,
-    media_asset_id: uuidOrEmpty.parse(value(formData, "media_asset_id")) || null,
-    alt_text: value(formData, "alt_text") || null,
-    source_url: url.parse(value(formData, "source_url")) || null,
-    source_credit: value(formData, "source_credit") || null,
-    usage_permission: z.enum([
-      "client_confirmed",
-      "official_publication",
-      "pending",
-    ]).catch("client_confirmed").parse(value(formData, "usage_permission")),
+    ...(formData.has("image_url") ? {
+      image_url: url.parse(value(formData, "image_url")) || null,
+    } : {}),
+    ...(formData.has("media_asset_id") ? {
+      media_asset_id: uuidOrEmpty.parse(value(formData, "media_asset_id")) || null,
+    } : {}),
+    ...(formData.has("alt_text") ? {
+      alt_text: value(formData, "alt_text") || null,
+    } : {}),
+    ...(formData.has("source_url") ? {
+      source_url: url.parse(value(formData, "source_url")) || null,
+    } : {}),
+    ...(formData.has("source_credit") ? {
+      source_credit: value(formData, "source_credit") || null,
+    } : {}),
+    ...(formData.has("usage_permission") ? {
+      usage_permission: z.enum([
+        "client_confirmed",
+        "official_publication",
+        "pending",
+      ]).catch("client_confirmed").parse(value(formData, "usage_permission")),
+    } : {}),
   };
 }
 
@@ -97,125 +109,125 @@ export function buildAdminUpdatePayload(
 
   if (table === "media_assets") {
     return {
-      title: title.parse(formData.get("title")),
-      alt_text: z.string().trim().min(5).max(300).parse(formData.get("alt_text")),
-      section: value(formData, "section") || null,
-      source_url: url.parse(value(formData, "source_url")) || null,
-      source_credit: value(formData, "source_credit") || null,
-      usage_permission: z.enum([
+      ...(formData.has("title") ? { title: title.parse(value(formData, "title")) } : {}),
+      ...(formData.has("alt_text") ? { alt_text: z.string().trim().min(5).max(300).parse(value(formData, "alt_text")) } : {}),
+      ...(formData.has("section") ? { section: value(formData, "section") || null } : {}),
+      ...(formData.has("source_url") ? { source_url: url.parse(value(formData, "source_url")) || null } : {}),
+      ...(formData.has("source_credit") ? { source_credit: value(formData, "source_credit") || null } : {}),
+      ...(formData.has("usage_permission") ? { usage_permission: z.enum([
         "client_confirmed",
         "official_publication",
         "pending",
-      ]).parse(formData.get("usage_permission")),
-      poster_asset_id:
-        uuidOrEmpty.parse(value(formData, "poster_asset_id")) || null,
+      ]).parse(formData.get("usage_permission")) } : {}),
+      ...(formData.has("poster_asset_id") ? { poster_asset_id:
+        uuidOrEmpty.parse(value(formData, "poster_asset_id")) || null } : {}),
     };
   }
 
-  const recordTitle = title.parse(formData.get("title"));
-  const recordDescription = description.parse(formData.get("description"));
   const shared = common(formData);
 
   if (table === "hero_slides") {
     return {
       ...shared,
-      eyebrow: value(formData, "eyebrow") || null,
-      title: recordTitle,
-      description: recordDescription,
-      cta_label: value(formData, "cta_label") || null,
-      cta_href: url.parse(value(formData, "cta_href")) || null,
+      ...(formData.has("eyebrow") ? { eyebrow: value(formData, "eyebrow") || null } : {}),
+      ...(formData.has("title") ? { title: title.parse(value(formData, "title")) } : {}),
+      ...(formData.has("description") ? { description: description.parse(value(formData, "description")) } : {}),
+      ...(formData.has("cta_label") ? { cta_label: value(formData, "cta_label") || null } : {}),
+      ...(formData.has("cta_href") ? { cta_href: url.parse(value(formData, "cta_href")) || null } : {}),
     };
   }
   if (table === "stories") {
     return {
       ...shared,
-      eyebrow: value(formData, "eyebrow") || null,
-      title: recordTitle,
-      description: recordDescription,
-      body: lines(value(formData, "body") || recordDescription),
-      quote: value(formData, "quote") || null,
+      ...(formData.has("eyebrow") ? { eyebrow: value(formData, "eyebrow") || null } : {}),
+      ...(formData.has("title") ? { title: title.parse(value(formData, "title")) } : {}),
+      ...(formData.has("description") ? { description: description.parse(value(formData, "description")) } : {}),
+      ...(formData.has("body") ? { body: lines(value(formData, "body")) } : {}),
+      ...(formData.has("quote") ? { quote: value(formData, "quote") || null } : {}),
     };
   }
   if (table === "journeys") {
-    const accessStatus = z.enum([
-      "open",
-      "contact_required",
-      "organized_only",
-    ]).parse(formData.get("access_status"));
+    const accessStatus = formData.has("access_status")
+      ? z.enum(["open", "contact_required", "organized_only"])
+        .parse(formData.get("access_status"))
+      : undefined;
     return {
       ...shared,
-      title: recordTitle,
-      slug: slug.parse(value(formData, "slug")),
-      category: z.enum(["nature", "community", "heritage", "ginseng"])
-        .parse(formData.get("category")),
-      short_description: recordDescription,
-      body: lines(value(formData, "body") || recordDescription),
-      location_label: value(formData, "location_label") || null,
-      duration_label: value(formData, "duration_label") || null,
-      access_note: value(formData, "access_note") || null,
-      safety_note: value(formData, "safety_note") || null,
-      highlights: lines(value(formData, "highlights")),
-      access_status: accessStatus,
-      contact_required: accessStatus !== "open",
+      ...(formData.has("title") ? { title: title.parse(value(formData, "title")) } : {}),
+      ...(formData.has("slug") ? { slug: slug.parse(value(formData, "slug")) } : {}),
+      ...(formData.has("category") ? { category: z.enum(["nature", "community", "heritage", "ginseng"])
+        .parse(formData.get("category")) } : {}),
+      ...(formData.has("description") ? { short_description: description.parse(value(formData, "description")) } : {}),
+      ...(formData.has("body") ? { body: lines(value(formData, "body")) } : {}),
+      ...(formData.has("location_label") ? { location_label: value(formData, "location_label") || null } : {}),
+      ...(formData.has("duration_label") ? { duration_label: value(formData, "duration_label") || null } : {}),
+      ...(formData.has("access_note") ? { access_note: value(formData, "access_note") || null } : {}),
+      ...(formData.has("safety_note") ? { safety_note: value(formData, "safety_note") || null } : {}),
+      ...(formData.has("highlights") ? { highlights: lines(value(formData, "highlights")) } : {}),
+      ...(accessStatus ? {
+        access_status: accessStatus,
+        contact_required: accessStatus !== "open",
+      } : {}),
     };
   }
   if (table === "ginseng_story_steps") {
     return {
       ...shared,
-      title: recordTitle,
-      description: recordDescription,
-      step_number: z.coerce.number().int().min(1).parse(formData.get("step_number")),
-      quote: value(formData, "quote") || null,
+      ...(formData.has("title") ? { title: title.parse(value(formData, "title")) } : {}),
+      ...(formData.has("description") ? { description: description.parse(value(formData, "description")) } : {}),
+      ...(formData.has("step_number") ? { step_number: z.coerce.number().int().min(1).parse(formData.get("step_number")) } : {}),
+      ...(formData.has("quote") ? { quote: value(formData, "quote") || null } : {}),
     };
   }
   if (table === "culture_stories") {
     return {
       ...shared,
-      title: recordTitle,
-      description: recordDescription,
-      caption: value(formData, "caption") || null,
+      ...(formData.has("title") ? { title: title.parse(value(formData, "title")) } : {}),
+      ...(formData.has("description") ? { description: description.parse(value(formData, "description")) } : {}),
+      ...(formData.has("caption") ? { caption: value(formData, "caption") || null } : {}),
     };
   }
   if (table === "local_products") {
     return {
       ...shared,
-      name: recordTitle,
-      slug: slug.parse(value(formData, "slug")),
-      category: z.enum(["am-thuc", "duoc-lieu", "nong-san"])
-        .parse(formData.get("category")),
-      description: recordDescription,
-      origin_note: value(formData, "origin_note") || null,
+      ...(formData.has("title") ? { name: title.parse(value(formData, "title")) } : {}),
+      ...(formData.has("slug") ? { slug: slug.parse(value(formData, "slug")) } : {}),
+      ...(formData.has("category") ? { category: z.enum(["am-thuc", "duoc-lieu", "nong-san"])
+        .parse(formData.get("category")) } : {}),
+      ...(formData.has("description") ? { description: description.parse(value(formData, "description")) } : {}),
+      ...(formData.has("origin_note") ? { origin_note: value(formData, "origin_note") || null } : {}),
     };
   }
   if (table === "ginseng_products") {
     return {
       ...shared,
-      name: recordTitle,
-      slug: slug.parse(value(formData, "slug")),
-      product_type: z.enum(["fresh-ginseng", "dried-ginseng", "herbal-tea"])
-        .parse(formData.get("product_type")),
-      short_description: recordDescription,
-      contact_url: url.parse(value(formData, "contact_url")) || null,
-      origin_note: value(formData, "origin_note") || null,
-      legal_disclaimer:
+      ...(formData.has("title") ? { name: title.parse(value(formData, "title")) } : {}),
+      ...(formData.has("slug") ? { slug: slug.parse(value(formData, "slug")) } : {}),
+      ...(formData.has("product_type") ? { product_type: z.enum(["fresh-ginseng", "dried-ginseng", "herbal-tea"])
+        .parse(formData.get("product_type")) } : {}),
+      ...(formData.has("description") ? { short_description: description.parse(value(formData, "description")) } : {}),
+      ...(formData.has("contact_url") ? { contact_url: url.parse(value(formData, "contact_url")) || null } : {}),
+      ...(formData.has("origin_note") ? { origin_note: value(formData, "origin_note") || null } : {}),
+      ...(formData.has("legal_disclaimer") ? { legal_disclaimer:
         value(formData, "legal_disclaimer") ||
         "Nội dung giới thiệu, không thay thế tư vấn chuyên môn.",
+      } : {}),
     };
   }
   if (table === "travel_guides") {
     return {
       ...shared,
-      title: recordTitle,
-      slug: slug.parse(value(formData, "slug")),
-      category: value(formData, "category") || "Cẩm nang",
-      excerpt: recordDescription,
-      body: lines(value(formData, "body") || recordDescription),
-      read_time_label: value(formData, "read_time_label") || null,
-      season_label: value(formData, "season_label") || null,
-      sections: lines(value(formData, "sections")).map((body, index) => ({
+      ...(formData.has("title") ? { title: title.parse(value(formData, "title")) } : {}),
+      ...(formData.has("slug") ? { slug: slug.parse(value(formData, "slug")) } : {}),
+      ...(formData.has("category") ? { category: value(formData, "category") || "Cẩm nang" } : {}),
+      ...(formData.has("description") ? { excerpt: description.parse(value(formData, "description")) } : {}),
+      ...(formData.has("body") ? { body: lines(value(formData, "body")) } : {}),
+      ...(formData.has("read_time_label") ? { read_time_label: value(formData, "read_time_label") || null } : {}),
+      ...(formData.has("season_label") ? { season_label: value(formData, "season_label") || null } : {}),
+      ...(formData.has("sections") ? { sections: lines(value(formData, "sections")).map((body, index) => ({
         title: `Phần ${index + 1}`,
         body,
-      })),
+      })) } : {}),
     };
   }
   return {};

@@ -168,7 +168,7 @@ test("keeps the place list usable when Mapbox credentials are absent", async ({ 
   ).toBeVisible();
 });
 
-test("place detail uses verified coordinates and trusted local media", async ({ page }) => {
+test("place detail uses verified coordinates and category artwork for contextual media", async ({ page }) => {
   const retiredRequests: string[] = [];
   page.on("request", (request) => {
     if (retiredImageHosts.some((host) => request.url().includes(host))) {
@@ -185,12 +185,48 @@ test("place detail uses verified coordinates and trusted local media", async ({ 
   const directionsLink = page.getByRole("link", {
     name: "Chỉ đường đến Trạm Dược liệu Trà Linh bằng Google Maps",
   });
-  const href = await directionsLink.getAttribute("href");
-  expect(href).toContain("destination=15.0352%2C108.0205");
-  expect(href).toContain("dir_action=navigate");
-  expect(href).not.toContain("origin=");
+  await expect(directionsLink).toHaveAttribute(
+    "href",
+    "https://maps.app.goo.gl/L52kCvrGj4rrbmin6",
+  );
+  await expect(page.getByTestId("tourism-category-artwork")).toHaveAttribute(
+    "data-category",
+    "ginseng",
+  );
+  await expect(
+    page.getByRole("img", { name: "Khu làm việc của Trạm Dược liệu Trà Linh" }),
+  ).toHaveCount(0);
   await expectVisibleImagesToLoad(page);
   expect(retiredRequests).toEqual([]);
+});
+
+test("place detail keeps a documentary cover as destination imagery", async ({ page }) => {
+  await page.goto("/dia-diem/diem-du-lich-vuon-sam-ngoc-linh-tak-ngo", {
+    waitUntil: "domcontentloaded",
+  });
+
+  await expect(
+    page.getByRole("img", {
+      name: "Sâm Ngọc Linh sinh trưởng dưới tán rừng tại vùng cao Trà Linh",
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(page.getByTestId("tourism-category-artwork")).toHaveCount(0);
+});
+
+test("place detail disables directions when Google Maps has no confirmed listing", async ({
+  page,
+}) => {
+  await page.goto("/dia-diem/lang-ty-phu", {
+    waitUntil: "domcontentloaded",
+  });
+
+  await expect(
+    page.getByRole("button", { name: "Chỉ đường đang cập nhật" }),
+  ).toBeDisabled();
+  await expect(
+    page.getByRole("link", { name: /Chỉ đường đến Làng Tỷ phú/i }),
+  ).toHaveCount(0);
 });
 
 for (const viewport of [

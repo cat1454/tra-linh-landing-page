@@ -26,8 +26,10 @@ export default defineConfig({
         'components/tourism-map/TourismMapPointMarker.tsx',
         'components/tourism-map/TourismPlaceIntakeForm.tsx',
         'lib/tourism-image-crawler.ts',
+        'lib/tourism-image-pipeline.ts',
         'lib/tourism-map-basemap.ts',
         'lib/tourism-map-intake.ts',
+        'lib/tourism-map-quality.ts',
       ],
       thresholds: {
         branches: 80,

@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { Footer } from "@/components/layout/Footer";
 import { MobileStickyCta } from "@/components/layout/MobileStickyCta";
+import { FACEBOOK_PAGE_URL } from "@/lib/site-links";
 
 describe("public shell", () => {
   it("uses real informational links without a dead newsletter CTA", () => {
@@ -14,7 +15,32 @@ describe("public shell", () => {
       "href",
       "/chinh-sach-quyen-rieng",
     );
-    expect(screen.getByText(/trang giới thiệu độc lập/i)).toBeVisible();
+    expect(screen.getAllByText(/Ủy ban nhân dân xã Trà Linh/i)).not.toHaveLength(0);
+    expect(screen.getByText("Liên hệ", { selector: "p" })).toBeVisible();
+    expect(screen.queryByText(/Đầu mối liên hệ/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/Ông Nguyễn Hữu Quang/i)).toBeVisible();
+    expect(screen.getByRole("link", { name: "037.667.1456" })).toHaveAttribute(
+      "href",
+      "tel:0376671456",
+    );
+    expect(
+      screen.getByRole("link", { name: "tralinh.namtramy@danang.gov.vn" }),
+    ).toHaveAttribute("href", "mailto:tralinh.namtramy@danang.gov.vn");
+    expect(
+      screen.getByRole("link", { name: "quangnh3@danang.gov.vn" }),
+    ).toHaveAttribute("href", "mailto:quangnh3@danang.gov.vn");
+    expect(
+      screen.getByText("Công trình Chuyển đổi số du lịch"),
+    ).toBeVisible();
+    expect(
+      screen.getByText(/do Trường Đại học Bách khoa.*hỗ trợ triển khai/i),
+    ).toBeVisible();
+    expect(screen.getByText("trong Chiến dịch Mùa hè Xanh 2026")).toHaveClass(
+      "block",
+    );
+    expect(
+      screen.queryByText(/Thông tin hành trình cần được xác nhận/i),
+    ).not.toBeInTheDocument();
   });
 
   it("offers mobile directions and contact without inventing phone or Zalo", () => {
@@ -55,6 +81,14 @@ describe("public shell", () => {
     );
   });
 
+  it("links the footer to the configured Facebook fanpage", () => {
+    render(<Footer facebookUrl={FACEBOOK_PAGE_URL} />);
+
+    expect(
+      screen.getByRole("link", { name: /Fanpage Xứ sở Sâm Ngọc Linh/i }),
+    ).toHaveAttribute("href", FACEBOOK_PAGE_URL);
+  });
+
   it("uses the editable address and privacy link in the public footer", () => {
     render(
       <Footer
@@ -63,7 +97,9 @@ describe("public shell", () => {
       />,
     );
 
-    expect(screen.getByText(/Xã Trà Linh, thành phố Đà Nẵng/)).toBeVisible();
+    expect(
+      screen.getAllByText(/Xã Trà Linh, thành phố Đà Nẵng/),
+    ).not.toHaveLength(0);
     expect(screen.getByRole("link", { name: /quyền riêng tư/i })).toHaveAttribute(
       "href",
       "/quyen-rieng",

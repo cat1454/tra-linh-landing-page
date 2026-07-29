@@ -1,6 +1,9 @@
 import { tourismEvents } from "@/data/tourism-map/events";
 import { tourismPlaces } from "@/data/tourism-map/places";
-import { getAllTourismEntities } from "@/lib/tourism-map";
+import {
+  getAllTourismEntities,
+  getTourismViewportEntities,
+} from "@/lib/tourism-map";
 import type { TourismMapMode } from "@/data/tourism-map/types";
 import { TourismMapLoader } from "./TourismMapLoader";
 
@@ -16,7 +19,7 @@ export function TourismMapSection({
   const allEntities = getAllTourismEntities(tourismPlaces, tourismEvents);
   const entities =
     mode === "preview"
-      ? allEntities
+      ? getTourismViewportEntities(allEntities, "all")
       : allEntities;
   const Heading = mode === "explorer" ? "h1" : "h2";
 

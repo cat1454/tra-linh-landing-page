@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState, type ComponentPropsWithoutRef } from 'react'
+import { useActionState, useEffect, useRef, type ComponentPropsWithoutRef } from 'react'
 import clsx from 'clsx'
 
 import {
@@ -30,6 +30,25 @@ export function ContactForm({
     INITIAL_PUBLIC_FORM_STATE,
   )
   const availabilityMessage = state.message || statusMessage
+  const formRef = useRef<HTMLFormElement>(null)
+
+  useEffect(() => {
+    if (isPending) return
+
+    if (state.status === 'success') {
+      formRef.current?.reset()
+      return
+    }
+
+    if (state.status !== 'error') return
+    const firstInvalidField = Object.keys(state.fieldErrors ?? {})[0]
+    const field = firstInvalidField
+      ? formRef.current?.querySelector<HTMLElement>(`[name="${firstInvalidField}"]`)
+      : null
+    field?.focus()
+  }, [isPending, state])
+
+  const fieldError = (name: string) => state.fieldErrors?.[name]?.[0]
 
   if (!isEnabled) {
     return (
@@ -59,8 +78,11 @@ export function ContactForm({
   return (
     <form
       {...formProps}
+      ref={formRef}
       action={formAction}
       className={clsx('contact-form space-y-5', className)}
+      aria-label="Biểu mẫu liên hệ Trà Linh"
+      aria-busy={isPending}
       aria-describedby={availabilityMessage ? 'contact-form-status' : undefined}
     >
       <div className="contact-form__heading">
@@ -73,7 +95,7 @@ export function ContactForm({
         </p>
       </div>
 
-      <fieldset className="contact-form__fields space-y-4">
+      <fieldset disabled={isPending} className="contact-form__fields space-y-4 disabled:opacity-70">
         <legend className="sr-only">Thông tin liên hệ</legend>
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="contact-form__field grid gap-2 text-sm font-medium text-[#10251A]">
@@ -85,9 +107,11 @@ export function ContactForm({
               required
               minLength={2}
               maxLength={80}
+              aria-invalid={Boolean(fieldError('name'))}
+              aria-describedby={fieldError('name') ? 'contact-name-error' : undefined}
               className="min-h-12 rounded-xl border border-[#10251A]/15 bg-white px-4 text-base font-normal outline-none transition focus:border-[#5E7F3B] focus:ring-2 focus:ring-[#5E7F3B]/20"
             />
-            {state.fieldErrors?.name ? <span className="text-xs font-normal text-red-700">{state.fieldErrors.name[0]}</span> : null}
+            {fieldError('name') ? <span id="contact-name-error" className="text-xs font-normal text-red-700">{fieldError('name')}</span> : null}
           </label>
           <label className="contact-form__field grid gap-2 text-sm font-medium text-[#10251A]">
             Số điện thoại
@@ -98,9 +122,11 @@ export function ContactForm({
               autoComplete="tel"
               required
               maxLength={30}
+              aria-invalid={Boolean(fieldError('phone'))}
+              aria-describedby={fieldError('phone') ? 'contact-phone-error' : undefined}
               className="min-h-12 rounded-xl border border-[#10251A]/15 bg-white px-4 text-base font-normal outline-none transition focus:border-[#5E7F3B] focus:ring-2 focus:ring-[#5E7F3B]/20"
             />
-            {state.fieldErrors?.phone ? <span className="text-xs font-normal text-red-700">{state.fieldErrors.phone[0]}</span> : null}
+            {fieldError('phone') ? <span id="contact-phone-error" className="text-xs font-normal text-red-700">{fieldError('phone')}</span> : null}
           </label>
         </div>
 
@@ -112,9 +138,11 @@ export function ContactForm({
             autoComplete="email"
             required
             maxLength={254}
+            aria-invalid={Boolean(fieldError('email'))}
+            aria-describedby={fieldError('email') ? 'contact-email-error' : undefined}
             className="min-h-12 rounded-xl border border-[#10251A]/15 bg-white px-4 text-base font-normal outline-none transition focus:border-[#5E7F3B] focus:ring-2 focus:ring-[#5E7F3B]/20"
           />
-          {state.fieldErrors?.email ? <span className="text-xs font-normal text-red-700">{state.fieldErrors.email[0]}</span> : null}
+          {fieldError('email') ? <span id="contact-email-error" className="text-xs font-normal text-red-700">{fieldError('email')}</span> : null}
         </label>
 
         <label className="contact-form__field grid gap-2 text-sm font-medium text-[#10251A]">
@@ -123,6 +151,8 @@ export function ContactForm({
             name="interest"
             defaultValue="journey"
             required
+            aria-invalid={Boolean(fieldError('interest'))}
+            aria-describedby={fieldError('interest') ? 'contact-interest-error' : undefined}
             className="min-h-12 rounded-xl border border-[#10251A]/15 bg-white px-4 text-base font-normal outline-none transition focus:border-[#5E7F3B] focus:ring-2 focus:ring-[#5E7F3B]/20"
           >
             <option value="journey">Hành trình khám phá</option>
@@ -131,7 +161,7 @@ export function ContactForm({
             <option value="partnership">Kết nối hợp tác</option>
             <option value="other">Nội dung khác</option>
           </select>
-          {state.fieldErrors?.interest ? <span className="text-xs font-normal text-red-700">{state.fieldErrors.interest[0]}</span> : null}
+          {fieldError('interest') ? <span id="contact-interest-error" className="text-xs font-normal text-red-700">{fieldError('interest')}</span> : null}
         </label>
 
         <label className="contact-form__field grid gap-2 text-sm font-medium text-[#10251A]">
@@ -141,10 +171,12 @@ export function ContactForm({
             rows={4}
             required
             minLength={20}
-            maxLength={1500}
+            maxLength={2000}
+            aria-invalid={Boolean(fieldError('message'))}
+            aria-describedby={fieldError('message') ? 'contact-message-error' : undefined}
             className="resize-y rounded-xl border border-[#10251A]/15 bg-white px-4 py-3 text-base font-normal outline-none transition focus:border-[#5E7F3B] focus:ring-2 focus:ring-[#5E7F3B]/20"
           />
-          {state.fieldErrors?.message ? <span className="text-xs font-normal text-red-700">{state.fieldErrors.message[0]}</span> : null}
+          {fieldError('message') ? <span id="contact-message-error" className="text-xs font-normal text-red-700">{fieldError('message')}</span> : null}
         </label>
 
         <label className="contact-form__honeypot absolute -left-[10000px] top-auto size-px overflow-hidden" aria-hidden="true">
@@ -158,6 +190,8 @@ export function ContactForm({
             type="checkbox"
             value="accepted"
             required
+            aria-invalid={Boolean(fieldError('consent'))}
+            aria-describedby={fieldError('consent') ? 'contact-consent-error' : undefined}
             className="mt-1 size-4 shrink-0 accent-[#5E7F3B]"
           />
           <span>
@@ -166,7 +200,7 @@ export function ContactForm({
               chính sách quyền riêng tư
             </a>.
           </span>
-          {state.fieldErrors?.consent ? <span className="sr-only">{state.fieldErrors.consent[0]}</span> : null}
+          {fieldError('consent') ? <span id="contact-consent-error" className="sr-only">{fieldError('consent')}</span> : null}
         </label>
 
         <button
@@ -181,7 +215,7 @@ export function ContactForm({
       {availabilityMessage ? (
         <p
           id="contact-form-status"
-          role="status"
+          role={state.status === 'error' || state.status === 'rate_limited' ? 'alert' : 'status'}
           aria-live="polite"
           className={clsx(
             'contact-form__status text-sm leading-6',

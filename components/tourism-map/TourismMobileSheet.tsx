@@ -1,13 +1,13 @@
 "use client";
 
 import { ArrowUpRight, MapPin, Navigation, X } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 
 import { getTourismCategoryLabel } from "@/data/tourism-map/categories";
-import { TOURISM_PLACEHOLDER_IMAGE } from "@/data/tourism-map/media";
 import type { TourismPlace } from "@/data/tourism-map/types";
 import { getPlaceDirectionsUrl, hasVerifiedCoordinates } from "@/lib/tourism-map";
+
+import { TourismPlaceVisual } from "./TourismPlaceVisual";
 
 interface TourismMobileSheetProps {
   place: TourismPlace | null;
@@ -27,8 +27,6 @@ export function TourismMobileSheet({
     places.findIndex((candidate) => candidate.slug === place.slug),
   );
   const directionsUrl = getPlaceDirectionsUrl(place);
-  const imageSrc = place.coverImage ?? TOURISM_PLACEHOLDER_IMAGE;
-
   return (
     <section
       className="tourism-mobile-sheet absolute inset-x-3 bottom-3 z-20 rounded-[1.5rem] border border-white/70 bg-white/96 p-2 shadow-[0_18px_50px_rgba(16,37,26,0.28)] backdrop-blur lg:hidden"
@@ -53,13 +51,7 @@ export function TourismMobileSheet({
 
       <div className="grid grid-cols-1 gap-2 px-1 pb-1.5 min-[360px]:grid-cols-[80px_minmax(0,1fr)] min-[360px]:gap-3">
         <div className="relative hidden h-20 overflow-hidden rounded-2xl bg-[#DDE5D5] min-[360px]:block">
-          <Image
-            src={imageSrc}
-            alt={place.imageAlt}
-            fill
-            sizes="80px"
-            className="object-cover"
-          />
+          <TourismPlaceVisual place={place} sizes="80px" />
         </div>
 
         <div className="min-w-0">

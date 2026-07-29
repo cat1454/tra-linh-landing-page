@@ -473,12 +473,10 @@ export async function updateContentItemAction(formData: FormData): Promise<never
     };
   }
 
-  if (formData.has("title") || formData.has("site_name")) {
-    try {
-      payload = { ...payload, ...buildAdminUpdatePayload(formData, table) };
-    } catch {
-      adminRedirect(table, "error", "invalid-update", idResult.data);
-    }
+  try {
+    payload = { ...payload, ...buildAdminUpdatePayload(formData, table) };
+  } catch {
+    adminRedirect(table, "error", "invalid-update", idResult.data);
   }
 
   const { error } = await supabase

@@ -5,6 +5,10 @@ import type {
   TourismFilterKey,
   TourismPlace,
 } from "@/data/tourism-map/types";
+import {
+  areTourismEntitiesRelated,
+  normalizeTourismIdentity,
+} from "@/lib/tourism-map-quality";
 
 export interface TourismFeatureProperties {
   slug: string;
@@ -20,9 +24,21 @@ export function getAllTourismEntities(
   places: TourismPlace[],
   events: TourismPlace[],
 ): TourismPlace[] {
+  const displayedByName = new Map<string, TourismPlace[]>();
+
   return [...places, ...events]
     .filter((entity) => entity.published)
-    .sort((left, right) => left.sortOrder - right.sortOrder);
+    .sort((left, right) => left.sortOrder - right.sortOrder)
+    .filter((entity) => {
+      const normalizedName = normalizeTourismIdentity(entity.name);
+      const displayedMatches = displayedByName.get(normalizedName) ?? [];
+      if (displayedMatches.some((displayed) => areTourismEntitiesRelated(displayed, entity))) {
+        return false;
+      }
+
+      displayedByName.set(normalizedName, [...displayedMatches, entity]);
+      return true;
+    });
 }
 
 export function filterTourismEntities(
@@ -94,6 +110,7 @@ export function hasMappableCoordinates(
     Number.isFinite(place.longitude) &&
     place.coordinateStatus !== "missing" &&
     place.coordinateStatus !== "conflicting" &&
+    place.geometryType === "point" &&
     place.entityType !== "recurring_event"
   );
 }
@@ -148,9 +165,22 @@ export function hasVerifiedCoordinates(
 }
 
 export function getPlaceDirectionsUrl(place: TourismPlace): string | null {
-  const destination = hasVerifiedCoordinates(place)
-    ? `${place.latitude},${place.longitude}`
-    : [place.name.trim(), place.currentAddress.trim()].filter(Boolean).join(", ");
+  const candidate = place.googleMapsUrl?.trim();
+  if (!candidate) return null;
 
-  return destination ? buildGoogleMapsDirectionsUrl(destination) : null;
+  try {
+    const url = new URL(candidate);
+    const isShortPlaceLink =
+      url.protocol === "https:" &&
+      url.hostname === "maps.app.goo.gl" &&
+      url.pathname.length > 1;
+    const isFullPlaceLink =
+      url.protocol === "https:" &&
+      (url.hostname === "google.com" || url.hostname === "www.google.com") &&
+      url.pathname.startsWith("/maps/place/");
+
+    return isShortPlaceLink || isFullPlaceLink ? candidate : null;
+  } catch {
+    return null;
+  }
 }

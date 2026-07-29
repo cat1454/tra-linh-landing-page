@@ -2,6 +2,7 @@
 
 import { Volume2, VolumeX } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 import type { MediaAsset } from "@/lib/content/types";
 
@@ -11,6 +12,7 @@ type HeroVideoBackgroundProps = {
   mobilePosterSrc?: string;
   className?: string;
   mediaClassName?: string;
+  soundControlTargetId?: string;
 };
 
 export function HeroVideoBackground({
@@ -19,11 +21,21 @@ export function HeroVideoBackground({
   mobilePosterSrc,
   className = "",
   mediaClassName = "",
+  soundControlTargetId,
 }: HeroVideoBackgroundProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
+  const [soundControlTarget, setSoundControlTarget] = useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (!soundControlTargetId) return;
+    const portalLookup = window.setTimeout(() => {
+      setSoundControlTarget(document.getElementById(soundControlTargetId));
+    }, 0);
+    return () => window.clearTimeout(portalLookup);
+  }, [soundControlTargetId]);
 
   const enableSound = useCallback(async () => {
     const video = videoRef.current;
@@ -149,6 +161,27 @@ export function HeroVideoBackground({
     setIsMuted(true);
   };
 
+  const soundControl = shouldLoadVideo ? (
+    <button
+      type="button"
+      data-hero-sound-control
+      onClick={() => void toggleSound()}
+      aria-label={`${isMuted ? "Bật" : "Tắt"} tiếng video giới thiệu`}
+      className={`z-20 inline-flex min-h-12 w-fit items-center gap-2 whitespace-nowrap rounded-full border px-6 py-3 text-sm font-medium shadow-lg backdrop-blur-md transition-colors focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#EEF1E9] ${
+        soundControlTarget
+          ? isMuted
+            ? "border-[#DDB149] bg-[#DDB149] text-[#10261F] hover:bg-[#EDC35D]"
+            : "border-white/20 bg-[#13261F]/70 text-white/90 hover:border-[#DDB149] hover:text-[#DDB149]"
+          : isMuted
+            ? "absolute bottom-24 left-1/2 -translate-x-1/2 border-[#D5A84E] bg-[#D5A84E] text-[#10251A] hover:bg-[#EEE3CB] sm:bottom-auto sm:left-auto sm:right-8 sm:top-24 sm:translate-x-0 lg:right-16"
+            : "absolute right-5 top-24 border-[#EEF1E9]/35 bg-[#07100C]/72 text-[#EEF1E9] hover:border-[#D5A84E] hover:text-[#D5A84E] sm:right-8 lg:right-16"
+      }`}
+    >
+      {isMuted ? <VolumeX aria-hidden="true" size={18} /> : <Volume2 aria-hidden="true" size={18} />}
+      <span>{isMuted ? "Chạm để bật tiếng" : "Tắt tiếng"}</span>
+    </button>
+  ) : null;
+
   return (
     <>
       <figure className={`overflow-hidden ${className}`.trim()}>
@@ -189,22 +222,9 @@ export function HeroVideoBackground({
         ) : null}
       </figure>
 
-      {shouldLoadVideo ? (
-        <button
-          type="button"
-          data-hero-sound-control
-          onClick={() => void toggleSound()}
-          aria-label={`${isMuted ? "Bật" : "Tắt"} tiếng video giới thiệu`}
-          className={`absolute z-20 inline-flex min-h-11 items-center gap-2 whitespace-nowrap rounded-full border px-4 py-2 text-xs font-semibold shadow-lg backdrop-blur-md transition-colors focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#EEF1E9] ${
-            isMuted
-              ? "bottom-24 left-1/2 -translate-x-1/2 border-[#D5A84E] bg-[#D5A84E] text-[#10251A] hover:bg-[#EEE3CB] sm:bottom-auto sm:left-auto sm:right-8 sm:top-24 sm:translate-x-0 lg:right-16"
-              : "right-5 top-24 border-[#EEF1E9]/35 bg-[#07100C]/72 text-[#EEF1E9] hover:border-[#D5A84E] hover:text-[#D5A84E] sm:right-8 lg:right-16"
-          }`}
-        >
-          {isMuted ? <VolumeX aria-hidden="true" size={17} /> : <Volume2 aria-hidden="true" size={17} />}
-          <span>{isMuted ? "Chạm để bật tiếng" : "Tắt tiếng"}</span>
-        </button>
-      ) : null}
+      {soundControlTarget && soundControl
+        ? createPortal(soundControl, soundControlTarget)
+        : soundControl}
     </>
   );
 }

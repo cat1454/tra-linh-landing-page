@@ -16,6 +16,8 @@ import {
 import { createContentRepository } from "@/lib/content/repository";
 import { isSupabaseAdminConfigured } from "@/lib/supabase/config";
 import { TourismMapSection } from "@/components/tourism-map/TourismMapSection";
+import { FacebookIcon } from "@/components/ui/FacebookIcon";
+import { FACEBOOK_PAGE_URL } from "@/lib/site-links";
 import {
   BRAND_LOGO_PATH,
   DEFAULT_DESCRIPTION,
@@ -110,6 +112,24 @@ export default async function Home() {
             isEnabled={formsEnabled}
             serverAction={submitContactAction}
           />
+          <div className="mt-8 flex flex-col gap-4 border-t border-[#10251A]/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="font-semibold text-[#10251A]">Fanpage Xứ sở Sâm Ngọc Linh</p>
+              <p className="mt-1 text-sm leading-6 text-[#10251A]/65">
+                Theo dõi thông tin và gửi tin nhắn trực tiếp cho chúng tôi.
+              </p>
+            </div>
+            <a
+              href={FACEBOOK_PAGE_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-full border border-[#3D5133]/20 bg-[#3D5133] px-5 font-semibold text-white transition-colors hover:bg-[#2F4027] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3D5133]"
+              aria-label="Nhắn tin qua Fanpage Xứ sở Sâm Ngọc Linh (mở trong tab mới)"
+            >
+              <FacebookIcon className="h-5 w-5" />
+              Nhắn tin qua Fanpage
+            </a>
+          </div>
         </div>
       </div>
     </main>

@@ -1,7 +1,12 @@
-import type { TourismPlace } from "./types";
-import { sanitizeTourismPlaceMedia } from "./media";
+import { completeTourismEntity } from "./entity";
+import {
+  applyApprovedTourismMedia,
+  approvedTourismMediaManifest,
+  sanitizeTourismPlaceMedia,
+} from "./media";
+import type { TourismPlace, TourismPlaceInput } from "./types";
 
-const tourismEventRecords: TourismPlace[] = [
+const tourismEventRecords: TourismPlaceInput[] = [
   {
     id: "event-tra-linh-market",
     slug: "su-kien-cho-phien-tra-linh",
@@ -11,11 +16,13 @@ const tourismEventRecords: TourismPlace[] = [
       "Chợ phiên Trà Linh được tổ chức định kỳ vào thứ Bảy và Chủ nhật tuần đầu tiên mỗi tháng tại khu Nhà văn hóa thôn 2 – Đền thờ Thần Sâm, làng Kon Pin. Chợ phiên là nơi giao thương kết nối giữa vùng cao Trà Linh và du khách, giới thiệu các sản phẩm sâm Ngọc Linh tươi, dược liệu núi rừng, nông sản sạch và đồ thủ công truyền thống của đồng bào Xơ Đăng.",
     category: "shopping",
     entityType: "recurring_event",
+    physicalPlaceId: "physical-kon-pin-cultural-complex",
+    parentPlaceId: "place-tra-linh-market",
     scope: "inside_tra_linh",
     latitude: 15.0372,
     longitude: 108.0215,
-    coordinateStatus: "verified",
-    googleMapsUrl: "https://www.google.com/maps?q=15.0372,108.0215",
+    coordinateStatus: "approximate",
+    googleMapsUrl: null,
     currentAddress:
       "Tổ chức tại khu Nhà văn hóa thôn 2 – Đền thờ Thần Sâm, làng Kon Pin, xã Trà Linh",
     legacyAddress: null,
@@ -47,11 +54,18 @@ const tourismEventRecords: TourismPlace[] = [
       "Phiên chợ Sâm Ngọc Linh diễn ra định kỳ từ ngày 1 đến ngày 3 hàng tháng tại Trung tâm tổ chức sự kiện Sâm Ngọc Linh (thôn 1, Nam Trà My). Đây là thị trường giao dịch sâm Ngọc Linh củ tươi và dược liệu lớn nhất khu vực, thu hút đông đảo thương lái, nhà nghiên cứu và du khách thập phương.",
     category: "shopping",
     entityType: "recurring_event",
+    physicalPlaceId: "physical-ngoc-linh-event-center",
+    parentPlaceId: "place-ngoc-linh-event-center",
     scope: "nearby",
-    latitude: 15.0645,
-    longitude: 108.113,
+    latitude: 15.1670938,
+    longitude: 108.1184889,
     coordinateStatus: "verified",
-    googleMapsUrl: "https://www.google.com/maps?q=15.0645,108.113",
+    precisionMeters: 25,
+    verificationStatus: "verified",
+    verifiedAt: "2026-07-29",
+    verifiedBy: "Google Maps public listing",
+    lastReviewedAt: "2026-07-29",
+    googleMapsUrl: "https://maps.app.goo.gl/zFmqzAvbrsjnPMFr6",
     currentAddress: "Tại Trung tâm tổ chức sự kiện Sâm Ngọc Linh, thôn 1, xã Nam Trà My",
     legacyAddress: "Khu trung tâm Trà Mai, huyện Nam Trà My, tỉnh Quảng Nam",
     coverImage: "/images/tourism-map/ngoc-linh-ginseng-market.webp",
@@ -75,7 +89,10 @@ const tourismEventRecords: TourismPlace[] = [
   },
 ];
 
-export const tourismEvents = tourismEventRecords.map(sanitizeTourismPlaceMedia);
+export const tourismEvents = tourismEventRecords
+  .map(completeTourismEntity)
+  .map((event) => applyApprovedTourismMedia(event, approvedTourismMediaManifest))
+  .map(sanitizeTourismPlaceMedia);
 
 export function getTourismEntities(): TourismPlace[] {
   return [...tourismEvents];

@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -118,6 +118,33 @@ describe("HeroVideoBackground", () => {
     await user.click(soundButton);
     expect(container.querySelector("video")).toHaveProperty("muted", false);
     expect(screen.getByRole("button", { name: "Tắt tiếng video giới thiệu" })).toBeVisible();
+  });
+
+  it("mounts the sound control into the unified hero rail", async () => {
+    stubMediaPreferences();
+    vi.spyOn(window.HTMLMediaElement.prototype, "play").mockResolvedValue();
+    const target = document.createElement("div");
+    target.id = "hero-sound-control";
+    document.body.appendChild(target);
+
+    const { unmount } = render(
+      <HeroVideoBackground
+        src="/videos/tra-linh-hero.mp4"
+        poster={poster}
+        soundControlTargetId="hero-sound-control"
+      />,
+    );
+
+    await waitFor(() => {
+      expect(
+        within(target).getByRole("button", {
+          name: "Tắt tiếng video giới thiệu",
+        }),
+      ).toBeVisible();
+    });
+
+    unmount();
+    target.remove();
   });
 
   it("enables sound on the visitor's first page interaction after mobile autoplay is muted", async () => {

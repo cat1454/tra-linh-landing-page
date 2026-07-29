@@ -9,6 +9,7 @@ import {
 import { createContentRepository } from "@/lib/content/repository";
 import { tourismPlaces } from "@/data/tourism-map/places";
 import { tourismEvents } from "@/data/tourism-map/events";
+import { hasDocumentaryTourismCover } from "@/data/tourism-map/media";
 import { getAllTourismEntities } from "@/lib/tourism-map";
 
 function validLastModified(value: string): Date | undefined {
@@ -70,7 +71,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     url: getAbsoluteUrl(`/dia-diem/${place.slug}`),
     changeFrequency: "monthly" as const,
     priority: 0.7,
-    ...(place.coverImage
+    ...(hasDocumentaryTourismCover(place)
       ? { images: [getAbsoluteUrl(place.coverImage)] }
       : {}),
   }));

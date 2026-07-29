@@ -7,7 +7,9 @@ import { ArrowLeft, Clock, MapPin, Navigation, Ticket } from "lucide-react";
 import { getTourismCategoryLabel } from "@/data/tourism-map/categories";
 import { tourismEvents } from "@/data/tourism-map/events";
 import { tourismPlaces } from "@/data/tourism-map/places";
-import { TOURISM_PLACEHOLDER_IMAGE } from "@/data/tourism-map/media";
+import { hasDocumentaryTourismCover } from "@/data/tourism-map/media";
+import { TourismMediaAttribution } from "@/components/tourism-map/TourismMediaAttribution";
+import { TourismPlaceVisual } from "@/components/tourism-map/TourismPlaceVisual";
 import {
   getAllTourismEntities,
   getPlaceDirectionsUrl,
@@ -32,7 +34,7 @@ export async function generateMetadata({
     title: place.name,
     description: place.shortDescription,
     alternates: { canonical: `/dia-diem/${place.slug}` },
-    ...(place.coverImage
+    ...(hasDocumentaryTourismCover(place)
       ? { openGraph: { images: [{ url: place.coverImage, alt: place.imageAlt }] } }
       : {}),
   };
@@ -134,19 +136,20 @@ export default async function TourismPlacePage({
 
           <figure>
             <div className="relative aspect-[4/3] overflow-hidden rounded-[2rem] bg-[#DDE5D5] shadow-[0_24px_70px_rgba(16,37,26,0.14)]">
-              <Image
-                src={place.coverImage ?? TOURISM_PLACEHOLDER_IMAGE}
-                alt={place.imageAlt}
-                fill
+              <TourismPlaceVisual
+                place={place}
                 priority
                 sizes="(max-width: 1023px) 100vw, 55vw"
-                className="object-cover"
+                variant="hero"
               />
             </div>
             {place.imageStatus !== "ready" ? (
               <figcaption className="mt-3 text-sm text-[#10251A]/60">
                 Ảnh đúng địa điểm đang được bổ sung và xác minh quyền sử dụng.
               </figcaption>
+            ) : null}
+            {hasDocumentaryTourismCover(place) ? (
+              <TourismMediaAttribution place={place} />
             ) : null}
           </figure>
         </div>

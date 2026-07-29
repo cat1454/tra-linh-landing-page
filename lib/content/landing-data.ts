@@ -3,14 +3,14 @@
 // You can easily edit the Vietnamese copy or swap the image paths below.
 
 export const HERO_DATA = {
-  eyebrow: "TRÀ LINH · ĐỈNH NGỌC LINH",
-  title: "Nơi mây ngàn ôm ấp báu vật đất trời",
+  eyebrow: "TRÀ LINH · VÙNG NGỌC LINH",
+  title: "Giữa đại ngàn, một báu vật lớn lên",
   placeName: "Trà Linh",
   description:
-    "Giữa bốn bề sương trắng bao phủ quanh năm, đất rừng nguyên sinh ẩm ướt Ngọc Linh đang ôm lấy và nuôi lớn từng củ sâm quý báu, song hành cùng nỗ lực giữ rừng của đồng bào Xơ Đăng.",
+    "Nơi rừng già, mây núi và bàn tay người Xơ Đăng cùng gìn giữ vùng sâm Ngọc Linh dưới tán đại ngàn.",
   primaryCta: { label: "Khám phá hành trình", href: "#hanh-trinh" },
   secondaryCta: { label: "Xem câu chuyện", href: "#cau-chuyen" },
-  tags: ["Đại Ngàn", "Văn Hóa Xơ Đăng", "Sâm Ngọc Linh Quốc Bảo"],
+  tags: ["Rừng", "Văn hóa", "Sâm Ngọc Linh"],
 
   // TODO: Swap this image path if it does not match the Hero landscape background.
   imagePath:

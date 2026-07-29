@@ -20,8 +20,7 @@ import verifiedCoordinateExport from "@/data/tourism-map/tra-linh-verified-coord
 const requiredNames = [
   "Điểm du lịch Vườn sâm Ngọc Linh – Tăk Ngo",
   "Trạm Dược liệu Trà Linh",
-  "Không gian văn hóa Kon Pin – Đền thờ Thần Sâm",
-  "Chợ phiên Trà Linh",
+  "Đền thờ Sâm Ngọc Linh – Công viên văn hóa và Sâm Ngọc Linh",
   "Chợ phiên Trà Linh",
   "Khu dân cư Tăk Lang",
   "Khu dân cư Tăk Ngo",
@@ -43,10 +42,17 @@ const requiredNames = [
   "Đường mòn trekking Tắk Ngo",
   "Điểm ngắm cảnh sườn Ngọc Linh",
   "Suối Tắk Ngo",
+  "Các vùng trồng Sâm Ngọc Linh xã Trà Linh",
+  "Làng du lịch cộng đồng Kon Pin",
+  "Ruộng bậc thang Kon Pin",
+  "Làng Tỷ phú",
+  "Thác Kon Pin",
+  "Điểm tham quan cá tầm, cá hồi Ngọc Linh",
+  "Cây thông đôi",
 ];
 
 describe("tourism map data", () => {
-  it("matches the 25 reviewed current and legacy addresses", () => {
+  it("matches the reviewed current and legacy addresses", () => {
     const entities = [...tourismPlaces, ...tourismEvents];
     const addresses = Object.fromEntries(
       entities.map(({ slug, currentAddress, legacyAddress }) => [
@@ -153,29 +159,56 @@ describe("tourism map data", () => {
         "Khu vực suối Tắk Ngo, xã Trà Linh, thành phố Đà Nẵng",
         "Tắk Ngo, xã Trà Linh, huyện Nam Trà My, tỉnh Quảng Nam",
       ],
+      "cac-vung-trong-sam-ngoc-linh-xa-tra-linh": [
+        "Các vùng trồng sâm Ngọc Linh, xã Trà Linh, thành phố Đà Nẵng",
+        "Xã Trà Linh, huyện Nam Trà My, tỉnh Quảng Nam",
+      ],
+      "lang-du-lich-cong-dong-kon-pin": [
+        "Làng Kon Pin, xã Trà Linh, thành phố Đà Nẵng",
+        "Làng Kon Pin, thôn 2, xã Trà Linh, huyện Nam Trà My, tỉnh Quảng Nam",
+      ],
+      "ruong-bac-thang-kon-pin": [
+        "Làng Kon Pin, xã Trà Linh, thành phố Đà Nẵng",
+        "Làng Kon Pin, thôn 2, xã Trà Linh, huyện Nam Trà My, tỉnh Quảng Nam",
+      ],
+      "lang-ty-phu": [
+        "Xã Trà Linh, thành phố Đà Nẵng",
+        "Xã Trà Linh, huyện Nam Trà My, tỉnh Quảng Nam",
+      ],
+      "thac-kon-pin": [
+        "Khu vực Kon Pin, xã Trà Linh, thành phố Đà Nẵng",
+        "Làng Kon Pin, xã Trà Linh, huyện Nam Trà My, tỉnh Quảng Nam",
+      ],
+      "diem-tham-quan-ca-tam-ca-hoi-ngoc-linh": [
+        "Khu vực Ngọc Linh, xã Trà Linh, thành phố Đà Nẵng",
+        "Xã Trà Linh, huyện Nam Trà My, tỉnh Quảng Nam",
+      ],
+      "cay-thong-doi": [
+        "Xã Trà Linh, thành phố Đà Nẵng",
+        "Xã Trà Linh, huyện Nam Trà My, tỉnh Quảng Nam",
+      ],
     });
 
     const sourceUrls = new Set(entities.flatMap((entity) => entity.sourceUrls ?? []));
     expect(sourceUrls.size).toBe(23);
   });
 
-  it("keeps the 18 reviewed coordinate records and emits 22 mappable features", () => {
-    expect(verifiedCoordinateExport.records).toHaveLength(18);
-    expect(verifiedCoordinateExport.assigned).toBe(18);
+  it("keeps the 15 Google Maps-reviewed records and emits 24 mappable features", () => {
+    expect(verifiedCoordinateExport.records).toHaveLength(15);
+    expect(verifiedCoordinateExport.assigned).toBe(15);
     expect(verifiedCoordinateExport.records.every((record) => Array.isArray(record.coordinate))).toBe(
       true,
     );
-    expect(toTourismGeoJson([...tourismPlaces, ...tourismEvents]).features).toHaveLength(22);
+    expect(toTourismGeoJson([...tourismPlaces, ...tourismEvents]).features).toHaveLength(24);
   });
 
-  it("keeps every required place and event with the official name", () => {
-    const entities = [...tourismPlaces, ...tourismEvents].sort(
-      (left, right) => left.sortOrder - right.sortOrder,
-    );
+  it("keeps every displayed place with a unique official name", () => {
+    const entities = getAllTourismEntities(tourismPlaces, tourismEvents);
 
-    expect(entities).toHaveLength(25);
+    expect(entities).toHaveLength(31);
     expect(entities.map((entity) => entity.name)).toEqual(requiredNames);
-    expect(new Set(entities.map((entity) => entity.slug)).size).toBe(25);
+    expect(new Set(entities.map((entity) => entity.slug)).size).toBe(31);
+    expect(new Set(entities.map((entity) => entity.name)).size).toBe(31);
   });
 
   it("publishes the eight required filters in their specified order", () => {
@@ -183,7 +216,7 @@ describe("tourism map data", () => {
       "Tất cả",
       "Sâm & dược liệu",
       "Văn hóa",
-      "Cộng đồng",
+      "Cơ sở lưu trú",
       "Thiên nhiên",
       "Chợ & đặc sản",
       "Dịch vụ công",
@@ -205,7 +238,7 @@ describe("tourism map data", () => {
       "Rừng quế cổ thụ Trà My",
       "Phiên chợ Sâm Ngọc Linh",
     ]);
-    expect(entities).toHaveLength(25);
+    expect(entities).toHaveLength(32);
   });
 });
 
@@ -219,7 +252,10 @@ describe("tourism map helpers", () => {
         scope: "inside_tra_linh",
         category: "culture_community",
       }).map((entity) => entity.name),
-    ).toEqual(["Không gian văn hóa Kon Pin – Đền thờ Thần Sâm"]);
+    ).toEqual([
+      "Đền thờ Sâm Ngọc Linh – Công viên văn hóa và Sâm Ngọc Linh",
+      "Làng du lịch cộng đồng Kon Pin",
+    ]);
 
     expect(
       filterTourismExplorerEntities(entities, {
@@ -240,6 +276,20 @@ describe("tourism map helpers", () => {
 
     expect(nearby).not.toHaveLength(0);
     expect(nearby.every((entity) => entity.scope === "nearby")).toBe(true);
+  });
+
+  it("keeps the homepage preview aligned with the explorer default scope", () => {
+    const entities = getAllTourismEntities(tourismPlaces, tourismEvents);
+    const homepagePreview = getTourismViewportEntities(entities, "all");
+    const explorerDefault = filterTourismExplorerEntities(entities, {
+      query: "",
+      scope: "inside_tra_linh",
+      category: "all",
+    });
+
+    expect(homepagePreview.map((entity) => entity.slug)).toEqual(
+      explorerDefault.map((entity) => entity.slug),
+    );
   });
 
   it("returns only published entities in display order", () => {
@@ -334,18 +384,18 @@ describe("tourism map helpers", () => {
     expect(url.searchParams.has("origin")).toBe(false);
   });
 
-  it("prioritizes verified coordinates for a place destination", () => {
+  it("uses only the confirmed Google Maps listing stored on the place", () => {
     const place: TourismPlace = {
       ...tourismPlaces[1],
       latitude: 15.123,
       longitude: 108.456,
       coordinateStatus: "verified",
+      googleMapsUrl: "https://maps.app.goo.gl/example-listing",
     };
 
-    const url = new URL(getPlaceDirectionsUrl(place)!);
-
-    expect(url.searchParams.get("destination")).toBe("15.123,108.456");
-    expect(url.searchParams.has("origin")).toBe(false);
+    expect(getPlaceDirectionsUrl(place)).toBe(
+      "https://maps.app.goo.gl/example-listing",
+    );
     expect(hasVerifiedCoordinates(place)).toBe(true);
   });
 
@@ -368,32 +418,53 @@ describe("tourism map helpers", () => {
     ).toBe(false);
   });
 
-  it("falls back to the official place name and current address", () => {
+  it("does not fall back to coordinates, name, or address without a confirmed listing", () => {
     const place: TourismPlace = {
       ...tourismPlaces[1],
-      latitude: null,
-      longitude: null,
-      coordinateStatus: "missing",
-    };
-    const url = new URL(getPlaceDirectionsUrl(place)!);
-
-    expect(url.searchParams.get("destination")).toBe(
-      `${place.name}, ${place.currentAddress}`,
-    );
-    expect(url.searchParams.get("dir_action")).toBe("navigate");
-    expect(url.searchParams.has("origin")).toBe(false);
-  });
-
-  it("does not create a directions link without a usable destination", () => {
-    const place: TourismPlace = {
-      ...tourismPlaces[1],
-      latitude: null,
-      longitude: null,
-      coordinateStatus: "missing",
-      name: " ",
-      currentAddress: " ",
+      latitude: 15.123,
+      longitude: 108.456,
+      coordinateStatus: "verified",
+      googleMapsUrl: null,
     };
 
     expect(getPlaceDirectionsUrl(place)).toBeNull();
+  });
+
+  it("rejects a generic coordinate query masquerading as a Google Maps listing", () => {
+    const place: TourismPlace = {
+      ...tourismPlaces[1],
+      googleMapsUrl: "https://www.google.com/maps?q=15.123,108.456",
+    };
+
+    expect(getPlaceDirectionsUrl(place)).toBeNull();
+  });
+
+  it("keeps Google Maps links limited to confirmed place or short-link URLs", () => {
+    const linkedEntities = [...tourismPlaces, ...tourismEvents].filter(
+      (entity) => entity.googleMapsUrl,
+    );
+
+    expect(linkedEntities).toHaveLength(15);
+    expect(
+      linkedEntities.every((entity) =>
+        entity.googleMapsUrl?.startsWith("https://maps.app.goo.gl/"),
+      ),
+    ).toBe(true);
+    expect(
+      linkedEntities.find((entity) => entity.slug === "ruong-bac-thang-kon-pin"),
+    ).toMatchObject({
+      latitude: 15.0207553,
+      longitude: 108.0044128,
+      coordinateStatus: "verified",
+    });
+    expect(
+      linkedEntities.find(
+        (entity) => entity.slug === "diem-tham-quan-ca-tam-ca-hoi-ngoc-linh",
+      ),
+    ).toMatchObject({
+      latitude: 15.0614369,
+      longitude: 107.9238312,
+      coordinateStatus: "verified",
+    });
   });
 });

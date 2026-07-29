@@ -1,7 +1,7 @@
 "use client";
 
 import { Layers3, X } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { tourismCategories } from "@/data/tourism-map/categories";
 import type { TourismCategory, TourismPlaceCategory } from "@/data/tourism-map/types";
@@ -33,6 +33,7 @@ function LegendItems() {
 
 export function TourismMapLegend({ open, onOpenChange }: TourismMapLegendProps) {
   const mobileLegendRef = useRef<HTMLDivElement>(null);
+  const [desktopOpen, setDesktopOpen] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -91,14 +92,42 @@ export function TourismMapLegend({ open, onOpenChange }: TourismMapLegendProps) 
         ) : null}
       </div>
 
-      <details className="absolute bottom-4 left-4 z-10 hidden max-w-sm rounded-2xl border border-white/60 bg-[#EEF1E9]/95 p-2 shadow-[0_12px_32px_rgba(16,37,26,0.18)] backdrop-blur lg:block">
-        <summary className="min-h-10 cursor-pointer list-none rounded-xl px-3 py-2 text-sm font-semibold text-[#10251A] focus-visible:outline-2 focus-visible:outline-[#D5A84E]">
-          Chú giải bản đồ
-        </summary>
-        <div className="px-3 pb-2 pt-1">
-          <LegendItems />
-        </div>
-      </details>
+      <div className="absolute bottom-4 left-4 z-10 hidden lg:block">
+        {desktopOpen ? (
+          <div
+            id="tourism-desktop-map-legend"
+            role="dialog"
+            aria-label="Chú giải bản đồ trên máy tính"
+            className="w-[25rem] max-w-[calc(100vw-2rem)] rounded-3xl border border-white/60 bg-[#EEF1E9]/95 p-4 shadow-[0_12px_32px_rgba(16,37,26,0.18)] backdrop-blur"
+          >
+            <div className="mb-3 flex items-center justify-between gap-4">
+              <h3 className="text-base font-semibold text-[#10251A]">
+                Chú giải bản đồ
+              </h3>
+              <button
+                type="button"
+                aria-label="Đóng chú giải bản đồ trên máy tính"
+                onClick={() => setDesktopOpen(false)}
+                className="inline-flex size-10 shrink-0 items-center justify-center rounded-full text-[#10251A] transition hover:bg-white focus-visible:outline-2 focus-visible:outline-[#D5A84E]"
+              >
+                <X className="size-4" aria-hidden="true" />
+              </button>
+            </div>
+            <LegendItems />
+          </div>
+        ) : (
+            <button
+              type="button"
+              aria-label="Mở chú giải bản đồ trên máy tính"
+              aria-expanded="false"
+              aria-controls="tourism-desktop-map-legend"
+              onClick={() => setDesktopOpen(true)}
+              className="min-h-11 rounded-2xl border border-white/60 bg-[#EEF1E9]/95 px-5 py-3 text-sm font-semibold text-[#10251A] shadow-[0_12px_32px_rgba(16,37,26,0.18)] backdrop-blur transition hover:bg-white focus-visible:outline-2 focus-visible:outline-[#D5A84E]"
+            >
+              Chú giải bản đồ
+            </button>
+        )}
+      </div>
     </>
   );
 }

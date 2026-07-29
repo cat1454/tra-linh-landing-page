@@ -1,9 +1,55 @@
 import type { TourismPlace } from "./types";
+import type { TourismMediaManifestEntry } from "@/lib/tourism-image-pipeline";
+import tourismMediaManifest from "./media-manifest.json";
 
 export const TOURISM_PLACEHOLDER_IMAGE =
   "/images/placeholders/tourism-place-placeholder.webp";
 
 export const TOURISM_BRAND_LOGO = "/images/brand/logo_tra_linh.jpg";
+export const approvedTourismMediaManifest =
+  tourismMediaManifest.entries as TourismMediaManifestEntry[];
+
+export function hasDocumentaryTourismCover(
+  place: TourismPlace,
+): place is TourismPlace & { coverImage: string } {
+  return Boolean(
+    place.coverImage &&
+      place.mediaAttribution?.some(
+        (asset) => asset.role === "cover" && asset.representation === "documentary",
+      ),
+  );
+}
+
+export function applyApprovedTourismMedia(
+  place: TourismPlace,
+  manifest: TourismMediaManifestEntry[],
+): TourismPlace {
+  const assets = manifest.filter((entry) => entry.slug === place.slug);
+  if (!assets.length) return place;
+
+  const cover = assets.find((entry) => entry.role === "cover");
+  const gallery = assets
+    .filter((entry) => entry.role === "gallery")
+    .map((entry) => entry.publicPath);
+
+  return {
+    ...place,
+    coverImage: cover?.publicPath ?? place.coverImage,
+    gallery,
+    imageStatus: cover || gallery.length ? "ready" : place.imageStatus,
+    mediaAttribution: assets.map((entry) => ({
+      assetId: entry.assetId,
+      role: entry.role,
+      credit: entry.credit,
+      sourcePageUrl: entry.sourcePageUrl,
+      license: entry.license as Exclude<
+        TourismMediaManifestEntry["license"],
+        "permission_required"
+      >,
+      representation: entry.representation,
+    })),
+  };
+}
 
 export function isTrustedTourismImageUrl(value: string | null): value is string {
   if (!value) return false;

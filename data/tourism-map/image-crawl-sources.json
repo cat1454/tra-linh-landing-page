@@ -10,7 +10,10 @@
     },
     {
       "slug": "tram-duoc-lieu-tra-linh",
-      "pageUrls": ["https://www.danang.gov.vn/vi/web/dng/w/day-manh-thuc-hien-chuong-trinh-phat-trien-sam-va-duoc-lieu-voi-nhiem-vu-cua-tung-nganh"]
+      "pageUrls": [
+        "https://www.danang.gov.vn/vi/web/dng/w/day-manh-thuc-hien-chuong-trinh-phat-trien-sam-va-duoc-lieu-voi-nhiem-vu-cua-tung-nganh",
+        "https://hochiminh.dms.gov.vn/web/guest/tin-chi-tiet/-/chi-tiet/tu-vung-kho-tra-linh-but-pha-nho-sam-ngoc-linh-6222-1.html"
+      ]
     },
     {
       "slug": "khong-gian-van-hoa-kon-pin-den-tho-than-sam",
@@ -46,6 +49,7 @@
       "slug": "khu-dan-cu-mang-lung",
       "pageUrls": [
         "https://danang.gov.vn/web/dang-uy-ubnd-thanh-pho/chi-tiet/-/asset_publisher/wthp/content/thong-nhat-dieu-chinh-chu-truong-dau-tu-du-an-duong-giao-thong-den-vung-phat-trien-sam-ngoc-linh/37638",
+        "https://baogialai.com.vn/tra-no-rung-xanh-post89219.html",
         "https://tralinh.danang.gov.vn/chi-tiet-tin/group/112/nid/4446/hdnd-xa-tra-linh-khoa-xiii-to-chuc-ky-hop-thu-ba-ky-hop-chuyen-de--thong-qua-nghi-quyet-ve-sap-xep-cac-thon-tren-dia-ban-xa"
       ]
     },
@@ -78,6 +82,51 @@
     {
       "slug": "phien-cho-sam-ngoc-linh",
       "pageUrls": ["https://namtramy.danang.gov.vn/chi-tiet-tin/group/113/nid/4289/le-hoi-sam-ngoc-linh-lan-thu-vii--nam-2-25-se-dien-ra-tu-ngay-1--3-8"]
+    },
+    {
+      "slug": "thac-5-tang",
+      "pageUrls": [
+        "https://dantri.com.vn/du-lich/kham-pha-thac-5-tang-va-suoi-nuoc-nong-bong-tay-20160403073137658.htm",
+        "https://sgtt.thesaigontimes.vn/ve-dep-noi-thuong-nguon-song-tranh-quang-nam/",
+        "https://www.dulichvn.org.vn/index.php/item/32315"
+      ]
+    },
+    {
+      "slug": "suoi-nuoc-nong-tac-to",
+      "pageUrls": ["https://www.vietnam.vn/du-lich-xanh-o-thu-phu-sam-ngoc-linh"]
+    },
+    {
+      "slug": "lang-van-hoa-tak-chuom",
+      "pageUrls": ["https://baoquangnam.vn/cuoc-chuyen-minh-cua-tak-chuom-3156863.html"]
+    },
+    {
+      "slug": "rung-que-co-thu-tra-my",
+      "pageUrls": [
+        "https://vnexpress.net/thoi-su/vuon-que-tram-nam-tuoi-o-nam-tra-my-3785846.html",
+        "https://baodanang.vn/video-tham-rung-que-co-thu-xa-tra-van-3128967.html"
+      ]
+    },
+    {
+      "slug": "dinh-nui-ngoc-linh",
+      "pageUrls": ["https://scov.gov.vn/dat-nuoc-con-nguoi/kham-pha-dinh-nui-ngoc-linh-kon-tum.html"]
+    },
+    {
+      "slug": "rung-nguyen-sinh-ngoc-linh",
+      "pageUrls": [
+        "https://baodanang.vn/len-rung-xem-quoc-bao-ngoc-linh-3304870.html",
+        "https://dulichnamtramy.vn/kinh-nghiem-du-lich/quang-nam-co-diem-du-lich-sam-ngoc-linh-doc-dao-hoan-toan-mien-phi-258305"
+      ]
+    },
+    {
+      "slug": "diem-tham-quan-ca-tam-ca-hoi-ngoc-linh",
+      "pageUrls": [
+        "https://thanhnien.vn/nuoi-ca-xu-lanh-giua-dai-ngan-185260408210331018.htm",
+        "https://anhai.danang.gov.vn/chi-tiet-tin/group/119/nid/2140/ket-noi-phat-trien-du-lich-an-hai--tra-linh"
+      ]
+    },
+    {
+      "slug": "cay-thong-doi",
+      "pageUrls": ["https://baodanang.vn/nguoi-xe-dang-ung-xu-voi-rung-3019339.html"]
     }
   ]
 }

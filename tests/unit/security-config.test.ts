@@ -16,4 +16,13 @@ describe("security configuration for the tourism map", () => {
     expect(csp).not.toContain("https://server.arcgisonline.com");
     expect(permissions).toContain("geolocation=()");
   });
+
+  it("allows the browser to request live weather from Open-Meteo", async () => {
+    const headerGroups = await nextConfig.headers?.();
+    const headers = headerGroups?.[0]?.headers ?? [];
+    const csp = headers.find((header) => header.key === "Content-Security-Policy")?.value;
+
+    expect(csp).toContain("connect-src");
+    expect(csp).toContain("https://api.open-meteo.com");
+  });
 });

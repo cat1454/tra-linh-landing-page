@@ -21,6 +21,8 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run test:coverage
+      - run: npm run audit:tourism-map
+      - run: npm run audit:tourism-images
       - run: npm run build
 
   e2e-chromium:

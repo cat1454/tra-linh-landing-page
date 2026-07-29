@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { TourismFilterBar } from "@/components/tourism-map/TourismFilterBar";
+import { TourismCategoryArtwork } from "@/components/tourism-map/TourismCategoryArtwork";
 import { TourismMapErrorFallback } from "@/components/tourism-map/TourismMapErrorFallback";
 import { TourismMapFullscreen } from "@/components/tourism-map/TourismMapFullscreen";
 import { TourismMapLegend } from "@/components/tourism-map/TourismMapLegend";
@@ -60,7 +61,7 @@ describe("tourism map interface", () => {
     expect(screen.getByRole("dialog", { name: "Chú giải bản đồ" })).toBeVisible();
     expect(screen.queryByText("Lân cận")).not.toBeInTheDocument();
     expect(screen.getAllByText("Văn hóa").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("Cộng đồng").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Cơ sở lưu trú").length).toBeGreaterThan(0);
     fireEvent.click(screen.getByRole("button", { name: "Đóng chú giải bản đồ" }));
     expect(onOpenChange).toHaveBeenLastCalledWith(false);
   });
@@ -178,19 +179,20 @@ describe("tourism map interface", () => {
       target: { value: "thác" },
     });
     fireEvent.click(screen.getByRole("button", { name: "Lân cận" }));
-    fireEvent.click(screen.getByRole("button", { name: "Văn hóa & cộng đồng" }));
+    fireEvent.click(screen.getByRole("button", { name: "Văn hóa & cơ sở lưu trú" }));
 
     expect(onQueryChange).toHaveBeenCalledWith("thác");
     expect(onScopeChange).toHaveBeenCalledWith("nearby");
     expect(onCategoryChange).toHaveBeenCalledWith("culture_community");
   });
 
-  it("keeps missing-coordinate places readable and opens reference directions", () => {
+  it("keeps missing-coordinate places readable and disables unconfirmed directions", () => {
     const place = {
       ...tourismPlaces[1],
       latitude: null,
       longitude: null,
       coordinateStatus: "missing" as const,
+      googleMapsUrl: null,
     };
     const onSelect = vi.fn();
     render(
@@ -205,18 +207,7 @@ describe("tourism map interface", () => {
     expect(
       screen.getByText("Vị trí tham khảo — vui lòng kiểm tra điểm đến trên Google Maps"),
     ).toBeVisible();
-    expect(screen.getByRole("link", { name: /chỉ đường/i })).toHaveAttribute(
-      "href",
-      expect.stringContaining("https://www.google.com/maps/dir/"),
-    );
-    expect(screen.getByRole("link", { name: /chỉ đường/i })).toHaveAttribute(
-      "target",
-      "_blank",
-    );
-    expect(screen.getByRole("link", { name: /chỉ đường/i })).toHaveAttribute(
-      "rel",
-      "noopener noreferrer",
-    );
+    expect(screen.getByRole("button", { name: /chỉ đường/i })).toBeDisabled();
     expect(screen.getByRole("link", { name: /xem chi tiết/i })).toHaveAttribute(
       "href",
       "/dia-diem/tram-duoc-lieu-tra-linh",
@@ -225,7 +216,8 @@ describe("tourism map interface", () => {
     expect(onSelect).toHaveBeenCalledWith(place);
   });
 
-  it("uses verified coordinates without a reference warning", () => {
+  it("uses a confirmed Google Maps listing without a reference warning", () => {
+    const googleMapsUrl = "https://maps.app.goo.gl/example-listing";
     render(
       <TourismPlaceCard
         place={{
@@ -233,6 +225,7 @@ describe("tourism map interface", () => {
           latitude: 15.123,
           longitude: 108.456,
           coordinateStatus: "verified",
+          googleMapsUrl,
         }}
         active
         onSelect={vi.fn()}
@@ -244,13 +237,13 @@ describe("tourism map interface", () => {
     ).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: /chỉ đường/i })).toHaveAttribute(
       "href",
-      expect.stringContaining("destination=15.123%2C108.456"),
+      googleMapsUrl,
     );
   });
 
   it("uses destination imagery in cards and popups with a local fallback", () => {
     const place = {
-      ...tourismPlaces[1],
+      ...tourismPlaces[0],
       coverImage: "/images/tourism-map/tak-ngo-ginseng-cover.webp",
     };
 
@@ -273,7 +266,60 @@ describe("tourism map interface", () => {
     );
   });
 
-  it("disables directions only when both name and address are unusable", () => {
+  it("replaces contextual covers with category artwork across map surfaces", () => {
+    const place = tourismPlaces[1];
+    const { rerender } = render(
+      <TourismPlaceCard place={place} active={false} onSelect={vi.fn()} />,
+    );
+
+    expect(screen.queryByRole("img", { name: place.imageAlt })).not.toBeInTheDocument();
+    expect(screen.getByTestId("tourism-category-artwork")).toHaveAttribute(
+      "data-category",
+      place.category,
+    );
+
+    rerender(<TourismPlacePopup place={place} />);
+    expect(screen.queryByRole("img", { name: place.imageAlt })).not.toBeInTheDocument();
+    expect(screen.getByTestId("tourism-category-artwork")).toBeVisible();
+
+    rerender(
+      <TourismMobileSheet place={place} places={[place]} onClose={vi.fn()} />,
+    );
+    expect(screen.queryByRole("img", { name: place.imageAlt })).not.toBeInTheDocument();
+    expect(screen.getByTestId("tourism-category-artwork")).toBeVisible();
+  });
+
+  it.each([
+    ["ginseng", "lucide-leaf", null],
+    ["nature", "lucide-mountain", "lucide-waves-horizontal"],
+    ["culture", "lucide-landmark", "lucide-drum"],
+    ["community", "lucide-house", "lucide-bed-double"],
+    ["shopping", "lucide-shopping-basket", null],
+    ["administrative", "lucide-building-2", null],
+  ] as const)(
+    "uses the requested %s artwork symbols",
+    (category, primaryIcon, secondaryIcon) => {
+      const place = { ...tourismPlaces[1], category };
+      render(<TourismCategoryArtwork place={place} />);
+
+      const artwork = screen.getByTestId("tourism-category-artwork");
+      expect(artwork.querySelector(`svg.${primaryIcon}`)).toBeInTheDocument();
+      if (secondaryIcon) {
+        expect(artwork.querySelector(`svg.${secondaryIcon}`)).toBeInTheDocument();
+      }
+    },
+  );
+
+  it("keeps documentary covers as real destination imagery", () => {
+    const place = tourismPlaces[0];
+
+    render(<TourismPlaceCard place={place} active={false} onSelect={vi.fn()} />);
+
+    expect(screen.getByRole("img", { name: place.imageAlt })).toBeVisible();
+    expect(screen.queryByTestId("tourism-category-artwork")).not.toBeInTheDocument();
+  });
+
+  it("disables directions whenever an exact Google Maps listing is absent", () => {
     render(
       <TourismPlaceCard
         place={{
@@ -281,8 +327,7 @@ describe("tourism map interface", () => {
           latitude: null,
           longitude: null,
           coordinateStatus: "missing",
-          name: " ",
-          currentAddress: " ",
+          googleMapsUrl: null,
         }}
         active={false}
         onSelect={vi.fn()}
@@ -292,7 +337,7 @@ describe("tourism map interface", () => {
     expect(screen.getByRole("button", { name: /chỉ đường/i })).toBeDisabled();
   });
 
-  it("uses the same reference directions behavior in the map popup", () => {
+  it("uses the same disabled directions behavior in the map popup", () => {
     render(
       <TourismPlacePopup
         place={{
@@ -300,6 +345,7 @@ describe("tourism map interface", () => {
           latitude: null,
           longitude: null,
           coordinateStatus: "missing",
+          googleMapsUrl: null,
         }}
       />,
     );
@@ -307,10 +353,7 @@ describe("tourism map interface", () => {
     expect(
       screen.getByText("Vị trí tham khảo — vui lòng kiểm tra điểm đến trên Google Maps"),
     ).toBeVisible();
-    expect(screen.getByRole("link", { name: /chỉ đường/i })).toHaveAttribute(
-      "rel",
-      "noopener noreferrer",
-    );
+    expect(screen.queryByRole("link", { name: /chỉ đường/i })).not.toBeInTheDocument();
   });
 
   it("hides the popup warning for verified coordinates", () => {

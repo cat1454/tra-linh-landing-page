@@ -20,7 +20,10 @@ vi.mock('@/lib/supabase/config', () => ({
   getMediaBucketName: vi.fn(() => 'media'),
 }))
 
-import { createContentItemAction } from '@/app/actions/admin-content'
+import {
+  createContentItemAction,
+  updateContentItemAction,
+} from '@/app/actions/admin-content'
 
 function contentForm(
   table: string,
@@ -53,6 +56,16 @@ function insertClient() {
   const insert = vi.fn().mockResolvedValue({ error: null })
   const from = vi.fn(() => ({ insert }))
   return { from, insert }
+}
+
+function updateClient() {
+  const eq = vi.fn().mockResolvedValue({ error: null })
+  const update = vi.fn((payload: unknown) => {
+    void payload
+    return { eq }
+  })
+  const from = vi.fn(() => ({ update }))
+  return { from, update, eq }
 }
 
 describe('admin content creation', () => {
@@ -142,5 +155,49 @@ describe('admin content creation', () => {
         body: 'Bring water and verify local access before departure.',
       }],
     }))
+  })
+})
+
+describe('admin field updates', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mocks.getAdminAccess.mockResolvedValue({ state: 'authorized' })
+    mocks.redirect.mockImplementation((url: string) => {
+      throw new Error(`redirect:${url}`)
+    })
+  })
+
+  it('persists a single changed field even when title is not submitted', async () => {
+    const client = updateClient()
+    mocks.createServerSupabaseClient.mockResolvedValue(client)
+    const data = new FormData()
+    data.set('table', 'site_settings')
+    data.set('id', '11111111-1111-4111-8111-111111111111')
+    data.set('intent', 'save-draft')
+    data.set('display_order', '0')
+    data.set('contact_email', 'contact@example.com')
+
+    await expect(updateContentItemAction(data)).rejects.toThrow('notice=draft-saved')
+
+    expect(client.update).toHaveBeenCalledWith(expect.objectContaining({
+      contact_email: 'contact@example.com',
+    }))
+    expect(client.update.mock.calls[0][0]).not.toHaveProperty('site_name')
+    expect(client.eq).toHaveBeenCalledWith('id', '11111111-1111-4111-8111-111111111111')
+  })
+
+  it('rejects an invalid single-field patch before writing to Supabase', async () => {
+    const client = updateClient()
+    mocks.createServerSupabaseClient.mockResolvedValue(client)
+    const data = new FormData()
+    data.set('table', 'site_settings')
+    data.set('id', '11111111-1111-4111-8111-111111111111')
+    data.set('intent', 'save-draft')
+    data.set('display_order', '0')
+    data.set('contact_email', 'not-an-email')
+
+    await expect(updateContentItemAction(data)).rejects.toThrow('error=invalid-update')
+
+    expect(client.update).not.toHaveBeenCalled()
   })
 })

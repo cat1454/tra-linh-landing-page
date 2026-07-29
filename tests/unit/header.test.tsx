@@ -14,10 +14,31 @@ describe('Header', () => {
     const trigger = screen.getByRole('button', { name: /mở menu/i })
 
     expect(header).toHaveClass('bg-[#10251A]/80')
-    expect(inner).toHaveClass('px-4', 'sm:px-6')
+    expect(inner).toHaveClass('px-6', 'sm:px-8')
     expect(cta.parentElement).toHaveClass('hidden', 'md:inline-flex')
     expect(cta).toHaveClass('whitespace-nowrap')
     expect(trigger).toHaveClass('size-10', 'rounded-xl')
+  })
+
+  it('shares the premium hero grid and keeps the desktop CTA secondary', () => {
+    render(<Header />)
+
+    const inner = document.querySelector('.site-header__inner')
+    const cta = screen.getByRole('link', { name: /khám phá trà linh/i })
+
+    expect(inner).toHaveClass(
+      'max-w-[1680px]',
+      'px-6',
+      'sm:px-8',
+      'lg:px-14',
+      'xl:px-20',
+    )
+    expect(cta).toHaveClass(
+      'border-[#DDB149]/70',
+      'bg-transparent',
+      'text-[#E6BD58]',
+      'hover:bg-[#DDB149]',
+    )
   })
 
   it('opens and closes an accessible mobile navigation', async () => {

@@ -56,7 +56,9 @@ describe("tourism place intake form", () => {
     expect(screen.getByLabelText("Địa chỉ hiện tại")).toHaveValue(
       tourismPlaces[1].currentAddress,
     );
-    expect(screen.getByLabelText("Vĩ độ (latitude)")).toHaveValue(15.0352);
+    expect(screen.getByLabelText("Vĩ độ (latitude)")).toHaveValue(
+      tourismPlaces[1].latitude,
+    );
 
     fireEvent.change(screen.getByLabelText("Địa điểm"), {
       target: { value: tourismPlaces[0].slug },

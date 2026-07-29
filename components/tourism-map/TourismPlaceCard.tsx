@@ -1,13 +1,13 @@
 "use client";
 
 import { ArrowUpRight, MapPin, Navigation } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 
 import { getTourismCategoryLabel } from "@/data/tourism-map/categories";
 import type { TourismPlace } from "@/data/tourism-map/types";
-import { TOURISM_PLACEHOLDER_IMAGE } from "@/data/tourism-map/media";
 import { getPlaceDirectionsUrl, hasVerifiedCoordinates } from "@/lib/tourism-map";
+
+import { TourismPlaceVisual } from "./TourismPlaceVisual";
 
 interface TourismPlaceCardProps {
   place: TourismPlace;
@@ -23,7 +23,6 @@ export function TourismPlaceCard({
   compact = false,
 }: TourismPlaceCardProps) {
   const directionsUrl = getPlaceDirectionsUrl(place);
-  const imageSrc = place.coverImage ?? TOURISM_PLACEHOLDER_IMAGE;
   return (
     <article
       id={`tourism-place-${place.slug}`}
@@ -44,12 +43,9 @@ export function TourismPlaceCard({
           }`}
       >
         <span className="relative min-h-32 overflow-hidden bg-[#DDE5D5]">
-          <Image
-            src={imageSrc}
-            alt={place.imageAlt}
-            fill
+          <TourismPlaceVisual
+            place={place}
             sizes="(max-width: 359px) 88px, (max-width: 1023px) 112px, 104px"
-            className="object-cover"
           />
         </span>
         <span className={compact ? "px-3 py-2 min-[360px]:px-4 min-[360px]:py-3" : "p-4"}>

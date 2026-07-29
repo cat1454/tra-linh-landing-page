@@ -103,4 +103,24 @@ describe("verified public content migration", () => {
     expect(sql).toContain("is_active = false");
     expect(sql).not.toContain("insert into public.admin_users");
   });
+
+  it("configures the official UBND contact details and website administrator", () => {
+    const sql = migration(
+      "202607270002_update_tra_linh_contact_and_admin.sql",
+    );
+
+    expect(sql).toContain("quangnh3@danang.gov.vn");
+    expect(sql).toContain("0376671456");
+    expect(sql).toContain("nhquang.it@mail.com");
+    expect(sql).toContain("on conflict ((lower(email))) do update");
+  });
+
+  it("keeps the additional administrator active after handover", () => {
+    const sql = migration("202607270003_add_secondary_admin.sql");
+
+    expect(sql).toContain("phuh15521@gmail.com");
+    expect(sql).toContain("role = 'admin'");
+    expect(sql).toContain("is_active = true");
+    expect(sql).toContain("on conflict ((lower(email))) do update");
+  });
 });

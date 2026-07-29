@@ -7,7 +7,6 @@ import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
-import { Button } from '@/components/ui/Button'
 import { PRIMARY_NAVIGATION } from '@/components/layout/navigation'
 
 const MobileMenu = dynamic(
@@ -50,7 +49,7 @@ export function Header({
             : 'site-header--transparent border-white/10 bg-[#10251A]/80 py-2.5 shadow-lg shadow-black/5 backdrop-blur-xl lg:border-transparent lg:bg-transparent lg:py-4 lg:shadow-none lg:backdrop-blur-none',
         )}
       >
-        <div className="site-header__inner mx-auto flex w-full max-w-[1440px] items-center justify-between gap-3 px-4 sm:px-6 md:gap-6 md:px-8 xl:px-12">
+        <div className="site-header__inner mx-auto flex w-full max-w-[1680px] items-center justify-between gap-3 px-6 sm:px-8 md:gap-6 lg:px-14 xl:px-20">
           <Link
             href="/"
             aria-label="Trà Linh — trang chủ"
@@ -62,8 +61,8 @@ export function Header({
             </span>
           </Link>
 
-          <nav className="site-header__desktop-nav hidden lg:block" aria-label="Điều hướng chính">
-            <ul className="flex items-center gap-5 xl:gap-7">
+          <nav className="site-header__desktop-nav hidden min-[1180px]:block" aria-label="Điều hướng chính">
+            <ul className="flex items-center gap-7 xl:gap-9">
               {navigation.map((item) => (
                 <li key={item.href}>
                   <a
@@ -79,15 +78,13 @@ export function Header({
 
           <div className="site-header__actions flex shrink-0 items-center gap-2">
             <span className="hidden md:inline-flex">
-              <Button
+              <Link
                 href="/#hanh-trinh"
-                variant="light"
-                size="sm"
-                className="site-header__cta whitespace-nowrap"
+                className="site-header__cta inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-full border border-[#DDB149]/70 bg-transparent px-5 text-sm font-medium text-[#E6BD58] transition-colors hover:bg-[#DDB149] hover:text-[#10261F] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#DDB149]"
               >
                 Khám phá Trà Linh
                 <ArrowRight aria-hidden="true" size={17} />
-              </Button>
+              </Link>
             </span>
             <button
               type="button"
@@ -96,7 +93,7 @@ export function Header({
               aria-expanded={isMenuOpen}
               aria-controls="mobile-navigation"
               onClick={() => setIsMenuOpen(true)}
-              className="site-header__menu-trigger inline-flex size-10 items-center justify-center rounded-xl border border-white/15 bg-white/5 transition-colors hover:border-[#D5A84E]/70 hover:bg-white/10 hover:text-[#D5A84E] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#D5A84E] lg:hidden"
+              className="site-header__menu-trigger inline-flex size-10 items-center justify-center rounded-xl border border-white/15 bg-white/5 transition-colors hover:border-[#D5A84E]/70 hover:bg-white/10 hover:text-[#D5A84E] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#D5A84E] min-[1180px]:hidden"
             >
               <Menu aria-hidden="true" size={20} strokeWidth={1.5} />
             </button>

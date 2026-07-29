@@ -14,6 +14,7 @@ import {
   getSiteUrl,
 } from "@/components/detail/seo";
 import { getPublicSiteSettings } from "@/lib/content/public-settings-server";
+import { FACEBOOK_PAGE_URL } from "@/lib/site-links";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "./globals.css";
@@ -157,6 +158,7 @@ export default async function RootLayout({
               description={siteSettings.footerDescription}
               legalAddress={siteSettings.legalAddress}
               privacyUrl={siteSettings.privacyUrl}
+              facebookUrl={FACEBOOK_PAGE_URL}
             />
             <MobileStickyCta
               contactPhone={siteSettings.contactPhone}
