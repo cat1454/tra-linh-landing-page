@@ -3,6 +3,7 @@ import ScrollReveal from "@/components/animation/ScrollReveal";
 
 import type { MediaAsset, PageSectionSettings } from "@/lib/content/types";
 
+import { SemanticHeadingText } from "./SemanticHeadingText";
 import { ArrowGlyph, MediaFrame } from "./_shared";
 
 type FinalCTAProps = {
@@ -11,6 +12,8 @@ type FinalCTAProps = {
 };
 
 export function FinalCTA({ media, section }: FinalCTAProps) {
+  const title = section?.title ?? "Trà Linh không chỉ để ngắm nhìn";
+
   return (
     <section aria-labelledby="final-cta-heading" className="relative isolate overflow-hidden bg-[#10251A] px-5 py-16 text-center text-[#EEF1E9] sm:px-8 sm:py-20 lg:px-16 lg:py-24">
       <MediaFrame media={media} className="final-cta-bg absolute inset-0 -z-30" sizes="100vw" imageClassName="brightness-[0.65]" />
@@ -23,7 +26,7 @@ export function FinalCTA({ media, section }: FinalCTAProps) {
         </ScrollReveal>
         <ScrollReveal direction="up" delay={0.4}>
           <h2 id="final-cta-heading" className="mt-5 font-serif text-[clamp(2.5rem,6vw,5.6rem)] leading-[0.98] tracking-[-0.04em]">
-            {section?.title ?? "Trà Linh không chỉ để ngắm nhìn"}
+            <SemanticHeadingText text={title} />
           </h2>
         </ScrollReveal>
         <ScrollReveal direction="up" delay={0.6}>

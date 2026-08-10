@@ -25,4 +25,13 @@ describe("security configuration for the tourism map", () => {
     expect(csp).toContain("connect-src");
     expect(csp).toContain("https://api.open-meteo.com");
   });
+
+  it("allows only the privacy-enhanced YouTube host for inline video", async () => {
+    const headerGroups = await nextConfig.headers?.();
+    const headers = headerGroups?.[0]?.headers ?? [];
+    const csp = headers.find((header) => header.key === "Content-Security-Policy")?.value;
+
+    expect(csp).toContain("frame-src 'self' https://www.youtube-nocookie.com");
+    expect(csp).not.toContain("frame-src *");
+  });
 });

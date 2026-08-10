@@ -12,49 +12,17 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import {
+  TRA_LINH_TIMEZONE,
+  buildWeatherForecastUrl,
+  describeWeatherCode,
+  parseCurrentWeather,
+  type CurrentWeather,
+  type WeatherIconName,
+} from "@/lib/weather-forecast";
 
-const TRA_LINH_LATITUDE = 15.035753;
-const TRA_LINH_LONGITUDE = 108.019359;
-const TRA_LINH_TIMEZONE = "Asia/Ho_Chi_Minh";
 const WEATHER_REFRESH_INTERVAL = 15 * 60 * 1_000;
-
-const WEATHER_URL =
-  "https://api.open-meteo.com/v1/forecast" +
-  `?latitude=${TRA_LINH_LATITUDE}` +
-  `&longitude=${TRA_LINH_LONGITUDE}` +
-  "&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m" +
-  `&timezone=${encodeURIComponent(TRA_LINH_TIMEZONE)}` +
-  "&forecast_days=1";
-
-type WeatherIconName =
-  | "clear"
-  | "partly-cloudy"
-  | "fog"
-  | "rain"
-  | "storm";
-
-type WeatherDescription = {
-  label: string;
-  icon: WeatherIconName;
-};
-
-type CurrentWeather = {
-  temperature: number;
-  apparentTemperature: number;
-  humidity: number;
-  weatherCode: number;
-  windSpeed: number;
-};
-
-type OpenMeteoResponse = {
-  current?: {
-    temperature_2m?: number;
-    apparent_temperature?: number;
-    relative_humidity_2m?: number;
-    weather_code?: number;
-    wind_speed_10m?: number;
-  };
-};
+const WEATHER_URL = buildWeatherForecastUrl(1);
 
 const weatherIcons: Record<WeatherIconName, LucideIcon> = {
   clear: Sun,
@@ -64,49 +32,7 @@ const weatherIcons: Record<WeatherIconName, LucideIcon> = {
   storm: CloudLightning,
 };
 
-export function describeWeatherCode(code: number): WeatherDescription {
-  if (code === 0) return { label: "Trời quang", icon: "clear" };
-  if (code === 1) return { label: "Ít mây", icon: "partly-cloudy" };
-  if (code === 2) return { label: "Có mây", icon: "partly-cloudy" };
-  if (code === 3) return { label: "Nhiều mây", icon: "partly-cloudy" };
-  if (code === 45 || code === 48) {
-    return { label: "Có sương mù", icon: "fog" };
-  }
-  if ([51, 53, 55, 56, 57, 61].includes(code)) {
-    return { label: "Mưa nhẹ", icon: "rain" };
-  }
-  if ([63, 66].includes(code)) {
-    return { label: "Mưa vừa", icon: "rain" };
-  }
-  if ([65, 67, 80, 81].includes(code)) {
-    return { label: "Mưa to", icon: "rain" };
-  }
-  if (code === 82) return { label: "Mưa rào mạnh", icon: "rain" };
-  if ([95, 96, 99].includes(code)) return { label: "Dông", icon: "storm" };
-  return { label: "Thời tiết thay đổi", icon: "partly-cloudy" };
-}
-
-function parseWeatherResponse(data: OpenMeteoResponse): CurrentWeather {
-  const current = data.current;
-  if (
-    !current ||
-    typeof current.temperature_2m !== "number" ||
-    typeof current.apparent_temperature !== "number" ||
-    typeof current.relative_humidity_2m !== "number" ||
-    typeof current.weather_code !== "number" ||
-    typeof current.wind_speed_10m !== "number"
-  ) {
-    throw new Error("Invalid weather response");
-  }
-
-  return {
-    temperature: current.temperature_2m,
-    apparentTemperature: current.apparent_temperature,
-    humidity: current.relative_humidity_2m,
-    weatherCode: current.weather_code,
-    windSpeed: current.wind_speed_10m,
-  };
-}
+export { describeWeatherCode } from "@/lib/weather-forecast";
 
 function formatTraLinhTime(date: Date) {
   return new Intl.DateTimeFormat("vi-VN", {
@@ -150,8 +76,8 @@ export function WeatherTimeCard() {
           signal: controller.signal,
         });
         if (!response.ok) throw new Error("Weather request failed");
-        const data = (await response.json()) as OpenMeteoResponse;
-        setWeather(parseWeatherResponse(data));
+        const data: unknown = await response.json();
+        setWeather(parseCurrentWeather(data));
         setWeatherUnavailable(false);
       } catch (error) {
         if ((error as Error).name !== "AbortError") {
@@ -195,7 +121,7 @@ export function WeatherTimeCard() {
           >
             {now ? formatTraLinhTime(now) : "--:--"}
           </time>
-          <p className="mt-1 text-[0.68rem] capitalize text-[#EEF1E9]/58">
+          <p className="mt-1 text-[0.68rem] capitalize text-[#D7E0D2]">
             {now ? formatTraLinhDate(now) : "Múi giờ Việt Nam"}
           </p>
         </div>
@@ -224,7 +150,7 @@ export function WeatherTimeCard() {
                   </p>
                 </div>
               </div>
-              <p className="mt-3 flex flex-col gap-1.5 text-xs text-[#EEF1E9]/58">
+              <p className="mt-3 flex flex-col gap-1.5 text-xs text-[#D7E0D2]">
                 <span className="inline-flex items-center gap-1">
                   <Droplets aria-hidden="true" size={11} />
                   Độ ẩm {Math.round(weather.humidity)}%
@@ -253,7 +179,7 @@ export function WeatherTimeCard() {
         </div>
       </div>
 
-      <p className="mt-5 border-t border-white/15 pt-4 text-[0.66rem] text-[#EEF1E9]/48">
+      <p className="mt-5 border-t border-white/15 pt-4 text-[0.66rem] text-[#D7E0D2]">
         Dữ liệu dự báo tại trung tâm xã ·{" "}
         <a
           href="https://open-meteo.com/"

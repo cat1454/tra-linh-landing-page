@@ -1,0 +1,182 @@
+{
+  "generatedAt": "2026-08-10T06:58:03.460Z",
+  "evidenceLabel": "deployed-latest",
+  "evidenceFile": "evidence-deployed-latest.json",
+  "targetUrl": "https://tra-linh-landing-page.vercel.app/",
+  "methodology": "Deterministic synthetic personas grounded in browser/code evidence; not real survey respondents.",
+  "seed": 20260810,
+  "sampleSize": 10000,
+  "uniqueComments": 10000,
+  "quotas": {
+    "age_band": {
+      "25-34": 3000,
+      "35-44": 2200,
+      "18-24": 1800,
+      "45-54": 1400,
+      "55-64": 1000,
+      "65+": 600
+    },
+    "device": {
+      "mobile": 7200,
+      "desktop": 2200,
+      "tablet": 600
+    },
+    "network": {
+      "4g_good": 3800,
+      "wifi": 2600,
+      "4g_weak": 2200,
+      "3g": 1400
+    },
+    "intent": {
+      "trip_planning": 2600,
+      "inspiration": 1700,
+      "trekking": 1300,
+      "ginseng_products": 1100,
+      "xo_dang_culture": 900,
+      "map_directions": 900,
+      "international": 500,
+      "local_official": 500,
+      "accessibility": 500
+    },
+    "accessibility_need": {
+      "none": 9500,
+      "low_vision": 150,
+      "motor": 100,
+      "cognitive": 90,
+      "motion_sensitivity": 80,
+      "screen_reader": 80
+    }
+  },
+  "averages": {
+    "score_visual": 4.6,
+    "score_clarity": 4.22,
+    "score_navigation": 4.41,
+    "score_planning": 4.03,
+    "score_trust": 4.32,
+    "score_mobile": 4.41,
+    "score_accessibility": 4.48,
+    "recommend_0_10": 8.17
+  },
+  "syntheticNps": 28,
+  "sentiment": {
+    "positive": 6376,
+    "mixed": 2983,
+    "negative": 641
+  },
+  "completion": {
+    "completed": 6871,
+    "partial": 2402,
+    "abandoned": 727
+  },
+  "resolutionStatus": {
+    "satisfied": 7612,
+    "blocked_external": 2388
+  },
+  "actionableFeedbackCount": 0,
+  "actionableIssueCodes": [],
+  "issues": {
+    "SATISFIED_NO_CHANGE": 7612,
+    "TRIP_INFO_GAPS": 1529,
+    "PRODUCT_TRACEABILITY_REQUEST": 449,
+    "OFFICIAL_EVENTS_REQUEST": 410
+  },
+  "features": {
+    "no_change": 7612,
+    "verified_route_distance": 522,
+    "booking_availability": 504,
+    "official_costs": 503,
+    "official_ginseng_traceability": 449,
+    "official_travel_alerts": 209,
+    "official_events_feed": 201
+  },
+  "evidenceLevels": {
+    "preference": 7612,
+    "blocked_by_official_source": 2388
+  },
+  "observedWebsiteFacts": {
+    "status": 200,
+    "title": "Du lịch Trà Linh | Khám phá vùng cao Nam Trà My",
+    "bodyTextLength": 10896,
+    "scrollHeight": 12480,
+    "headings": 44,
+    "imagesInDom": 34,
+    "mapMarkers": 10,
+    "transferSizeMB": 3,
+    "brokenInternalLinks": [],
+    "missingHashTargets": [],
+    "accessibilityViolations": [],
+    "badResponses": [],
+    "mobileOverflow": 0,
+    "featureChecks": {
+      "weatherRoute": true,
+      "searchRoute": true,
+      "faqRoute": true,
+      "englishRoute": true,
+      "englishLang": "en",
+      "journeyTripInfo": true,
+      "journeyItinerary": true,
+      "journeyPrint": true,
+      "journeyVerification": true,
+      "journeySaveShare": true,
+      "savedRoute": true,
+      "guideOffline": true,
+      "guideSaveShare": true,
+      "placeVerification": true,
+      "placeSources": true,
+      "placeSaveShare": true,
+      "faqAuthenticityGuidance": true,
+      "manualDataSaver": true,
+      "dataSaverUnloadsVideo": true,
+      "dataSaverPersists": true,
+      "boundedSpecialties": true,
+      "boundedMapPreview": true,
+      "boundedMediaRails": true,
+      "stickyTaskNavigation": true,
+      "backToTop": true,
+      "contactPhone": true,
+      "contactEmail": true,
+      "contactFacebook": true
+    },
+    "mapKeyboard": {
+      "markerCount": 5,
+      "role": "button",
+      "selectedAfterEnter": true
+    },
+    "performance": {
+      "lcpMs": 1992,
+      "cls": 0.0071,
+      "layoutShiftSources": [
+        {
+          "node": "<div class=\"grid items-end gap-10 min-[1180px]:grid-cols-[minmax(0,850px)_320px] min-[1180px]:justify-between min-[1180px]:gap-10 xl:grid-cols-[minmax(0,850px)_360px] xl:gap-16\"><div class=\"max-w-[850px]\"><div><p class=\"text-xs font-semibol",
+          "previousRect": {
+            "x": 60,
+            "y": 325.96875,
+            "width": 1300,
+            "height": 526.03125,
+            "top": 325.96875,
+            "right": 1360,
+            "bottom": 852,
+            "left": 60
+          },
+          "currentRect": {
+            "x": 60,
+            "y": 307.15625,
+            "width": 1300,
+            "height": 544.84375,
+            "top": 307.15625,
+            "right": 1360,
+            "bottom": 852,
+            "left": 60
+          }
+        }
+      ]
+    },
+    "mobilePerformance": {
+      "lcpMs": 1036,
+      "cls": 0.0021,
+      "inpMs": 0,
+      "transferSize": 896296
+    },
+    "consoleErrors": []
+  }
+}

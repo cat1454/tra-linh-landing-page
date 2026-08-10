@@ -3,17 +3,14 @@ import ScrollReveal from "@/components/animation/ScrollReveal";
 
 import type { HomePageContent } from "@/lib/content/types";
 
-import { HeroVideoBackground } from "./HeroVideoBackground";
 import { HeroRightRail } from "./HeroRightRail";
 import { HeroTitle } from "./HeroTitle";
+import { HeroYouTubeVideo } from "./HeroYouTubeVideo";
 import { ArrowGlyph } from "./_shared";
 
 type HeroSectionProps = {
   hero: HomePageContent["hero"];
 };
-
-export const HERO_INTRO_VIDEO_SRC =
-  "/assets/ThienNhien/1784805090350_7825852089651351479_g3040039768026489372.mp4";
 
 export function HeroSection({ hero }: HeroSectionProps) {
   return (
@@ -22,14 +19,24 @@ export function HeroSection({ hero }: HeroSectionProps) {
       aria-labelledby="hero-title"
       className="hero-section relative isolate flex min-h-screen overflow-hidden bg-[#031713] text-[#F1F1E8]"
     >
-      <HeroVideoBackground
-        src={HERO_INTRO_VIDEO_SRC}
-        poster={hero.backgroundMedia}
-        mobilePosterSrc={hero.mobilePoster?.src ?? "/images/tra-linh/hero-ban-lang-ngoc-linh-mobile.webp"}
-        className="hero-media absolute inset-0 -z-30"
-        mediaClassName="scale-[1.03] motion-safe:transition-transform motion-safe:duration-[1800ms]"
-        soundControlTargetId="hero-sound-control"
-      />
+      <figure className="hero-media absolute inset-0 -z-30 overflow-hidden">
+        <picture>
+          <source
+            media="(max-width: 767px)"
+            srcSet={hero.mobilePoster?.src ?? "/images/tra-linh/hero-ban-lang-ngoc-linh-mobile.webp"}
+          />
+          <img
+            src={hero.backgroundMedia.src}
+            alt={hero.backgroundMedia.altText}
+            width={1920}
+            height={1080}
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
+            className="absolute inset-0 h-full w-full scale-[1.03] object-cover"
+          />
+        </picture>
+      </figure>
       <div className="absolute inset-0 -z-20 bg-black/20" />
       <div className="absolute inset-0 -z-20 bg-gradient-to-r from-[#031713]/95 via-[#08251f]/65 to-[#081610]/20 max-lg:from-[#031713]/95 max-lg:via-[#031713]/78 max-lg:to-[#081610]/48" />
       <div className="absolute inset-0 -z-20 bg-gradient-to-t from-black/45 via-transparent to-black/15" />
@@ -70,6 +77,7 @@ export function HeroSection({ hero }: HeroSectionProps) {
                   {hero.primaryCta.label}
                   <ArrowGlyph />
                 </Link>
+                <HeroYouTubeVideo />
               </div>
 
               <p className="mt-8 text-xs font-medium uppercase tracking-[0.25em] text-white/50">

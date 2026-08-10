@@ -1,21 +1,42 @@
+"use client";
+
 import Image from "next/image";
+import { useEffect, useState } from "react";
 
 import type { MediaAsset } from "@/lib/content/types";
+import { DATA_SAVER_EVENT, isDataSaverEnabled } from "@/lib/data-saver";
 
 type ResponsiveMediaRailProps = {
   media: MediaAsset[];
   tone: "mist" | "cream";
   itemSize: "small" | "large";
-  maxItems?: number;
 };
 
 export function ResponsiveMediaRail({
   media,
   tone,
   itemSize,
-  maxItems = 12,
 }: ResponsiveMediaRailProps) {
-  const featured = media.slice(0, maxItems);
+  const [allowMarquee, setAllowMarquee] = useState(false);
+
+  useEffect(() => {
+    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const connection = (navigator as Navigator & { connection?: { saveData?: boolean; addEventListener?: (type: "change", listener: () => void) => void; removeEventListener?: (type: "change", listener: () => void) => void } }).connection;
+    const sync = () => setAllowMarquee(!motion.matches && !isDataSaverEnabled());
+    sync();
+    motion.addEventListener("change", sync);
+    connection?.addEventListener?.("change", sync);
+    window.addEventListener(DATA_SAVER_EVENT, sync);
+    return () => {
+      motion.removeEventListener("change", sync);
+      connection?.removeEventListener?.("change", sync);
+      window.removeEventListener(DATA_SAVER_EVENT, sync);
+    };
+  }, []);
+
+  const featured = Array.from(
+    new Map(media.map((item) => [item.id, item])).values(),
+  );
   if (!featured.length) return null;
 
   const edgeColor = tone === "cream" ? "#EEE3CB" : "#EEF1E9";
@@ -61,7 +82,7 @@ export function ResponsiveMediaRail({
             {cards()}
           </div>
           <div data-testid="media-rail-duplicates" aria-hidden="true" className="hidden gap-4 lg:flex">
-            {cards(true)}
+            {allowMarquee ? cards(true) : null}
           </div>
         </div>
       </div>

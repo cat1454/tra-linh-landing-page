@@ -8,15 +8,34 @@ vi.mock("@/components/animation/ScrollReveal", () => ({
   default: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
-vi.mock("@/components/home/HeroVideoBackground", () => ({
-  HeroVideoBackground: () => <div data-testid="hero-media" />,
-}));
-
 vi.mock("@/components/home/WeatherTimeCard", () => ({
   WeatherTimeCard: () => <div aria-label="Thời gian và thời tiết tại Trà Linh" />,
 }));
 
 describe("premium homepage hero layout", () => {
+  it("uses pre-compressed art-directed posters instead of the multi-megabyte source photo", () => {
+    expect(fallbackContent.hero.backgroundMedia.src).toBe(
+      "/images/tra-linh/hero-ban-lang-ngoc-linh-desktop.webp",
+    );
+    expect(fallbackContent.hero.mobilePoster?.src).toBe(
+      "/images/tra-linh/hero-ban-lang-ngoc-linh-mobile.webp",
+    );
+  });
+
+  it("uses the responsive poster as the hero background without embedding a video", () => {
+    const { container } = render(<HeroSection hero={fallbackContent.hero} />);
+
+    expect(container.querySelector("#dau-trang video")).not.toBeInTheDocument();
+    expect(container.querySelector('#dau-trang picture source')).toHaveAttribute(
+      "srcset",
+      fallbackContent.hero.mobilePoster?.src,
+    );
+    expect(
+      screen.getByRole("button", { name: /xem video giới thiệu/i }),
+    ).toBeVisible();
+    expect(container.querySelector("iframe")).not.toBeInTheDocument();
+  });
+
   it("uses the shared 1680px grid and a near full-screen composition", () => {
     const { container } = render(<HeroSection hero={fallbackContent.hero} />);
     const hero = container.querySelector("#dau-trang");
@@ -44,7 +63,7 @@ describe("premium homepage hero layout", () => {
 
     const rail = screen.getByLabelText("Thông tin nhanh");
     expect(rail).toHaveClass("min-[1180px]:w-[320px]", "xl:w-[360px]");
-    expect(rail.querySelector("#hero-sound-control")).toBeInTheDocument();
+    expect(rail.querySelector("#hero-sound-control")).not.toBeInTheDocument();
     expect(screen.getAllByRole("link", { name: /đại ngàn|vùng sâm|con người/i })).toHaveLength(3);
   });
 

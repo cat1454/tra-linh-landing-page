@@ -1909,6 +1909,9 @@ const journeys: Journey[] = JOURNEY_CARDS.map(item => {
     category: item.category,
     locationLabel: item.locationLabel,
     durationLabel: item.durationLabel,
+    difficultyLabel: item.difficultyLabel,
+    bestSeasonLabel: item.bestSeasonLabel,
+    itinerary: item.itinerary,
     accessStatus: item.accessStatus,
     accessNote: item.accessNote,
     safetyNote: item.safetyNote,
@@ -1989,7 +1992,7 @@ const localSpecialties: LocalSpecialty[] = LOCAL_SPECIALTIES.map(item => ({
 
 // --- 9. FULL PAGED CONTENT EXPORT ---
 export const fallbackContent: HomePageContent = {
-  source: 'fallback',
+  source: 'static',
   hero: {
     eyebrow: HERO_DATA.eyebrow,
     title: HERO_DATA.title,
@@ -1998,7 +2001,15 @@ export const fallbackContent: HomePageContent = {
     primaryCta: HERO_DATA.primaryCta,
     secondaryCta: HERO_DATA.secondaryCta,
     tags: HERO_DATA.tags,
-    backgroundMedia: allMediaList.find(m => m.src === HERO_DATA.imagePath) || media.heroPoster,
+    backgroundMedia: {
+      ...(allMediaList.find(m => m.src === HERO_DATA.imagePath) || media.heroPoster),
+      src: '/images/tra-linh/hero-ban-lang-ngoc-linh-desktop.webp',
+    },
+    mobilePoster: {
+      ...media.heroPoster,
+      id: 'media-hero-poster-mobile',
+      src: '/images/tra-linh/hero-ban-lang-ngoc-linh-mobile.webp',
+    },
     videoMedia: allMediaList.find(m => m.src === HERO_DATA.videoPath) || media.heroVideo,
   },
   sectionSettings: {

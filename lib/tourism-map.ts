@@ -100,6 +100,38 @@ export function getTourismViewportEntities(
   return filterTourismEntities(entities, filter);
 }
 
+const previewCategoryOrder: TourismPlace["category"][] = [
+  "ginseng",
+  "culture",
+  "community",
+  "nature",
+  "shopping",
+  "administrative",
+];
+
+export function getTourismPreviewEntities(
+  entities: TourismPlace[],
+  limit = 6,
+): TourismPlace[] {
+  if (limit <= 0) return [];
+  const insideTraLinh = getTourismViewportEntities(entities, "all");
+  const selected: TourismPlace[] = [];
+
+  for (const category of previewCategoryOrder) {
+    const candidates = insideTraLinh.filter((entity) => entity.category === category);
+    const candidate = candidates.find((entity) => entity.featured) ?? candidates[0];
+    if (candidate) selected.push(candidate);
+    if (selected.length === limit) return selected;
+  }
+
+  for (const entity of insideTraLinh) {
+    if (!selected.some(({ id }) => id === entity.id)) selected.push(entity);
+    if (selected.length === limit) break;
+  }
+
+  return selected;
+}
+
 export function hasMappableCoordinates(
   place: TourismPlace,
 ): place is TourismPlace & { latitude: number; longitude: number } {

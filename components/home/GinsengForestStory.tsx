@@ -1,6 +1,7 @@
 import { ContactRound, Trees } from "lucide-react";
 
 import ScrollReveal from "@/components/animation/ScrollReveal";
+import { SemanticHeadingText } from "@/components/home/SemanticHeadingText";
 import type { HomePageContent } from "@/lib/content/types";
 
 import { MediaFrame, SectionIntro } from "./_shared";
@@ -56,7 +57,9 @@ export function GinsengForestStory({ steps, section }: GinsengForestStoryProps) 
                   >
                     {String(step.stepNumber).padStart(2, "0")}
                   </span>
-                  <h3 className="font-serif text-3xl leading-tight sm:text-4xl">{step.title}</h3>
+                  <h3 className="font-serif text-3xl leading-tight sm:text-4xl">
+                    <SemanticHeadingText text={step.title} compact />
+                  </h3>
                   <p className="mt-5 max-w-xl text-base leading-8 text-[#EEF1E9]/68">{step.description}</p>
                   {step.quote ? (
                     <blockquote className="mt-7 border-l-2 border-[#D5A84E] pl-5 font-serif text-lg italic leading-8 text-[#EEE3CB]">
@@ -74,7 +77,9 @@ export function GinsengForestStory({ steps, section }: GinsengForestStoryProps) 
             <div className="flex items-start gap-4">
               <ContactRound aria-hidden="true" className="mt-1 size-6 shrink-0 text-[#D5A84E]" />
               <div>
-                <h3 className="font-serif text-xl">Tham quan có hướng dẫn</h3>
+                <h3 className="font-serif text-xl">
+                  <SemanticHeadingText text="Tham quan có hướng dẫn" compact />
+                </h3>
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-[#EEF1E9]/62">
                   Việc tiếp cận vườn sâm phụ thuộc quy định bảo tồn và điều kiện địa phương. Hãy liên hệ đơn vị quản lý trước hành trình.
                 </p>

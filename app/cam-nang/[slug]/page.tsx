@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { DetailPage } from "@/components/detail/DetailPage";
+import { GuideOfflineActions } from "@/components/detail/GuideOfflineActions";
 import {
   createArticleSchema,
   createBreadcrumbSchema,
@@ -104,6 +105,7 @@ export default async function GuideDetailPage({ params }: PageProps) {
         sourceCredit={guide.sourceCredit}
         updatedAt={guide.updatedAt}
         navigationTabs={navigationTabs}
+        supplementaryContent={<GuideOfflineActions guide={guide} />}
       />
     </>
   );

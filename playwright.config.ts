@@ -32,11 +32,6 @@ export default defineConfig({
       NEXT_PUBLIC_SITE_URL: baseURL,
       NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN: mapboxToken,
       NEXT_PUBLIC_MAPBOX_STYLE_URL: mapboxStyle,
-      NEXT_PUBLIC_SUPABASE_URL: 'http://127.0.0.1:54321',
-      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_e2e',
-      SUPABASE_SERVICE_ROLE_KEY: 'sb_secret_e2e',
-      RATE_LIMIT_SALT: 'tra-linh-e2e-rate-limit-salt',
-      SUPABASE_MEDIA_BUCKET: 'media',
     },
   },
 })

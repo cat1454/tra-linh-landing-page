@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { headers } from "next/headers";
 import { Be_Vietnam_Pro, Lora } from "next/font/google";
 
 import { SmoothScrollProvider } from "@/components/animation/SmoothScrollProvider";
@@ -13,7 +14,6 @@ import {
   SOCIAL_IMAGE_ALT,
   getSiteUrl,
 } from "@/components/detail/seo";
-import { getPublicSiteSettings } from "@/lib/content/public-settings-server";
 import { FACEBOOK_PAGE_URL } from "@/lib/site-links";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -92,28 +92,7 @@ const baseMetadata: Metadata = {
   },
 };
 
-export async function generateMetadata(): Promise<Metadata> {
-  const settings = await getPublicSiteSettings();
-  const title = settings.seoTitle;
-  const description = settings.seoDescription;
-  if (!title && !description) return baseMetadata;
-
-  return {
-    ...baseMetadata,
-    title: title ?? baseMetadata.title,
-    description: description ?? baseMetadata.description,
-    openGraph: {
-      ...baseMetadata.openGraph,
-      title: title ?? baseMetadata.openGraph?.title,
-      description: description ?? baseMetadata.openGraph?.description,
-    },
-    twitter: {
-      ...baseMetadata.twitter,
-      title: title ?? baseMetadata.twitter?.title,
-      description: description ?? baseMetadata.twitter?.description,
-    },
-  };
-}
+export const metadata = baseMetadata;
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -130,10 +109,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const siteSettings = await getPublicSiteSettings();
+  const locale = (await headers()).get("x-site-locale") === "en" ? "en" : "vi";
 
   return (
-    <html lang="vi" className={`${beVietnamPro.variable} ${lora.variable}`}>
+    <html lang={locale} className={`${beVietnamPro.variable} ${lora.variable}`}>
       <body className="min-h-screen bg-mist pb-[calc(4.5rem+env(safe-area-inset-bottom))] text-jungle antialiased md:pb-0">
         <SmoothScrollProvider>
           <a className="skip-link" href="#noi-dung-chinh">
@@ -141,30 +120,14 @@ export default async function RootLayout({
           </a>
 
           <div className="public-site-chrome contents">
-            <Header
-              title={siteSettings.headerTitle}
-              subtitle={siteSettings.headerSubtitle}
-              navigation={siteSettings.navigation}
-            />
+            <Header locale={locale} />
           </div>
 
           {children}
 
           <div className="public-site-chrome contents">
-            <Footer
-              contactEmail={siteSettings.contactEmail}
-              contactPhone={siteSettings.contactPhone}
-              title={siteSettings.footerTitle ?? siteSettings.headerTitle}
-              description={siteSettings.footerDescription}
-              legalAddress={siteSettings.legalAddress}
-              privacyUrl={siteSettings.privacyUrl}
-              facebookUrl={FACEBOOK_PAGE_URL}
-            />
-            <MobileStickyCta
-              contactPhone={siteSettings.contactPhone}
-              mapsUrl={siteSettings.mapsUrl}
-              zaloUrl={siteSettings.zaloUrl}
-            />
+            <Footer facebookUrl={FACEBOOK_PAGE_URL} locale={locale} />
+            <MobileStickyCta />
           </div>
         </SmoothScrollProvider>
 

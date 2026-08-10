@@ -1,6 +1,7 @@
 import { ExternalLink, Navigation } from "lucide-react";
 import Link from "next/link";
 
+import { SemanticHeadingText } from "@/components/home/SemanticHeadingText";
 import { getTourismCategoryLabel } from "@/data/tourism-map/categories";
 import type { TourismPlace } from "@/data/tourism-map/types";
 import { getPlaceDirectionsUrl, hasVerifiedCoordinates } from "@/lib/tourism-map";
@@ -27,7 +28,9 @@ export function TourismPlacePopup({ place }: { place: TourismPlace }) {
         <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#49672D]">
           {getTourismCategoryLabel(place.category)}
         </p>
-        <h3 className="mt-1 font-serif text-lg font-semibold leading-snug">{place.name}</h3>
+        <h3 className="mt-1 font-serif text-lg font-semibold leading-snug">
+          <SemanticHeadingText text={place.name} compact />
+        </h3>
         <p className="mt-2 line-clamp-3 text-xs leading-5 text-[#10251A]/65">
           {place.shortDescription}
         </p>

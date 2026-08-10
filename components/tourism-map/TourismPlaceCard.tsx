@@ -3,6 +3,7 @@
 import { ArrowUpRight, MapPin, Navigation } from "lucide-react";
 import Link from "next/link";
 
+import { SemanticHeadingText } from "@/components/home/SemanticHeadingText";
 import { getTourismCategoryLabel } from "@/data/tourism-map/categories";
 import type { TourismPlace } from "@/data/tourism-map/types";
 import { getPlaceDirectionsUrl, hasVerifiedCoordinates } from "@/lib/tourism-map";
@@ -58,12 +59,12 @@ export function TourismPlaceCard({
             ) : null}
           </span>
           <span
-            className={`block font-serif font-semibold leading-snug text-[#10251A] ${compact
+            className={`block text-balance font-serif font-semibold leading-snug text-[#10251A] ${compact
                 ? "mt-1 text-base min-[360px]:mt-2 min-[360px]:text-lg"
                 : "mt-2 text-lg"
               }`}
           >
-            {place.name}
+            <SemanticHeadingText text={place.name} compact />
           </span>
           <span
             className={`text-[#10251A]/65 ${compact

@@ -32,6 +32,10 @@ import {
   createTourismLabelLayer,
   getTourismMapConfiguration,
 } from "@/lib/tourism-map-basemap";
+import {
+  createTourismMarkerElement,
+  updateTourismMarkerElement,
+} from "@/lib/tourism-marker-element";
 import { TourismFilterBar } from "./TourismFilterBar";
 import { TourismMapErrorFallback } from "./TourismMapErrorFallback";
 import { TourismMapFullscreen } from "./TourismMapFullscreen";
@@ -91,7 +95,7 @@ interface PopupReference {
 }
 
 interface MarkerReference {
-  element: HTMLDivElement;
+  element: HTMLButtonElement;
   marker: mapboxgl.Marker;
   onSelect: () => void;
   place: TourismPlace;
@@ -127,11 +131,11 @@ function disposePopup(reference: PopupReference | null) {
 }
 
 function renderMarker(reference: MarkerReference, active: boolean) {
+  updateTourismMarkerElement(reference.element, active);
   reference.root.render(
     <TourismMapPointMarker
       place={reference.place}
       active={active}
-      onSelect={reference.onSelect}
     />,
   );
 }
@@ -294,8 +298,6 @@ export default function TourismMapClient({
       });
 
       entitiesRef.current.filter(hasMappableCoordinates).forEach((place) => {
-        const element = document.createElement("div");
-        const root = createRoot(element);
         const onSelect = () => {
           setLegendOpen(false);
           setActiveSlug(place.slug);
@@ -306,6 +308,8 @@ export default function TourismMapClient({
             });
           }
         };
+        const element = createTourismMarkerElement(place.name, onSelect);
+        const root = createRoot(element);
         const marker = new mapboxgl.Marker({ element, anchor: "center" })
           .setLngLat([place.longitude, place.latitude])
           .addTo(map);

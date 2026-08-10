@@ -5,6 +5,7 @@ import { ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { useId, useState } from "react";
 
+import { SemanticHeadingText } from "@/components/home/SemanticHeadingText";
 import type { HomePageContent } from "@/lib/content/types";
 
 import { PlaceholderPill } from "./_shared";
@@ -37,7 +38,9 @@ export function TravelGuideAccordion({ guides }: TravelGuideAccordionProps) {
                 className="group flex min-h-20 w-full items-center justify-between gap-5 py-5 text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#5E7F3B]"
               >
                 <span className="flex min-w-0 items-center gap-4">
-                  <span className="font-serif text-2xl text-[#10251A] sm:text-3xl">{guide.title}</span>
+                  <span className="font-serif text-2xl text-[#10251A] sm:text-3xl">
+                    <SemanticHeadingText text={guide.title} compact />
+                  </span>
                   {guide.isPlaceholder ? <span className="hidden sm:inline-flex"><PlaceholderPill label={guide.placeholderLabel} /></span> : null}
                 </span>
                 <span className="grid size-11 shrink-0 place-items-center rounded-full border border-[#10251A]/20 transition-colors group-hover:border-[#5E7F3B] group-hover:text-[#5E7F3B]">
@@ -61,7 +64,9 @@ export function TravelGuideAccordion({ guides }: TravelGuideAccordionProps) {
                     <p className="text-base leading-8 text-[#10251A]/70">{guide.shortDescription}</p>
                     {guide.sections.slice(0, 2).map((section) => (
                       <div key={section.title} className="mt-5">
-                        <h4 className="text-sm font-semibold text-[#29452C]">{section.title}</h4>
+                        <h4 className="text-sm font-semibold text-[#29452C]">
+                          <SemanticHeadingText text={section.title} compact />
+                        </h4>
                         <p className="mt-1 text-sm leading-7 text-[#3D5133]">{section.body}</p>
                       </div>
                     ))}

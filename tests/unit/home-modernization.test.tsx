@@ -112,7 +112,7 @@ describe("modern responsive homepage interactions", () => {
     expect(screen.getByText("Sản vật sam")).toBeInTheDocument();
   });
 
-  it("limits each media rail to twelve originals and hides desktop duplicates from assistive technology", () => {
+  it("keeps every unique media item and hides desktop duplicates from assistive technology", () => {
     render(
       <ResponsiveMediaRail
         media={Array.from({ length: 20 }, (_, index) => media(`rail-${index + 1}`))}
@@ -122,7 +122,7 @@ describe("modern responsive homepage interactions", () => {
     );
 
     const originals = within(screen.getByTestId("media-rail-originals")).getAllByRole("img");
-    expect(originals).toHaveLength(12);
+    expect(originals).toHaveLength(20);
     expect(screen.getByTestId("media-rail-duplicates")).toHaveAttribute("aria-hidden", "true");
     expect(within(screen.getByTestId("media-rail-duplicates")).queryAllByRole("img")).toHaveLength(0);
   });

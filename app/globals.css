@@ -8,6 +8,7 @@ body:has([data-admin-root]) .public-site-chrome {
 }
 
 :root {
+  --site-header-offset: 5.5rem;
   --forest-black: #07100c;
   --deep-jungle: #10251a;
   --forest-moss: #29452c;
@@ -44,8 +45,38 @@ body:has([data-admin-root]) .public-site-chrome {
 html {
   min-width: 320px;
   scroll-behavior: smooth;
-  scroll-padding-top: 5.5rem;
+  scroll-padding-top: var(--site-header-offset);
   background: var(--mist-white);
+}
+
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+  html:has(.landing-page):not(.lenis) {
+    scroll-snap-type: y proximity;
+  }
+
+  .landing-page > section:is([id], [aria-labelledby]),
+  .landing-page > #lien-he {
+    scroll-snap-align: start;
+    scroll-snap-stop: normal;
+  }
+}
+
+/* Short chapters get a viewport-sized canvas. Content-heavy chapters keep
+ * their intrinsic height, so scroll snap never blocks reading within them. */
+@media (min-width: 1024px) {
+  .landing-page > :is(
+    #cau-chuyen,
+    #san-vat,
+    #san-pham-sam,
+    #cam-nang,
+    #bao-chi,
+    section[aria-labelledby="final-cta-heading"],
+    #lien-he
+  ) {
+    display: grid;
+    min-block-size: calc(100svh - var(--site-header-offset));
+    align-items: center;
+  }
 }
 
 body {
@@ -85,6 +116,43 @@ h3,
 h4,
 li {
   overflow-wrap: break-word;
+}
+
+/* The original brand green is decorative. Small foreground text uses the
+ * darker accessible variant to meet WCAG AA on both mist and cream surfaces. */
+#noi-dung-chinh .text-\[\#5E7F3B\] {
+  color: #3d5133;
+}
+
+@media print {
+  .public-site-chrome,
+  .no-print,
+  .skip-link {
+    display: none !important;
+  }
+
+  body {
+    padding: 0 !important;
+    background: white !important;
+  }
+
+  .trip-planner {
+    break-inside: avoid;
+    border: 1px solid #405347 !important;
+    background: white !important;
+    box-shadow: none !important;
+  }
+}
+
+.landing-page :is(h1, h2, h3, h4) {
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
+  text-wrap: balance;
+}
+
+.landing-page p {
+  text-wrap: pretty;
 }
 
 ::selection {

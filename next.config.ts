@@ -2,27 +2,16 @@ import type { NextConfig } from "next";
 
 const isDevelopment = process.env.NODE_ENV === "development";
 
-const remoteImagePatterns = [
-  {
-    protocol: "https",
-    hostname: "*.supabase.co",
-    pathname: "/storage/v1/object/public/**",
-  },
-] satisfies NonNullable<NonNullable<NextConfig["images"]>["remotePatterns"]>;
-
-const remoteImageSources = remoteImagePatterns
-  .map(({ protocol, hostname }) => `${protocol}://${hostname}`)
-  .join(" ");
-
 const contentSecurityPolicy = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'${isDevelopment ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
-  `img-src 'self' data: blob: ${remoteImageSources}`,
+  "img-src 'self' data: blob:",
   "font-src 'self' data:",
-  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.mapbox.com https://events.mapbox.com https://api.open-meteo.com",
+  "connect-src 'self' https://api.mapbox.com https://events.mapbox.com https://api.open-meteo.com",
   "worker-src 'self' blob:",
-  "media-src 'self' blob: https://*.supabase.co",
+  "media-src 'self' blob:",
+  "frame-src 'self' https://www.youtube-nocookie.com",
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",
@@ -38,7 +27,6 @@ const nextConfig: NextConfig = {
   },
   images: {
     formats: ["image/avif", "image/webp"],
-    remotePatterns: remoteImagePatterns,
   },
   async headers() {
     return [

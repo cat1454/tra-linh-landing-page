@@ -1,6 +1,7 @@
 import { MapPin, ExternalLink } from "lucide-react";
 import Link from "next/link";
 
+import { SemanticHeadingText } from "@/components/home/SemanticHeadingText";
 import type { HomePageContent } from "@/lib/content/types";
 
 import { MediaFrame, PlaceholderPill } from "./_shared";
@@ -41,7 +42,9 @@ export function JourneyCard({
               </a>
             </p>
           ) : null}
-          <h3 className="mt-3 font-serif text-3xl leading-tight text-[#EEF1E9] sm:text-4xl">{journey.title}</h3>
+          <h3 className="mt-3 font-serif text-3xl leading-tight text-[#EEF1E9] sm:text-4xl">
+            <SemanticHeadingText text={journey.title} compact />
+          </h3>
           <p className="mt-4 line-clamp-3 text-sm leading-7 text-[#EEF1E9]/70">{journey.shortDescription}</p>
           <Link
             href={`/hanh-trinh/${journey.slug}`}

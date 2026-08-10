@@ -14,12 +14,6 @@ const result = spawnSync(process.execPath, [nextCli, "build"], {
     NEXT_PUBLIC_MAPBOX_STYLE_URL:
       process.env.E2E_MAPBOX_STYLE_URL?.trim() ??
       "mapbox://styles/mapbox/standard",
-    NEXT_PUBLIC_SUPABASE_URL: "http://127.0.0.1:54321",
-    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "sb_publishable_e2e",
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: "",
-    SUPABASE_SERVICE_ROLE_KEY: "sb_secret_e2e",
-    RATE_LIMIT_SALT: "tra-linh-e2e-rate-limit-salt",
-    SUPABASE_MEDIA_BUCKET: "media",
   },
 });
 

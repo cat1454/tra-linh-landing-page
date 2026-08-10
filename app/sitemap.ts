@@ -92,6 +92,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "yearly",
       priority: 0.3,
     },
+    { url: getAbsoluteUrl("/vi"), changeFrequency: "weekly", priority: 0.9 },
+    { url: getAbsoluteUrl("/en"), changeFrequency: "weekly", priority: 0.8 },
+    { url: getAbsoluteUrl("/thoi-tiet"), changeFrequency: "daily", priority: 0.8 },
+    { url: getAbsoluteUrl("/tim-kiem"), changeFrequency: "monthly", priority: 0.5 },
+    { url: getAbsoluteUrl("/cau-hoi-thuong-gap"), changeFrequency: "monthly", priority: 0.6 },
     ...detailEntries,
     ...tourismEntries,
   ];

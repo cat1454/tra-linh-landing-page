@@ -28,8 +28,6 @@
     "crawl:tourism-images": "tsx scripts/crawl-tourism-images.ts"
   },
   "dependencies": {
-    "@supabase/ssr": "^0.12.3",
-    "@supabase/supabase-js": "^2.110.8",
     "@vercel/speed-insights": "^2.0.0",
     "clsx": "^2.1.1",
     "embla-carousel-react": "^8.6.0",
@@ -41,10 +39,7 @@
     "next": "16.2.12",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "server-only": "^0.0.1",
-    "sharp": "^0.35.3",
-    "tus-js-client": "^4.3.1",
-    "zod": "^4.4.3"
+    "sharp": "^0.35.3"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.12.1",
@@ -70,9 +65,12 @@
     "vitest": "^4.1.10"
   },
   "overrides": {
-    "brace-expansion": "5.0.8",
-    "minimatch": "10.2.5",
-    "postcss": "8.5.21",
-    "sharp": "$sharp"
+    "brace-expansion": "5.0.9",
+    "js-yaml": "4.3.1",
+    "minimatch": "10.2.6",
+    "nanoid": "3.3.18",
+    "postcss": "8.5.26",
+    "sharp": "$sharp",
+    "undici": "7.29.0"
   }
 }

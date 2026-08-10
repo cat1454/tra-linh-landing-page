@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import type { ReactNode } from "react";
 
 import type { MediaAsset } from "@/lib/content/types";
 
@@ -35,6 +36,7 @@ type DetailPageProps = {
   sourceCredit?: string;
   updatedAt?: string;
   navigationTabs?: { label: string; href: string; isActive: boolean }[];
+  supplementaryContent?: ReactNode;
 };
 
 const dateFormatter = new Intl.DateTimeFormat("vi-VN", {
@@ -76,6 +78,7 @@ export function DetailPage({
   sourceCredit,
   updatedAt,
   navigationTabs,
+  supplementaryContent,
 }: DetailPageProps) {
   const formattedDate = updatedAt ? formatDate(updatedAt) : null;
   const galleryItems = gallery.filter(
@@ -182,6 +185,8 @@ export function DetailPage({
             <p className="mt-6 whitespace-pre-line text-lg leading-8 text-[#35483B]">
               {description}
             </p>
+
+            {supplementaryContent}
 
             {sections.map((section) => (
               <section

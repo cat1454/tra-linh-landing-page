@@ -80,9 +80,24 @@ describe("public shell", () => {
   it("links the footer to the configured Facebook fanpage", () => {
     render(<Footer facebookUrl={FACEBOOK_PAGE_URL} />);
 
+    expect(screen.getByRole("contentinfo")).toHaveAttribute("id", "lien-he");
     expect(
-      screen.getByRole("link", { name: /Fanpage Xứ sở Sâm Ngọc Linh/i }),
+      screen.getByRole("heading", { name: /Liên hệ & hỗ trợ chuyến đi/i }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole("link", { name: /Nhắn Fanpage Xứ sở Sâm Ngọc Linh/i }),
     ).toHaveAttribute("href", FACEBOOK_PAGE_URL);
+    expect(screen.getByText(/Phản hồi trong giờ hành chính/i)).toBeVisible();
+  });
+
+  it("links the destination index to the working tourism map route", () => {
+    render(<Footer />);
+
+    expect(screen.getByRole("link", { name: "Địa điểm & bản đồ" })).toHaveAttribute(
+      "href",
+      "/ban-do-du-lich",
+    );
+    expect(document.querySelector('a[href="/dia-diem"]')).not.toBeInTheDocument();
   });
 
   it("uses the editable address and privacy link in the public footer", () => {

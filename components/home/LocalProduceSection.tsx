@@ -7,6 +7,7 @@ import ScrollReveal from "@/components/animation/ScrollReveal";
 
 import type { HomePageContent, LocalSpecialty } from "@/lib/content/types";
 import { SpecialtyStoryModal } from "@/components/ui/SpecialtyStoryModal";
+import { SemanticHeadingText } from "@/components/home/SemanticHeadingText";
 
 import { MediaFrame, PlaceholderPill, SectionIntro } from "./_shared";
 
@@ -31,12 +32,15 @@ const filterTabs = [
 export function LocalProduceSection({ items, section }: LocalProduceSectionProps) {
   const [selectedSpecialty, setSelectedSpecialty] = useState<LocalSpecialty | null>(null);
   const [activeCategory, setActiveCategory] = useState<string>("all");
+  const [visibleCount, setVisibleCount] = useState(6);
 
   if (!items.length) return null;
 
   const filteredItems = activeCategory === "all"
     ? items
     : items.filter(item => item.category === activeCategory);
+  const visibleItems = filteredItems.slice(0, visibleCount);
+  const remainingCount = filteredItems.length - visibleItems.length;
 
   return (
     <section id="san-vat" aria-labelledby="produce-heading" className="bg-[#EEF1E9] px-5 py-12 text-[#10251A] sm:px-8 sm:py-16 lg:px-16 lg:py-20 xl:px-20">
@@ -62,7 +66,10 @@ export function LocalProduceSection({ items, section }: LocalProduceSectionProps
                   key={tab.id}
                   type="button"
                   aria-pressed={isActive}
-                  onClick={() => setActiveCategory(tab.id)}
+                  onClick={() => {
+                    setActiveCategory(tab.id);
+                    setVisibleCount(6);
+                  }}
                   className={`inline-flex min-h-11 items-center gap-2 rounded-full px-5 py-2 text-xs font-bold uppercase tracking-[0.1em] transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#5E7F3B] active:scale-95 ${
                     isActive
                       ? "bg-[#29452C] text-[#EEF1E9] shadow-[0_8px_20px_rgba(41,69,44,0.2)] scale-[1.02]"
@@ -83,7 +90,7 @@ export function LocalProduceSection({ items, section }: LocalProduceSectionProps
           className="mt-8 grid gap-6 sm:grid-cols-2 lg:mt-10 lg:grid-cols-3"
         >
           <AnimatePresence mode="popLayout">
-            {filteredItems.map((item) => {
+            {visibleItems.map((item) => {
               const meta = categoryMeta[item.category];
               const Icon = meta.icon;
 
@@ -115,7 +122,9 @@ export function LocalProduceSection({ items, section }: LocalProduceSectionProps
                       {item.isPlaceholder ? <PlaceholderPill label={item.placeholderLabel} /> : null}
                     </div>
                     <div>
-                      <h3 className="font-serif text-2xl text-[#EEF1E9] sm:text-3xl leading-tight">{item.name}</h3>
+                      <h3 className="font-serif text-2xl text-[#EEF1E9] sm:text-3xl leading-tight">
+                        <SemanticHeadingText text={item.name} compact />
+                      </h3>
                       <p className="mt-2 line-clamp-2 text-sm leading-6 text-[#EEF1E9]/78">{item.description}</p>
                       <div
                         className="mt-4 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.14em] text-[#D5A84E] group-hover:text-[#EEF1E9] transition-colors"
@@ -130,6 +139,18 @@ export function LocalProduceSection({ items, section }: LocalProduceSectionProps
             })}
           </AnimatePresence>
         </motion.div>
+
+        {remainingCount > 0 ? (
+          <div className="mt-8 flex justify-center">
+            <button
+              type="button"
+              onClick={() => setVisibleCount((count) => Math.min(count + 6, filteredItems.length))}
+              className="inline-flex min-h-12 items-center rounded-full border border-[#29452C]/25 bg-white/70 px-6 text-sm font-semibold text-[#29452C] transition hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#5E7F3B]"
+            >
+              Xem thêm {remainingCount} sản vật
+            </button>
+          </div>
+        ) : null}
       </div>
 
       <AnimatePresence>

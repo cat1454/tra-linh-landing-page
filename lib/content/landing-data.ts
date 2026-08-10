@@ -58,6 +58,13 @@ export const JOURNEY_CARDS = [
     category: "nature" as const,
     locationLabel: "Rừng nguyên sinh Trà Linh",
     durationLabel: "1 ngày trải nghiệm",
+    difficultyLabel: "Khá · cần thể lực và người dẫn đường",
+    bestSeasonLabel: "Đang xác minh với đơn vị địa phương",
+    itinerary: [
+      { title: "Xác nhận hành trình", description: "Liên hệ đơn vị tổ chức hoặc người dẫn đường và kiểm tra điều kiện thời tiết." },
+      { title: "Đi dưới tán rừng", description: "Di chuyển theo đoàn, quan sát sinh cảnh và thực vật đặc hữu." },
+      { title: "Rời rừng an toàn", description: "Kiểm tra quân số, mang toàn bộ rác ra ngoài và kết thúc trước khi trời tối." },
+    ],
     accessStatus: "organized_only" as const,
     accessNote:
       "Chỉ tham gia theo chương trình được phê duyệt hoặc có kiểm lâm/người dẫn đường địa phương.",
@@ -83,6 +90,13 @@ export const JOURNEY_CARDS = [
     category: "community" as const,
     locationLabel: "Nọc (bản) người Xơ Đăng, Trà Linh",
     durationLabel: "Nửa ngày hoặc ở lại qua đêm",
+    difficultyLabel: "Đang xác minh với đơn vị địa phương",
+    bestSeasonLabel: "Đang xác minh với đơn vị địa phương",
+    itinerary: [
+      { title: "Liên hệ trước", description: "Xin xác nhận của trưởng bản hoặc ban đại diện địa phương trước khi đến." },
+      { title: "Tìm hiểu không gian bản", description: "Khám phá kiến trúc, sinh hoạt và câu chuyện văn hóa cùng người địa phương." },
+      { title: "Khép lại có trách nhiệm", description: "Tôn trọng quyền riêng tư, xin phép trước khi chụp ảnh và giữ gìn không gian chung." },
+    ],
     accessStatus: "contact_required" as const,
     accessNote:
       "Cần liên hệ với trưởng bản hoặc ban đại diện địa phương trước khi vào tham quan.",
@@ -108,6 +122,13 @@ export const JOURNEY_CARDS = [
     category: "ginseng" as const,
     locationLabel: "Vườn dược liệu Trà Linh",
     durationLabel: "Tham quan theo lịch ươm giống",
+    difficultyLabel: "Đang xác minh với đơn vị địa phương",
+    bestSeasonLabel: "Theo lịch của đơn vị bảo tồn",
+    itinerary: [
+      { title: "Kiểm tra lịch mở cửa", description: "Chỉ lên đường khi đoàn đã được đơn vị quản lý xác nhận." },
+      { title: "Tham quan có hướng dẫn", description: "Tìm hiểu quy trình ươm giống và bảo tồn theo tuyến được cho phép." },
+      { title: "Tuân thủ bảo tồn", description: "Không chạm, hái hoặc di chuyển cây và vật liệu trong khu vực bảo tồn." },
+    ],
     accessStatus: "organized_only" as const,
     accessNote:
       "Khu vực bảo tồn sâm nghiêm ngặt, chỉ mở cửa cho các chương trình khoa học hoặc đoàn được cấp phép.",

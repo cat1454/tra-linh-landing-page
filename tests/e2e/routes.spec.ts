@@ -35,22 +35,26 @@ test('privacy route is indexable and links back home', async ({ page }) => {
   )
 })
 
-test('admin redirects anonymous visitors to the configured login', async ({ page }) => {
-  const response = await page.goto('/admin', { waitUntil: 'domcontentloaded' })
-
-  expect(response?.ok()).toBe(true)
-  await expect(page.locator('main#noi-dung-chinh')).toBeVisible()
-  await expect(page).toHaveURL(/\/admin\/login$/)
-  await expect(page.getByRole('heading', { name: 'Đăng nhập quản trị' })).toBeVisible()
-  await expect(page.locator('.site-header')).toBeHidden()
-  await expect(page.locator('.public-site-chrome').last()).toBeHidden()
+test('planning, search, FAQ, and English routes are public', async ({ page }) => {
+  for (const route of ['/thoi-tiet', '/tim-kiem', '/cau-hoi-thuong-gap', '/vi', '/en']) {
+    const response = await page.goto(route, { waitUntil: 'domcontentloaded' })
+    expect(response?.ok(), `${route} should return HTTP 200`).toBe(true)
+    await expect(page.locator('main#noi-dung-chinh')).toBeVisible()
+  }
 })
 
-test('configured admin login accepts an allowlisted email', async ({ page }) => {
-  const response = await page.goto('/admin/login', { waitUntil: 'domcontentloaded' })
+test('English route exposes English metadata and document language', async ({ page }) => {
+  await page.goto('/en', { waitUntil: 'domcontentloaded' })
 
-  expect(response?.ok()).toBe(true)
-  await expect(page.getByRole('heading', { name: 'Đăng nhập quản trị' })).toBeVisible()
-  await expect(page.getByLabel('Email quản trị')).toHaveAttribute('required', '')
-  await expect(page.getByRole('button', { name: 'Gửi liên kết đăng nhập' })).toBeEnabled()
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en')
+  await expect(page).toHaveTitle(/Tra Linh/i)
+  await expect(page.getByRole('heading', { level: 1 })).toContainText(/Tra Linh/i)
+})
+
+test('retired admin routes stay unavailable on the static public site', async ({ page }) => {
+  for (const route of ['/admin', '/admin/login']) {
+    const response = await page.goto(route, { waitUntil: 'domcontentloaded' })
+    expect(response?.status()).toBe(404)
+    await expect(page.getByRole('heading', { name: /không tìm thấy trang/i })).toBeVisible()
+  }
 })

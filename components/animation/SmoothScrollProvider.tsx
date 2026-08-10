@@ -40,10 +40,18 @@ export function SmoothScrollProvider({ children }: SmoothScrollProviderProps) {
       gsap.registerPlugin(ScrollTrigger)
 
       activeSmoothScrollCleanup?.()
+      const getHeaderOffset = () => {
+        const value = getComputedStyle(document.documentElement).scrollPaddingTop
+        return Number.parseFloat(value) || 0
+      }
       const lenis = new Lenis({
         duration: 1.05,
         smoothWheel: true,
         syncTouch: false,
+        anchors: {
+          duration: 0.85,
+        },
+        stopInertiaOnNavigate: true,
       })
 
       const handleScroll = () => ScrollTrigger.update()
@@ -51,6 +59,140 @@ export function SmoothScrollProvider({ children }: SmoothScrollProviderProps) {
       lenis.on('scroll', handleScroll)
       gsap.ticker.add(tick)
       gsap.ticker.lagSmoothing(0)
+
+      const landingPage = document.querySelector<HTMLElement>('.landing-page')
+      const desktopSnapQuery = window.matchMedia('(min-width: 1024px)')
+      let chapterResizeObserver: ResizeObserver | undefined
+      let chapterRefreshFrame = 0
+      let chapterSnapTimer: ReturnType<typeof setTimeout> | undefined
+      let chapterPoints: number[] = []
+      let chapterSnapEnabled = false
+      let chapterDirection: -1 | 1 = 1
+      let chapterGestureDistance = 0
+
+      const cancelChapterSettle = () => {
+        if (chapterSnapTimer) clearTimeout(chapterSnapTimer)
+        chapterSnapTimer = undefined
+        chapterGestureDistance = 0
+      }
+
+      const refreshChapterPoints = () => {
+        if (!chapterSnapEnabled || !landingPage) return
+
+        const headerOffset = getHeaderOffset()
+        const chapters = landingPage.querySelectorAll<HTMLElement>(
+          ':scope > section:is([id], [aria-labelledby]), :scope > #lien-he',
+        )
+        chapterPoints = Array.from(chapters, (chapter) => {
+          const top = chapter.getBoundingClientRect().top + window.scrollY
+          return Math.max(0, Math.round(top - headerOffset))
+        })
+      }
+
+      const scheduleChapterRefresh = () => {
+        cancelAnimationFrame(chapterRefreshFrame)
+        chapterRefreshFrame = requestAnimationFrame(refreshChapterPoints)
+      }
+
+      const disableChapterSnap = () => {
+        cancelAnimationFrame(chapterRefreshFrame)
+        cancelChapterSettle()
+        chapterResizeObserver?.disconnect()
+        chapterResizeObserver = undefined
+        chapterPoints = []
+        chapterSnapEnabled = false
+        document.documentElement.removeAttribute('data-lenis-chapter-snap')
+      }
+
+      const settleChapter = () => {
+        chapterSnapTimer = undefined
+        const gestureDistance = chapterGestureDistance
+        chapterGestureDistance = 0
+        if (
+          !chapterSnapEnabled ||
+          chapterPoints.length === 0 ||
+          gestureDistance < 40
+        ) return
+
+        const position = lenis.targetScroll
+        const distanceThreshold = Math.min(window.innerHeight * 0.52, 520)
+        const target = chapterDirection > 0
+          ? chapterPoints.find((point) => point > position + 1)
+          : chapterPoints.findLast((point) => point < position - 1)
+
+        if (target === undefined || Math.abs(target - position) > distanceThreshold) return
+
+        lenis.scrollTo(target, {
+          duration: 0.72,
+          lock: false,
+          userData: { initiator: 'chapter-snap' },
+        })
+      }
+
+      const handleChapterGesture = ({
+        deltaX,
+        deltaY,
+        event,
+      }: {
+        deltaX: number
+        deltaY: number
+        event: WheelEvent | TouchEvent
+      }) => {
+        if (!chapterSnapEnabled || event.type === 'touchmove') return
+        if (Math.abs(deltaY) <= Math.abs(deltaX) || deltaY === 0) return
+
+        const eventTarget = event.target instanceof Element ? event.target : null
+        if (eventTarget?.closest('[data-lenis-prevent], [data-lenis-prevent-wheel], [role="dialog"]')) return
+
+        const nextDirection = deltaY > 0 ? 1 : -1
+        if (chapterDirection !== nextDirection) chapterGestureDistance = 0
+        chapterDirection = nextDirection
+        chapterGestureDistance += Math.abs(deltaY)
+        if (chapterSnapTimer) clearTimeout(chapterSnapTimer)
+        chapterSnapTimer = setTimeout(settleChapter, 180)
+      }
+
+      const handleAnchorNavigation = (event: MouseEvent) => {
+        const currentUrl = new URL(window.location.href)
+        const anchor = event
+          .composedPath()
+          .find((node): node is HTMLAnchorElement =>
+            node instanceof HTMLAnchorElement && Boolean(node.href),
+          )
+        if (!anchor) return
+
+        const targetUrl = new URL(anchor.href)
+        if (
+          targetUrl.host === currentUrl.host &&
+          targetUrl.pathname === currentUrl.pathname &&
+          targetUrl.hash
+        ) {
+          cancelChapterSettle()
+        }
+      }
+
+      lenis.on('virtual-scroll', handleChapterGesture)
+      document.addEventListener('click', handleAnchorNavigation, true)
+
+      const syncChapterSnap = () => {
+        if (!landingPage || !desktopSnapQuery.matches) {
+          disableChapterSnap()
+          return
+        }
+        if (chapterSnapEnabled) {
+          scheduleChapterRefresh()
+          return
+        }
+
+        chapterSnapEnabled = true
+        document.documentElement.setAttribute('data-lenis-chapter-snap', '')
+        chapterResizeObserver = new ResizeObserver(scheduleChapterRefresh)
+        chapterResizeObserver.observe(landingPage)
+        scheduleChapterRefresh()
+      }
+
+      desktopSnapQuery.addEventListener('change', syncChapterSnap)
+      syncChapterSnap()
 
       const animationMedia = gsap.matchMedia()
       const animationContext = gsap.context(() => {
@@ -165,8 +307,12 @@ export function SmoothScrollProvider({ children }: SmoothScrollProviderProps) {
       ScrollTrigger.refresh()
 
       const cleanup = () => {
+        desktopSnapQuery.removeEventListener('change', syncChapterSnap)
+        disableChapterSnap()
         animationMedia.revert()
         animationContext.revert()
+        document.removeEventListener('click', handleAnchorNavigation, true)
+        lenis.off('virtual-scroll', handleChapterGesture)
         lenis.off('scroll', handleScroll)
         gsap.ticker.remove(tick)
         lenis.destroy()
@@ -189,20 +335,17 @@ export function SmoothScrollProvider({ children }: SmoothScrollProviderProps) {
     const removeInteractionListeners = () => {
       window.removeEventListener('pointerdown', beginOnInteraction)
       window.removeEventListener('wheel', beginOnInteraction)
-      window.removeEventListener('touchstart', beginOnInteraction)
-      window.removeEventListener('keydown', beginOnInteraction)
     }
-    const beginOnInteraction = () => {
+    const beginOnInteraction = (event: Event) => {
+      if (event instanceof PointerEvent && event.pointerType === 'touch') return
       interactionStarted = true
       removeInteractionListeners()
       if (!reducedMotionQuery.matches) void start()
     }
 
     reducedMotionQuery.addEventListener('change', handleMotionPreference)
-    window.addEventListener('pointerdown', beginOnInteraction, { once: true, passive: true })
-    window.addEventListener('wheel', beginOnInteraction, { once: true, passive: true })
-    window.addEventListener('touchstart', beginOnInteraction, { once: true, passive: true })
-    window.addEventListener('keydown', beginOnInteraction, { once: true })
+    window.addEventListener('pointerdown', beginOnInteraction, { passive: true })
+    window.addEventListener('wheel', beginOnInteraction, { passive: true })
 
     return () => {
       cancelled = true

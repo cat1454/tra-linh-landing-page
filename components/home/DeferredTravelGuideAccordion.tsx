@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 
+import { SemanticHeadingText } from "@/components/home/SemanticHeadingText";
 import type { HomePageContent } from "@/lib/content/types";
 
 const LazyTravelGuideAccordion = lazy(() =>
@@ -21,7 +22,9 @@ function StaticGuideList({ guides }: Props) {
       {guides.map((guide, index) => (
         <details key={guide.id} open={index === 0} className="group">
           <summary className="flex min-h-20 cursor-pointer list-none items-center justify-between gap-5 py-5 font-serif text-2xl marker:content-none sm:text-3xl">
-            {guide.title}
+            <span className="min-w-0 text-balance">
+              <SemanticHeadingText text={guide.title} compact />
+            </span>
             <span aria-hidden="true" className="grid size-11 shrink-0 place-items-center rounded-full border border-[#10251A]/20 text-base">+</span>
           </summary>
           <div className="max-w-3xl pb-7 pr-12">

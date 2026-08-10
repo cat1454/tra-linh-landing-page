@@ -1,0 +1,41 @@
+{
+  "TRIP_INFO_GAPS": {
+    "label": "Chờ dữ liệu chính thức về quãng đường, chi phí hoặc lịch nhận khách",
+    "evidence": "blocked_by_official_source",
+    "evidenceRef": "evidence-deployed-latest.json#pageFacts.headings,anchors",
+    "requestedFeatures": [
+      "verified_route_distance",
+      "official_costs",
+      "booking_availability"
+    ],
+    "resolutionStatus": "blocked_external"
+  },
+  "SATISFIED_NO_CHANGE": {
+    "label": "Hài lòng, không yêu cầu chỉnh sửa",
+    "evidence": "preference",
+    "evidenceRef": "evidence-deployed-latest.json#featureChecks",
+    "requestedFeatures": [
+      "no_change"
+    ],
+    "resolutionStatus": "satisfied"
+  },
+  "OFFICIAL_EVENTS_REQUEST": {
+    "label": "Chờ nguồn chính thức cho lịch sự kiện và cảnh báo chủ động",
+    "evidence": "blocked_by_official_source",
+    "evidenceRef": "evidence-deployed-latest.json#featureChecks",
+    "requestedFeatures": [
+      "official_events_feed",
+      "official_travel_alerts"
+    ],
+    "resolutionStatus": "blocked_external"
+  },
+  "PRODUCT_TRACEABILITY_REQUEST": {
+    "label": "Chờ hệ thống truy xuất nguồn gốc sâm từ đơn vị có thẩm quyền",
+    "evidence": "blocked_by_official_source",
+    "evidenceRef": "evidence-deployed-latest.json#featureChecks.faqAuthenticityGuidance",
+    "requestedFeatures": [
+      "official_ginseng_traceability"
+    ],
+    "resolutionStatus": "blocked_external"
+  }
+}

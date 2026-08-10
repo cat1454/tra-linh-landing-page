@@ -52,23 +52,7 @@ export function applyApprovedTourismMedia(
 }
 
 export function isTrustedTourismImageUrl(value: string | null): value is string {
-  if (!value) return false;
-  if (value.startsWith("/images/")) return true;
-
-  const configuredSupabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
-  if (!configuredSupabaseUrl) return false;
-
-  try {
-    const candidate = new URL(value);
-    const supabase = new URL(configuredSupabaseUrl);
-    return (
-      candidate.protocol === "https:" &&
-      candidate.hostname === supabase.hostname &&
-      candidate.pathname.startsWith("/storage/v1/object/public/")
-    );
-  } catch {
-    return false;
-  }
+  return Boolean(value?.startsWith("/images/"));
 }
 
 export function sanitizeTourismPlaceMedia(place: TourismPlace): TourismPlace {

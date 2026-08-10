@@ -1,6 +1,7 @@
 import type { HomePageContent } from "@/lib/content/types";
 import { HorizontalJourney } from "@/components/animation/HorizontalJourney";
 import ScrollReveal from "@/components/animation/ScrollReveal";
+import { SemanticHeadingText } from "@/components/home/SemanticHeadingText";
 
 import { DeferredJourneyCarousel } from "./DeferredJourneyCarousel";
 import { JourneyCard } from "./JourneyCard";
@@ -36,16 +37,15 @@ export function JourneySection({ journeys, section, activityMedia = [] }: Journe
           </HorizontalJourney>
         </div>
 
-        {/* Activity Gallery (64 real images) */}
         {activityMedia.length > 0 && (
           <ScrollReveal direction="up" delay={0.2}>
             <div className="mt-16 border-t border-[#10251A]/10 pt-12">
               <div className="flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between">
                 <h3 className="font-serif text-2xl text-[#10251A] sm:text-3xl">
-                  Hình ảnh hoạt động trải nghiệm thực tế
+                  <SemanticHeadingText text="Hình ảnh hoạt động trải nghiệm thực tế" compact />
                 </h3>
                 <p className="text-xs text-[#536258] uppercase tracking-[0.12em]">
-                  {Math.min(activityMedia.length, 12)} khoảnh khắc tiêu biểu
+                  {new Set(activityMedia.map((item) => item.id)).size} khoảnh khắc tiêu biểu
                 </p>
               </div>
 

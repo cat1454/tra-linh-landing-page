@@ -2,6 +2,8 @@ import Image from "next/image";
 
 import type { MediaAsset } from "@/lib/content/types";
 
+import { SemanticHeadingText } from "./SemanticHeadingText";
+
 export function SectionIntro({
   eyebrow,
   title,
@@ -19,7 +21,7 @@ export function SectionIntro({
 
   return (
     <header
-      className={`section-intro ${align === "center" ? "mx-auto max-w-3xl text-center" : "max-w-3xl"}`}
+      className={`section-intro w-full max-w-7xl ${align === "center" ? "mx-auto text-center" : ""}`}
     >
       <p
         className={`text-[0.7rem] font-semibold uppercase tracking-[0.3em] sm:text-xs ${
@@ -33,7 +35,7 @@ export function SectionIntro({
           isDark ? "text-[#EEF1E9]" : "text-[#10251A]"
         }`}
       >
-        {title}
+        <SemanticHeadingText text={title} />
       </h2>
       {description ? (
         <p

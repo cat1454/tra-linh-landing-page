@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { SemanticHeadingText } from "@/components/home/SemanticHeadingText";
 import type { HomePageContent } from "@/lib/content/types";
 
 import { ArrowGlyph, MediaFrame, PlaceholderPill, SectionIntro } from "./_shared";
@@ -45,7 +46,9 @@ export function GinsengProductsSection({ products, section }: GinsengProductsSec
               </div>
               <div className="flex flex-1 flex-col p-6 sm:p-7">
                 <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-[#D5A84E]">{productTypeLabels[product.productType]}</p>
-                <h3 className="mt-3 font-serif text-3xl">{product.title}</h3>
+                <h3 className="mt-3 font-serif text-3xl">
+                  <SemanticHeadingText text={product.title} compact />
+                </h3>
                 <p className="mt-3 text-sm leading-7 text-[#EEF1E9]/66">{product.shortDescription}</p>
                 {product.originNote ? <p className="mt-4 text-xs leading-6 text-[#9BBE62]">Nguồn gốc: {product.originNote}</p> : null}
                 <Link

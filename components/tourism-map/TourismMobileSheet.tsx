@@ -3,6 +3,7 @@
 import { ArrowUpRight, MapPin, Navigation, X } from "lucide-react";
 import Link from "next/link";
 
+import { SemanticHeadingText } from "@/components/home/SemanticHeadingText";
 import { getTourismCategoryLabel } from "@/data/tourism-map/categories";
 import type { TourismPlace } from "@/data/tourism-map/types";
 import { getPlaceDirectionsUrl, hasVerifiedCoordinates } from "@/lib/tourism-map";
@@ -59,7 +60,7 @@ export function TourismMobileSheet({
             {getTourismCategoryLabel(place.category)}
           </p>
           <h3 className="mt-1 font-serif text-[15px] font-semibold leading-[1.2] text-[#10251A]">
-            {place.name}
+            <SemanticHeadingText text={place.name} compact />
           </h3>
           <p className="mt-0.5 hidden truncate text-xs leading-4 text-[#10251A]/62 min-[360px]:block">
             {place.shortDescription}

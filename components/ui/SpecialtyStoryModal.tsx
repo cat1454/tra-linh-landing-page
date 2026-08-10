@@ -4,6 +4,7 @@ import { useEffect, useId, useRef } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { X, MapPin, UtensilsCrossed, Leaf, Wheat } from "lucide-react";
 import Image from "next/image";
+import { SemanticHeadingText } from "@/components/home/SemanticHeadingText";
 import type { LocalSpecialty } from "@/lib/content/types";
 
 interface SpecialtyStoryModalProps {
@@ -176,7 +177,7 @@ export function SpecialtyStoryModal({ isOpen, onClose, specialty }: SpecialtySto
           </div>
 
           <h2 id={titleId} className="mt-4 font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
-            {story.title}
+            <SemanticHeadingText text={story.title} compact />
           </h2>
           <p className="mt-2 text-base font-medium italic text-[#3D5133] sm:text-lg">
             {story.introduction}

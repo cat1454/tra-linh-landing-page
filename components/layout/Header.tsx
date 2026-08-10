@@ -18,13 +18,25 @@ interface HeaderProps {
   title?: string
   subtitle?: string
   navigation?: ReadonlyArray<{ label: string; href: string }>
+  locale?: 'vi' | 'en'
 }
 
 export function Header({
-  title = 'TRÀ LINH',
-  subtitle = 'Đại ngàn Ngọc Linh',
-  navigation = PRIMARY_NAVIGATION,
+  title,
+  subtitle,
+  navigation,
+  locale = 'vi',
 }: HeaderProps = {}) {
+  const resolvedTitle = title ?? 'TRÀ LINH'
+  const resolvedSubtitle = subtitle ?? (locale === 'en' ? 'Ngoc Linh highlands' : 'Đại ngàn Ngọc Linh')
+  const resolvedNavigation = navigation ?? (locale === 'en'
+    ? [
+        { label: 'Overview', href: '/en#overview' },
+        { label: 'Journeys', href: '/en#journeys' },
+        { label: 'Travel advice', href: '/en#travel-advice' },
+        { label: 'Contact', href: '/en#contact' },
+      ]
+    : PRIMARY_NAVIGATION)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const pathname = usePathname()
@@ -51,19 +63,19 @@ export function Header({
       >
         <div className="site-header__inner mx-auto flex w-full max-w-[1680px] items-center justify-between gap-3 px-6 sm:px-8 md:gap-6 lg:px-14 xl:px-20">
           <Link
-            href="/"
-            aria-label="Trà Linh — trang chủ"
+            href={locale === 'en' ? '/en' : '/'}
+            aria-label={locale === 'en' ? 'Tra Linh — home' : 'Trà Linh — trang chủ'}
             className="site-header__brand inline-flex min-h-10 shrink-0 flex-col justify-center focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#D5A84E]"
           >
-            <span className="text-sm font-semibold tracking-[0.22em] sm:text-base lg:text-lg">{title}</span>
+            <span className="text-sm font-semibold tracking-[0.22em] sm:text-base lg:text-lg">{resolvedTitle}</span>
             <span className="mt-0.5 hidden text-[0.66rem] tracking-wide text-[#EEF1E9]/70 lg:block">
-              {subtitle}
+              {resolvedSubtitle}
             </span>
           </Link>
 
           <nav className="site-header__desktop-nav hidden min-[1180px]:block" aria-label="Điều hướng chính">
             <ul className="flex items-center gap-7 xl:gap-9">
-              {navigation.map((item) => (
+              {resolvedNavigation.map((item) => (
                 <li key={item.href}>
                   <a
                     href={item.href}
@@ -77,12 +89,15 @@ export function Header({
           </nav>
 
           <div className="site-header__actions flex shrink-0 items-center gap-2">
+            {locale === 'en' ? (
+              <Link href="/" className="inline-flex min-h-10 items-center rounded-full px-3 text-xs font-semibold text-[#EEF1E9]/85 hover:text-[#D5A84E]" aria-label="Chuyển sang tiếng Việt">VI</Link>
+            ) : null}
             <span className="hidden md:inline-flex">
               <Link
-                href="/#hanh-trinh"
+                href={locale === 'en' ? '/en#journeys' : '/#hanh-trinh'}
                 className="site-header__cta inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-full border border-[#DDB149]/70 bg-transparent px-5 text-sm font-medium text-[#E6BD58] transition-colors hover:bg-[#DDB149] hover:text-[#10261F] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#DDB149]"
               >
-                Khám phá Trà Linh
+                {locale === 'en' ? 'Explore Tra Linh' : 'Khám phá Trà Linh'}
                 <ArrowRight aria-hidden="true" size={17} />
               </Link>
             </span>
@@ -101,7 +116,7 @@ export function Header({
         </div>
       </header>
 
-      {isMenuOpen ? <MobileMenu isOpen onClose={closeMenu} items={navigation} title={title} subtitle={subtitle} /> : null}
+      {isMenuOpen ? <MobileMenu isOpen onClose={closeMenu} items={resolvedNavigation} title={resolvedTitle} subtitle={resolvedSubtitle} /> : null}
     </>
   )
 }

@@ -109,21 +109,17 @@ describe("tourism map interface", () => {
     ["nature", "lucide-mountain"],
     ["shopping", "lucide-shopping-basket"],
     ["administrative", "lucide-building-2"],
-  ] as const)("uses the %s category icon on the actual map marker", (category, iconClass) => {
-    const onSelect = vi.fn();
+  ] as const)("uses the %s category icon in a non-interactive marker visual", (category, iconClass) => {
     const place = { ...tourismPlaces[0], category };
 
     render(
-      <TourismMapPointMarker place={place} active={false} onSelect={onSelect} />,
+      <TourismMapPointMarker place={place} active={false} />,
     );
 
-    const marker = screen.getByRole("button", {
-      name: `Chọn ${place.name} trên bản đồ`,
-    });
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
+    const marker = screen.getByTestId(`tourism-map-marker-${place.slug}`);
     expect(marker).toHaveAttribute("data-category", category);
     expect(marker.querySelector(`svg.${iconClass}`)).toBeInTheDocument();
-    fireEvent.click(marker);
-    expect(onSelect).toHaveBeenCalledWith(place.slug);
   });
 
   it("highlights the selected marker with the warm gold accent", () => {
@@ -131,7 +127,6 @@ describe("tourism map interface", () => {
       <TourismMapPointMarker
         place={tourismPlaces[0]}
         active
-        onSelect={vi.fn()}
       />,
     );
 
@@ -203,7 +198,9 @@ describe("tourism map interface", () => {
       />,
     );
 
-    expect(screen.getByText("Trạm Dược liệu Trà Linh")).toBeVisible();
+    expect(screen.getByTestId("tourism-place-card")).toHaveTextContent(
+      "Trạm Dược liệu Trà Linh",
+    );
     expect(
       screen.getByText("Vị trí tham khảo — vui lòng kiểm tra điểm đến trên Google Maps"),
     ).toBeVisible();

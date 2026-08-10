@@ -18,6 +18,13 @@ describe('Header', () => {
     expect(cta.parentElement).toHaveClass('hidden', 'md:inline-flex')
     expect(cta).toHaveClass('whitespace-nowrap')
     expect(trigger).toHaveClass('size-10', 'rounded-xl')
+    expect(screen.queryByRole('link', { name: /switch to english/i })).not.toBeInTheDocument()
+  })
+
+  it('keeps a Vietnamese return link only on the direct English route', () => {
+    render(<Header locale="en" />)
+
+    expect(screen.getByRole('link', { name: /chuyển sang tiếng việt/i })).toHaveTextContent('VI')
   })
 
   it('shares the premium hero grid and keeps the desktop CTA secondary', () => {

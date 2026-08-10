@@ -2,6 +2,8 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 
+import { SemanticHeadingText } from "./SemanticHeadingText";
+
 type HeroTitleProps = {
   title: string;
 };
@@ -48,7 +50,7 @@ export function HeroTitle({ title }: HeroTitleProps) {
           }}
           transition={{ duration: prefersReducedMotion ? 0 : 0.75, ease: [0.16, 1, 0.3, 1] }}
         >
-          {line}
+          <SemanticHeadingText text={line} compact />
         </motion.span>
       ))}
     </motion.h1>

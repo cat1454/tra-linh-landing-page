@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { DetailPage } from "@/components/detail/DetailPage";
+import { JourneyTripPlanner } from "@/components/detail/JourneyTripPlanner";
 import {
   createArticleSchema,
   createBreadcrumbSchema,
@@ -131,6 +132,7 @@ export default async function JourneyDetailPage({ params }: PageProps) {
         sourceCredit={journey.sourceCredit}
         updatedAt={journey.updatedAt}
         navigationTabs={navigationTabs}
+        supplementaryContent={<JourneyTripPlanner journey={journey} />}
       />
     </>
   );

@@ -1,4 +1,5 @@
 export { FinalCTA } from "./FinalCTA";
+export { HomeBackToTop } from "./HomeBackToTop";
 export { GinsengForestStory } from "./GinsengForestStory";
 export { GinsengProductsSection } from "./GinsengProductsSection";
 export { HeroSection } from "./HeroSection";

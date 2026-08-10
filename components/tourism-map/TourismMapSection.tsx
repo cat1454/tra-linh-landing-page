@@ -2,9 +2,10 @@ import { tourismEvents } from "@/data/tourism-map/events";
 import { tourismPlaces } from "@/data/tourism-map/places";
 import {
   getAllTourismEntities,
-  getTourismViewportEntities,
+  getTourismPreviewEntities,
 } from "@/lib/tourism-map";
 import type { TourismMapMode } from "@/data/tourism-map/types";
+import { SemanticHeadingText } from "@/components/home/SemanticHeadingText";
 import { TourismMapLoader } from "./TourismMapLoader";
 
 interface TourismMapSectionProps {
@@ -19,7 +20,7 @@ export function TourismMapSection({
   const allEntities = getAllTourismEntities(tourismPlaces, tourismEvents);
   const entities =
     mode === "preview"
-      ? getTourismViewportEntities(allEntities, "all")
+      ? getTourismPreviewEntities(allEntities, 6)
       : allEntities;
   const Heading = mode === "explorer" ? "h1" : "h2";
 
@@ -38,7 +39,7 @@ export function TourismMapSection({
             id="tourism-map-heading"
             className="mt-3 font-serif text-[clamp(2rem,5vw,4.25rem)] font-semibold leading-[1.06] tracking-[-0.035em] text-[#10251A]"
           >
-            Khám phá Trà Linh trên bản đồ
+            <SemanticHeadingText text="Khám phá Trà Linh trên bản đồ" />
           </Heading>
           <p className="mt-5 max-w-2xl text-base leading-7 text-[#10251A]/68 sm:text-lg sm:leading-8">
             Khám phá các điểm đến thiên nhiên, văn hóa, sâm Ngọc Linh và đời sống cộng đồng tại vùng Trà Linh.

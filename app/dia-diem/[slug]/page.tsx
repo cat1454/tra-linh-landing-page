@@ -10,6 +10,8 @@ import { tourismPlaces } from "@/data/tourism-map/places";
 import { hasDocumentaryTourismCover } from "@/data/tourism-map/media";
 import { TourismMediaAttribution } from "@/components/tourism-map/TourismMediaAttribution";
 import { TourismPlaceVisual } from "@/components/tourism-map/TourismPlaceVisual";
+import { TourismVerificationPanel } from "@/components/tourism-map/TourismVerificationPanel";
+import { SaveShareActions } from "@/components/ui/SaveShareActions";
 import {
   getAllTourismEntities,
   getPlaceDirectionsUrl,
@@ -132,6 +134,12 @@ export default async function TourismPlacePage({
                 Chỉ đường đang cập nhật
               </button>
             )}
+            <TourismVerificationPanel place={place} />
+            <SaveShareActions
+              item={{ id: `place:${place.slug}`, title: place.name, url: `/dia-diem/${place.slug}` }}
+              saveLabel="Lưu địa điểm"
+              savedLabel="Đã lưu địa điểm"
+            />
           </div>
 
           <figure>

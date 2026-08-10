@@ -1,8 +1,6 @@
 import { fallbackContent } from './fallback-content'
 import { assertContentIsPublishable } from './content-guard'
-import { createSupabaseContentAdapter } from './supabase-adapter'
 import type {
-  ContentAdapter,
   ContentRepository,
   Guide,
   HomePageContent,
@@ -10,7 +8,7 @@ import type {
   Product,
 } from './types'
 
-export type { ContentAdapter, ContentRepository } from './types'
+export type { ContentRepository } from './types'
 
 const validSlugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 
@@ -89,114 +87,45 @@ function fallbackGuide(slug: string): Guide | null {
   )
 }
 
-function resolveAdapter(adapter?: ContentAdapter): ContentAdapter | null {
-  if (adapter) return adapter.isConfigured ? adapter : null
-
-  try {
-    return createSupabaseContentAdapter()
-  } catch {
-    return null
-  }
-}
-
-export function createContentRepository(
-  adapter?: ContentAdapter,
-): ContentRepository {
-  const source = resolveAdapter(adapter)
-
+export function createContentRepository(): ContentRepository {
   return {
     async getHomePageContent(): Promise<HomePageContent> {
-      if (!source) return clone(fallbackContent)
-
-      try {
-        const content = await source.getHomePageContent()
-        return {
-          ...content,
-          journeys: published(content.journeys),
-          products: published(content.products),
-          guides: published(content.guides),
-        }
-      } catch {
-        return clone(fallbackContent)
-      }
+      return clone({
+        ...fallbackContent,
+        journeys: published(fallbackContent.journeys),
+        products: published(fallbackContent.products),
+        guides: published(fallbackContent.guides),
+      })
     },
 
     async getJourneyBySlug(slug: string): Promise<Journey | null> {
       const normalized = normalizeSlug(slug)
       if (!normalized) return null
-      if (!source) return clone(fallbackJourney(normalized))
-
-      try {
-        const result = await source.getJourneyBySlug(normalized)
-        return result && isPublishableRecord(result) ? result : null
-      } catch {
-        return clone(fallbackJourney(normalized))
-      }
+      return clone(fallbackJourney(normalized))
     },
 
     async getProductBySlug(slug: string): Promise<Product | null> {
       const normalized = normalizeSlug(slug)
       if (!normalized) return null
-      if (!source) return clone(fallbackProduct(normalized))
-
-      try {
-        const result = await source.getProductBySlug(normalized)
-        return result && isPublishableRecord(result) ? result : null
-      } catch {
-        return clone(fallbackProduct(normalized))
-      }
+      return clone(fallbackProduct(normalized))
     },
 
     async getGuideBySlug(slug: string): Promise<Guide | null> {
       const normalized = normalizeSlug(slug)
       if (!normalized) return null
-      if (!source) return clone(fallbackGuide(normalized))
-
-      try {
-        const result = await source.getGuideBySlug(normalized)
-        return result && isPublishableRecord(result) ? result : null
-      } catch {
-        return clone(fallbackGuide(normalized))
-      }
+      return clone(fallbackGuide(normalized))
     },
 
     async getPublishedJourneys(): Promise<Journey[]> {
-      if (!source) return clone(published(fallbackContent.journeys))
-
-      try {
-        const records = source.getPublishedJourneys
-          ? await source.getPublishedJourneys()
-          : (await source.getHomePageContent()).journeys
-        return published(records)
-      } catch {
-        return clone(published(fallbackContent.journeys))
-      }
+      return clone(published(fallbackContent.journeys))
     },
 
     async getPublishedProducts(): Promise<Product[]> {
-      if (!source) return clone(published(fallbackContent.products))
-
-      try {
-        const records = source.getPublishedProducts
-          ? await source.getPublishedProducts()
-          : (await source.getHomePageContent()).products
-        return published(records)
-      } catch {
-        return clone(published(fallbackContent.products))
-      }
+      return clone(published(fallbackContent.products))
     },
 
     async getPublishedGuides(): Promise<Guide[]> {
-      if (!source) return clone(published(fallbackContent.guides))
-
-      try {
-        const records = source.getPublishedGuides
-          ? await source.getPublishedGuides()
-          : (await source.getHomePageContent()).guides
-        return published(records)
-      } catch {
-        return clone(published(fallbackContent.guides))
-      }
+      return clone(published(fallbackContent.guides))
     },
   }
 }

@@ -9,7 +9,7 @@ export type UsagePermission =
   | 'official_publication'
   | 'pending'
 
-export type ContentSource = 'fallback' | 'supabase'
+export type ContentSource = 'static'
 
 export interface MediaAsset {
   id: string
@@ -41,6 +41,11 @@ export interface ContentSection {
   body: string
 }
 
+export interface JourneyItineraryStep {
+  title: string
+  description: string
+}
+
 export interface BaseContentRecord {
   id: string
   slug: string
@@ -64,6 +69,9 @@ export interface Journey extends BaseContentRecord {
   category: 'nature' | 'community' | 'heritage' | 'ginseng'
   locationLabel: string
   durationLabel: string
+  difficultyLabel: string
+  bestSeasonLabel: string
+  itinerary: JourneyItineraryStep[]
   accessStatus: AccessStatus
   accessNote: string
   safetyNote: string
@@ -201,19 +209,4 @@ export interface ContentRepository {
   getPublishedJourneys(): Promise<Journey[]>
   getPublishedProducts(): Promise<Product[]>
   getPublishedGuides(): Promise<Guide[]>
-}
-
-/**
- * Boundary implemented by a CMS-specific data source. List methods are optional
- * so small adapters can derive them from the home-page payload.
- */
-export interface ContentAdapter {
-  isConfigured: boolean
-  getHomePageContent(): Promise<HomePageContent>
-  getJourneyBySlug(slug: string): Promise<Journey | null>
-  getProductBySlug(slug: string): Promise<Product | null>
-  getGuideBySlug(slug: string): Promise<Guide | null>
-  getPublishedJourneys?(): Promise<Journey[]>
-  getPublishedProducts?(): Promise<Product[]>
-  getPublishedGuides?(): Promise<Guide[]>
 }

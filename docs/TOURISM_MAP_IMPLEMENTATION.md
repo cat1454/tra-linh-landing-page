@@ -99,6 +99,6 @@ Không đưa token thật vào source, fixture, ảnh chụp hoặc log CI.
 
 ## Giới hạn v1.0.0
 
-- Bản đồ hiện đọc dữ liệu tĩnh trong repo, chưa đồng bộ các thực thể bản đồ từ Supabase CMS.
+- Bản đồ đọc dữ liệu tĩnh đã được kiểm duyệt và lưu trực tiếp trong repository.
 - Cần tiếp tục rà soát độ chính xác của tọa độ và bằng chứng quyền sử dụng media trước mỗi lần publish.
 - Khi số marker tăng đáng kể, cân nhắc clustering và tải dữ liệu theo vùng nhìn.

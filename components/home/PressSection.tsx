@@ -1,6 +1,7 @@
 import { ExternalLink } from "lucide-react";
 
 import ScrollReveal from "@/components/animation/ScrollReveal";
+import { SemanticHeadingText } from "@/components/home/SemanticHeadingText";
 import type { PageSectionSettings, PressArticle } from "@/lib/content/types";
 
 import { MediaFrame, SectionIntro } from "./_shared";
@@ -52,7 +53,9 @@ export function PressSection({ articles, section }: PressSectionProps) {
                       <span>{article.publisher}</span>
                       <time dateTime={article.publishedDate}>{article.publishedDate}</time>
                     </div>
-                    <h3 className="mt-3 text-balance font-serif text-xl leading-snug text-[#10251A]">{article.title}</h3>
+                    <h3 className="mt-3 text-balance font-serif text-xl leading-snug text-[#10251A]">
+                      <SemanticHeadingText text={article.title} compact />
+                    </h3>
                     <span className="mt-5 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-[#29452C]">
                       Đọc bài viết <ExternalLink aria-hidden="true" className="size-4" />
                     </span>

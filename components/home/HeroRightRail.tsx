@@ -19,8 +19,6 @@ export function HeroRightRail() {
       aria-label="Thông tin nhanh"
       className="flex w-full flex-col gap-5 sm:max-w-md min-[1180px]:w-[320px] min-[1180px]:max-w-none min-[1180px]:justify-end xl:w-[360px]"
     >
-      <div id="hero-sound-control" className="flex min-h-12 justify-start min-[1180px]:justify-end" />
-
       <motion.div
         initial={prefersReducedMotion ? false : { opacity: 0, x: 28 }}
         animate={{ opacity: 1, x: 0 }}

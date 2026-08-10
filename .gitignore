@@ -58,4 +58,6 @@ service-account*.json
 secrets*.json
 .envrc
 .direnv/
-supabase/.temp/
+
+# generated production audit may contain signed/tokenized request URLs
+docs/research/1000-user-simulation/evidence-deployed-latest.json
