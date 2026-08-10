@@ -8,7 +8,7 @@ import {
 } from "@/components/home/HeroYouTubeVideo";
 
 describe("HeroYouTubeVideo", () => {
-  it("shows a compact preview and loads YouTube inline only when requested", async () => {
+  it("shows a small 16:9 preview and loads YouTube inline only when requested", async () => {
     const user = userEvent.setup();
     const { container } = render(<HeroYouTubeVideo />);
 
@@ -17,8 +17,14 @@ describe("HeroYouTubeVideo", () => {
     const card = screen.getByRole("region", {
       name: /video giới thiệu trà linh/i,
     });
-    expect(card).toBeVisible();
-    expect(card).toHaveClass("mx-auto", "sm:mx-0");
+    expect(card).toHaveClass(
+      "mx-auto",
+      "max-w-[280px]",
+      "sm:max-w-[320px]",
+      "sm:mx-0",
+    );
+    expect(card.firstElementChild).toHaveClass("aspect-video");
+    expect(screen.queryByRole("link", { name: /xem trên youtube/i })).not.toBeInTheDocument();
     expect(
       screen.getByRole("img", { name: /xem trước video/i }).getAttribute("src"),
     ).toContain("hero-ban-lang-ngoc-linh-mobile.webp");
@@ -38,10 +44,9 @@ describe("HeroYouTubeVideo", () => {
       "href",
       HERO_YOUTUBE_URL,
     );
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
-  it("keeps playback inside the compact card instead of opening a page overlay", async () => {
+  it("keeps playback inside the preview instead of opening a modal", async () => {
     const user = userEvent.setup();
     render(<HeroYouTubeVideo />);
     const trigger = screen.getByRole("button", {

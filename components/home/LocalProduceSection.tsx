@@ -70,7 +70,7 @@ export function LocalProduceSection({ items, section }: LocalProduceSectionProps
                     setActiveCategory(tab.id);
                     setVisibleCount(6);
                   }}
-                  className={`inline-flex min-h-11 items-center gap-2 rounded-full px-5 py-2 text-xs font-bold uppercase tracking-[0.1em] transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#5E7F3B] active:scale-95 ${
+                  className={`inline-flex min-h-12 items-center gap-2 rounded-full px-5 py-2 text-xs font-bold uppercase tracking-[0.1em] transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#5E7F3B] active:scale-95 ${
                     isActive
                       ? "bg-[#29452C] text-[#EEF1E9] shadow-[0_8px_20px_rgba(41,69,44,0.2)] scale-[1.02]"
                       : "bg-[#10251A]/5 text-[#10251A]/70 hover:bg-[#10251A]/10 hover:text-[#10251A]"

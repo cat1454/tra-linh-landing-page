@@ -164,6 +164,7 @@ test('mobile media rail scrolls manually and controls meet the 44px touch target
     targets.every(
       ({ width, height }) => Math.round(width) >= 44 && Math.round(height) >= 44,
     ),
+    `Filter touch targets: ${JSON.stringify(targets)}`,
   ).toBe(true)
 })
 

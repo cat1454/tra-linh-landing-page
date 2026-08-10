@@ -6,6 +6,9 @@ async function waitForHeroImage(page: import('@playwright/test').Page) {
   const image = page.locator('#dau-trang img').first()
   await expect(image).toBeVisible()
   await image.evaluate((element) => (element as HTMLImageElement).decode())
+  await page.evaluate(() => new Promise<void>((resolve) => {
+    requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
+  }))
 }
 
 test.beforeEach(async ({ page }, testInfo) => {

@@ -14,11 +14,9 @@ export function HeroYouTubeVideo() {
   return (
     <section
       aria-label="Video giới thiệu Trà Linh"
-      className={`mx-auto w-full rounded-2xl border border-white/25 bg-[#07100C]/55 shadow-xl backdrop-blur-sm transition-[max-width] sm:mx-0 ${
-        isPlaying ? "max-w-[320px] p-2" : "max-w-[280px] p-1"
-      }`}
+      className="mx-auto w-full max-w-[280px] rounded-2xl border border-white/25 bg-[#07100C]/55 p-2 shadow-xl backdrop-blur-sm sm:mx-0 sm:max-w-[320px]"
     >
-      <div className={`${isPlaying ? "aspect-video" : "h-14"} overflow-hidden rounded-xl bg-black`}>
+      <div className="aspect-video overflow-hidden rounded-xl bg-black">
         {isPlaying ? (
           <iframe
             src={HERO_YOUTUBE_EMBED_URL}
@@ -45,7 +43,7 @@ export function HeroYouTubeVideo() {
               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
             <span className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
-            <span className="absolute inset-0 flex items-center gap-2.5 px-3 text-sm font-semibold text-white">
+            <span className="absolute inset-x-3 bottom-3 flex items-center gap-2.5 text-sm font-semibold text-white">
               <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-[#DDB149] text-[#10251A] shadow-lg">
                 <Play aria-hidden="true" className="ml-0.5 size-4" fill="currentColor" />
               </span>

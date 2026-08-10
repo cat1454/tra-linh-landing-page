@@ -168,6 +168,19 @@ export function SmoothScrollProvider({ children }: SmoothScrollProviderProps) {
           targetUrl.hash
         ) {
           cancelChapterSettle()
+          const target = document.getElementById(
+            decodeURIComponent(targetUrl.hash.slice(1)),
+          )
+          if (!target) return
+
+          event.preventDefault()
+          window.history.replaceState(null, '', targetUrl.hash)
+          lenis.scrollTo(target, {
+            offset: -getHeaderOffset(),
+            duration: 0.85,
+            lock: false,
+            userData: { initiator: 'anchor-navigation' },
+          })
         }
       }
 
@@ -337,7 +350,11 @@ export function SmoothScrollProvider({ children }: SmoothScrollProviderProps) {
       window.removeEventListener('wheel', beginOnInteraction)
     }
     const beginOnInteraction = (event: Event) => {
-      if (event instanceof PointerEvent && event.pointerType === 'touch') return
+      if (event instanceof PointerEvent) {
+        if (event.pointerType === 'touch') return
+        const target = event.target instanceof Element ? event.target : null
+        if (target?.closest('a[href^="#"]')) return
+      }
       interactionStarted = true
       removeInteractionListeners()
       if (!reducedMotionQuery.matches) void start()
